@@ -1,0 +1,32 @@
+services:
+  server:
+    container_name: wangohan_server
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    volumes:
+      - ./backend:/app
+      - server_node_modules:/app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+  web:
+    container_name: wangohan_web
+    build: 
+      context: ./web
+      dockerfile: Dockerfile
+    volumes:
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - 3000:3000
+    depends_on:
+      - server
+volumes:
+  web_node_modules:
+  server_node_modules:
