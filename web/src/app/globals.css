@@ -8,6 +8,8 @@
   --secondary-background: #FFFAF0;
   --primary-text: #523636;
   --secondary-text: #6b4528;
+  --inactive: #999999;
+  --bullet-color: #FFBA08;
   --text: 1rem;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -48,6 +50,8 @@
   --color-secondary-bg: var(--secondary-background);
   --color-primary-text: var(--primary-text);
   --color-secondary-text: var(--secondary-text);
+  --color-inactive: var(--inactive);
+  --color-bullet: var(--bullet-color);
   --text-xxs: calc(var(--text)*0.60);
 }
 
