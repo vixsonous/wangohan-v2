@@ -83,7 +83,8 @@ export default async function RootLayout({
           crossOrigin="anonymous"></script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary-bg`}
+        style={{fontFamily: 'mitimasu'}}
+        className={` antialiased bg-primary-bg`}
       >
         <SidebarProvider>
           <RootHeader />

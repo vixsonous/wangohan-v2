@@ -5,6 +5,7 @@ import BannerSection from "./_root-components/banner-section";
 import ThisWeekRecipeCarousel from "./_root-components/this-week-recipe-carousel";
 import RecipeCarouselWrapper, { RecipeProps } from "./_root-components/recipe-carousel-wrapper";
 import BirthdayWrapper from "./_root-components/birthday-wrapper";
+import ColumnBanner from "./_root-components/column-banner";
 
 const gloria = Gloria_Hallelujah({
   weight: "400",
@@ -29,13 +30,14 @@ const recipes = Array(10).fill(
 
 export default function Home() {
   return (
-    <section className="w-full flex flex-col items-center px-6 py-6 lg:px-0 min-h-screen">
+    <section className={`w-full flex flex-col items-center px-6 py-6 lg:px-0 min-h-screen`}>
       <HomeLogoHeader mochi={mochi} gloria={gloria}/>
       <HomeNavigation />
       <BannerSection />
       <RecipeCarouselWrapper title="今週のレシピ" recipes={recipes}/>
       <RecipeCarouselWrapper title="人気レシピ" recipes={recipes}/>
       <BirthdayWrapper />
+      <ColumnBanner />
     </section>
   );
 }

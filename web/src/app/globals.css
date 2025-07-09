@@ -45,6 +45,11 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+@font-face {
+  font-family: 'mitimasu';
+  src: url('/fonts/mitimasu.ttf');
+}
+
 @theme {
   --color-primary-bg: var(--primary-background);
   --color-secondary-bg: var(--secondary-background);
