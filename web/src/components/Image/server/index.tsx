@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { ServerUtils } from "@/lib/server-utils";
 import Head from "next/head";
 import React, { ImgHTMLAttributes } from "react";
 
@@ -16,14 +17,11 @@ export default async function Image({src, dpr=1.5, width, height, noprocess=fals
     url = height ? url + "&h=" + (Number(height) * dpr) : url;
   }
 
+  if(preload && typeof url === 'string') {
+    ServerUtils.registerPreload(url);
+  }
+
   return (
-    <>
-    {preload && typeof url === 'string' ? (
-      <Head>
-        <link rel="preload" href={url} as="image"/>
-      </Head>
-    ) : undefined}
     <img {...props} width={width} height={height} src={url} alt={alt || "undescribed image"} />
-    </>
   )
 }

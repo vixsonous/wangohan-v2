@@ -4,6 +4,7 @@ import "./globals.css";
 import RootHeader from "./_root-components/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getRecipe } from "@/server-actions/recipe";
+import { ServerUtils } from "@/lib/server-utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,9 +67,16 @@ export default async function RootLayout({
     },
     "keywords": "犬用レシピ, 手作りごはん",
   };
+
+  const preloads = ServerUtils.getPreloads();
   return (
     <html lang="en">
       <head>
+        {preloads.map( l => {
+          return (
+            <link key={l} rel="preload" href={l} as="image"/>
+          )
+        })}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <meta name="google-adsense-account" content="ca-pub-9990388374961956"></meta>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9990388374961956"
