@@ -5,6 +5,7 @@ import RootHeader from "./_root-components/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getRecipe } from "@/server-actions/recipe";
 import { ServerUtils } from "@/lib/server-utils";
+import RootFooter from "./_root-components/root-footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -84,13 +85,14 @@ export default async function RootLayout({
       </head>
       <body
         style={{fontFamily: 'mitimasu'}}
-        className={` antialiased bg-primary-bg`}
+        className={` antialiased bg-primary-bg `}
       >
-        <SidebarProvider>
+        <SidebarProvider className="grid grid-cols-1">
           <RootHeader />
           <main className={`pt-[65.68px] min-h-screen flex grow justify-center`}>
             <div className='w-screen max-w-7xl'>{children}</div>
           </main>
+          <RootFooter />
         </SidebarProvider>
         <script
           type="application/ld+json"
