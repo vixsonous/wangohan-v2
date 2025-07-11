@@ -1,6 +1,7 @@
 import Image from "@/components/Image/server";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import CreateRecipeForm from "./root-create-recipe-form";
+import CreateRecipeForm from "./root-create-recipe-form/root-create-recipe-form";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export async function CreateRecipe() {
   return (
@@ -15,16 +16,18 @@ export async function CreateRecipe() {
         />
       </SheetTrigger>
       <SheetContent style={{maxWidth: '100vw'}} side="left" className="w-screen max-w-screen">
-        <section className="p-5 flex flex-col items-center">
-          <header className="flex justify-center items-center relative mt-14 mb-28">
-            <SheetTitle className="absolute top-[55px] font-semibold text-primary-text text-[2em]">レシピを書く</SheetTitle>
-            <Image src={'/icons/btn/recipe-button.webp'} loading="lazy" className="max-w-none" width={300}  alt="ribbon" />
-          </header>
-          <CreateRecipeForm />
-          <SheetDescription >
-            This is the create recipe
-          </SheetDescription>
-        </section>
+        <ScrollArea className="overflow-auto">
+          <section className="p-5 flex flex-col items-center">
+            <header className="flex justify-center items-center relative mt-14 mb-28">
+              <SheetTitle className="absolute top-[55px] font-semibold text-primary-text text-[2em]">レシピを書く</SheetTitle>
+              <Image src={'/icons/btn/recipe-button.webp'} loading="lazy" className="max-w-none" width={300}  alt="ribbon" />
+            </header>
+            <CreateRecipeForm />
+            <SheetDescription >
+              This is the create recipe
+            </SheetDescription>
+          </section>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   )
