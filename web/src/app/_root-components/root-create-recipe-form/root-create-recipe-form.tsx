@@ -44,7 +44,7 @@ export default function CreateRecipeForm() {
   } = useCreateRecipeForm(unregister);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap justify-between gap-8 max-w-7xl h-full w-full">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap justify-center gap-8 max-w-7xl h-full w-full">
       <div className="first-section--container grid grid-cols-6 md:grid-cols-12 w-full gap-8">
         <div className="col-span-6 flex flex-col gap-4">
           <p className="flex flex-col gap-2">
@@ -62,7 +62,7 @@ export default function CreateRecipeForm() {
         </div>
         <div className="col-span-6">
           <p className="relative flex flex-col gap-2">
-            <label htmlFor="recipe_images" className="absolute z-10 -top-16 left-38">
+            <label htmlFor="recipe_images" className="absolute z-10 -top-14 left-38">
               <Image  width={211} height={120} src={"/banner/3dogs.webp"} alt="3 dogs image background for image upload"/>
             </label>
             <label htmlFor="recipe_images" className=" z-10 top-0 left-0 text-xl font-semibold">画像を追加する</label>
@@ -118,18 +118,18 @@ export default function CreateRecipeForm() {
           </header>
           <div className="grid grid-cols-12 gap-y-2">
             <section className="col-span-6 grid gap-2">
-              <h1 className="text-xs text-gray-500">年齢を選択</h1>
+              <h1 className="text-sm text-gray-500">年齢を選択</h1>
               <div className="flex gap-1">
                 {age.map(a => {
                   return (
                     <p key={a}>
                       <InputField {...register(`checkbox-age-` + a)} id={a} type="checkbox" className="hidden"/>
                       <label htmlFor={a}>
-                        <span
-                          className={`cursor-pointer bg-primary-text hover:bg-primary-text/80 self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-xxs`}
+                        <Button
+                          className={`cursor-pointer bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
                         >
                           {a}
-                        </span>
+                        </Button>
                       </label>
                     </p>
                   )
@@ -137,18 +137,18 @@ export default function CreateRecipeForm() {
               </div>
             </section>
             <section className="col-span-6 grid gap-2">
-              <h1 className="text-xs text-gray-500">サイズを選択</h1>
+              <h1 className="text-sm text-gray-500">サイズを選択</h1>
               <div className="flex gap-1">
                 {size.map(s => {
                   return (
                     <p key={s}>
                       <InputField {...register(`checkbox-size-` + s)} id={s} type="checkbox" className="hidden"/>
                       <label htmlFor={s}>
-                        <span
-                          className={`cursor-pointer bg-primary-text hover:bg-primary-text/80 self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-xxs`}
+                        <Button
+                          className={`cursor-pointer bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
                         >
                           {s}
-                        </span>
+                        </Button>
                       </label>
                     </p>
                   )
@@ -156,18 +156,18 @@ export default function CreateRecipeForm() {
               </div>
             </section>
             <section className="col-span-12 grid gap-2">
-              <h1 className="text-xs text-gray-500">イベントを選択</h1>
+              <h1 className="text-sm text-gray-500">イベントを選択</h1>
               <div className="flex gap-1">
                 {events.map(e => {
                   return (
                     <p key={e}>
                       <InputField {...register(`checkbox-event-` + e)} id={e} type="checkbox" className="hidden"/>
                       <label htmlFor={e}>
-                        <span
-                          className={`cursor-pointer bg-primary-text hover:bg-primary-text/80 self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-xxs`}
+                        <Button
+                          className={`cursor-pointer bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
                         >
                           {e}
-                        </span>
+                        </Button>
                       </label>
                     </p>
                   )
@@ -177,7 +177,9 @@ export default function CreateRecipeForm() {
           </div>
         </section>
       </div>
-      <Button role="submit">Submit</Button>
+      <Button className={`bg-[#ffb762] text-white py-2.5 rounded-md text-sm px-5 font-bold self-center`} role="submit">
+        作成する
+      </Button>
     </form>
   )
 }

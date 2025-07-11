@@ -23,8 +23,8 @@ export async function CreateRecipe() {
               <Image src={'/icons/btn/recipe-button.webp'} loading="lazy" className="max-w-none" width={300}  alt="ribbon" />
             </header>
             <CreateRecipeForm />
-            <SheetDescription >
-              This is the create recipe
+            <SheetDescription className="text-sm mt-10">
+              レシピを共有しましょう！
             </SheetDescription>
           </section>
         </ScrollArea>
