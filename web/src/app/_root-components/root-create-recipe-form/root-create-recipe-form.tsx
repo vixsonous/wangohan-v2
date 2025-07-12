@@ -68,7 +68,7 @@ export default function CreateRecipeForm() {
             <label htmlFor="recipe_images" className=" z-10 top-0 left-0 text-xl font-semibold">画像を追加する</label>
             <label htmlFor="recipe_images" className=" cursor-pointer">
               <span className="relative flex h-full  after:content-[''] after:transition-all after:duration-300 after:absolute after:top-0 after:left-0 after:w-full after:h-full hover:after:bg-black/10">
-                <Image width={624} height={351} src={"/banner/empty-bg.webp"} alt="empty background for image upload"/>
+                <Image className="rounded-md" width={624} height={351} src={"/banner/empty-bg.webp"} alt="empty background for image upload"/>
               </span>
             </label>
             <InputField className="hidden" id="recipe_images" type="file"/>
@@ -82,10 +82,12 @@ export default function CreateRecipeForm() {
             {recipeIngredientsCnt.map( (cnt, idx) => {
               return (
                 <div key={cnt.recipe_ingredient} className="flex gap-2 w-full">
-                  <InputField {...register(cnt.recipe_ingredient)} placeholder="例）にんじん" className="" />
-                  <InputField {...register(cnt.recipe_amount)} placeholder="例）1/2本" className="" />
+                  <div className="flex gap-2 w-full">
+                    <InputField {...register(cnt.recipe_ingredient)} placeholder="例）にんじん" />
+                    <InputField {...register(cnt.recipe_amount)} placeholder="例）1/2本" />
+                  </div>
                   <Button onClick={deleteRecipeIngredients(cnt.recipe_ingredient)}>
-                    <Image src={"/icons/svg/primary-trash.svg"} alt="trash icon" noprocess/>
+                    <Image width={20} src={"/icons/svg/primary-trash.svg"} alt="trash icon" noprocess/>
                   </Button>
                 </div>
               )
@@ -97,12 +99,18 @@ export default function CreateRecipeForm() {
         <section className="recipe_ingredients w-full flex flex-col gap-2">
           <h1 className="text-xl font-semibold">作り方</h1>
           <div className="recipe_ingredients_fields flex flex-col gap-2">
-            {recipeInstructions.map( (ins) => {
+            {recipeInstructions.map( (ins, idx) => {
               return (
                 <div key={ins} className="flex gap-2 w-full ">
-                  <InputField {...register(ins)} placeholder="例）にんじん" className="" />
+                  <span className="mr-2 ml-2.5 flex justify-center items-center rounded-xl relative">
+                    {idx + 1}
+                    <div className="border border-black absolute h-6 w-6 rounded-full"></div>
+                  </span>
+                  <div className="w-full">
+                    <InputField {...register(ins)} placeholder="例）にんじん" />
+                  </div>
                   <Button onClick={deleteRecipeInstructions(ins)}>
-                    <Image src={"/icons/svg/primary-trash.svg"} alt="trash icon" noprocess/>
+                    <Image width={20} src={"/icons/svg/primary-trash.svg"} alt="trash icon" noprocess/>
                   </Button>
                 </div>
               )

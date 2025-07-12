@@ -7,14 +7,14 @@ import RecipeCarouselWrapper, { RecipeProps } from "./_root-components/recipe-ca
 import BirthdayWrapper from "./_root-components/birthday-wrapper";
 import ColumnBanner from "./_root-components/column-banner";
 
-const gloria = Gloria_Hallelujah({
+export const gloria = Gloria_Hallelujah({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
   adjustFontFallback: false,
 });
 
-const mochi = Mochiy_Pop_P_One({
+export const mochi = Mochiy_Pop_P_One({
   weight: "400",
   subsets: ["latin"],
   display: "swap",

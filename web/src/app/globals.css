@@ -10,6 +10,7 @@
   --secondary-text: #6b4528;
   --inactive: #999999;
   --bullet-color: #FFBA08;
+  --error: red;
   --text: 1rem;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -45,15 +46,19 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+.error>svg>path {
+  fill: var(--error);
+}
+
 @font-face {
   font-family: 'mitimasu';
   src: url('/fonts/mitimasu.ttf');
 }
 
 input[type="checkbox"]:checked+label>span{ 
-  background-color: white;
-  color:#523636;
-  border: 2px solid #523636;
+  background-color: var(--secondary-background);
+  color: var(--primary-text);
+  border: 2px solid var(--primary-text);
   font-weight: bold;
 } 
 
@@ -64,6 +69,7 @@ input[type="checkbox"]:checked+label>span{
   --color-secondary-text: var(--secondary-text);
   --color-inactive: var(--inactive);
   --color-bullet: var(--bullet-color);
+  --color-error: var(--error);
   --text-xxs: calc(var(--text)*0.60);
 
   --animate-bubble: bubble 1s ease-out;
