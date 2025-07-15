@@ -90,7 +90,7 @@ export default async function RootLayout({
         <SidebarProvider className="grid grid-cols-1">
           <RootHeader />
           <main className={`pt-[65.68px] min-h-screen flex grow justify-center`}>
-            <div className='w-screen max-w-7xl'>{children}</div>
+            <div className='w-screen max-w-7xl flex flex-col items-center'>{children}</div>
           </main>
           <RootFooter />
         </SidebarProvider>

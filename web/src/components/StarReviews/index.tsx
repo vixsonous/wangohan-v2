@@ -30,7 +30,7 @@ export default function StarReviews({
               onMouseOver={(e) => setState(prev => ({...prev, starVal: 1}))}  
               key={a} 
               className={`${large ? 'w-4 h-4': 'w-[10px] h-[10px]'} 
-              ${value >= a ? 'text-yellow-300' : 'text-gray-300 dark:text-gray-500'} ms-1`} 
+              ${value > a ? 'text-yellow-300' : 'text-gray-300 dark:text-gray-500'} ms-1`} 
               aria-hidden="true" 
               xmlns="http://www.w3.org/2000/svg" 
               fill="currentColor" 
