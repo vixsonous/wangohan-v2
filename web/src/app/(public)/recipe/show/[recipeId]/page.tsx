@@ -7,6 +7,36 @@ import Link from "next/link";
 import Image from "@/components/Image/server";
 import ShowRecipeCommentsHeader from "./show-recipe-comments-header";
 import ShowRecipeComments from "./show-recipe-comments";
+import { Metadata } from "next";
+
+export const metadata:Metadata = {
+  title: "クリスマス3色あんかけ",
+  keywords: ["愛犬のための手作りごはんレシピサイト",
+    "わんごはん",
+    "犬用手作りごはん",
+    "wangohan",
+    "homemade dog food",
+    "healthy pet food",
+    "dog recipe ideas",
+    "ペットレシピサイト"],
+  creator: "Victor Chiong",
+  description: "わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？",
+  openGraph: {
+    title: 'わんごはん - 愛犬のための手作りごはんレシピサイト',
+    description: 'わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？',
+    url: 'https://wangohanjp.com', // Your website URL
+    type: 'website',
+    images: [
+        { url: 'https://wangohanjp.com/logo-final.webp', width: 500, height: 500, alt: 'わんごはん' }
+    ]
+  },
+  robots: {
+    index:true,
+    follow: true,
+    nocache: false,
+  },
+  
+}
 
 export default async function ShowRecipe() {
   const recipe_data = {
@@ -14,7 +44,7 @@ export default async function ShowRecipe() {
     user: {
       user_id: 6,
     },
-    recipe_name: "Example Recipe",
+    recipe_name: "クリスマス3色あんかけ",
     recipe_description: `簡単に作れるクリスマスメニュー🎄
     ドッグフードにかけてあんかけ風に♪
     野菜はお好みのもの使用してください。
@@ -37,9 +67,9 @@ export default async function ShowRecipe() {
       "火を止め、水溶き片栗粉を加えてとろみをつける。",
       "ドッグフードの上にかけて完成♪",
     ],
-    recipe_age_tag: "a",
-    recipe_size_tag: "asd",
-    recipe_event_tag: "qweqwe",
+    recipe_age_tag: "a,aqwe,qwtqwt,asdasd",
+    recipe_size_tag: "asd,rrwet,dfgdfg,qweqwe",
+    recipe_event_tag: "qweqwe,asdasd,sdgsdg",
     comments: [
       {
         recipe_comment_id: 3,

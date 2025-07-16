@@ -1,10 +1,9 @@
+import { RECIPE_AMOUNT, RECIPE_INGREDIENT, RECIPE_INSTRUCTION } from "@/constants/field-ids";
 import { useCallback, useState } from "react";
 import { FieldValues, UseFormUnregister } from "react-hook-form";
 import { v4 } from "uuid";
 
-const RECIPE_INSTRUCTION = 'recipe_instruction';
-const RECIPE_AMOUNT = 'recipe_amount';
-const RECIPE_INGREDIENT = 'recipe_ingredient';
+
 
 export const useCreateRecipeForm = (unregister: UseFormUnregister<FieldValues>) => {
   

@@ -1,77 +1,55 @@
 "use client";
+import { useCreateRecipeForm } from "@/app/_root-components/root-create-recipe-form/helper";
 import Button from "@/components/Button";
 import Image from "@/components/Image/client";
 import InputField from "@/components/Input";
 import TextareaField from "@/components/Textarea";
-import React, { useCallback, useState } from "react";
-import {v4} from 'uuid';
-import {FieldValues, useForm} from 'react-hook-form';
-import { useCreateRecipeForm } from "./helper";
+import { age, events, size } from "@/constants/array-values";
+import { RECIPE_DESCRIPTION, RECIPE_DESCRIPTION_EDIT, RECIPE_IMAGES_EDIT, RECIPE_TITLE, RECIPE_TITLE_EDIT } from "@/constants/field-ids";
+import { FieldValues, useForm } from "react-hook-form";
 
-const events = [
-  "お誕生日",
-  "おうち記念日",
-  "お正月",
-  "節分",
-  "ひな祭り",
-  "こどもの日",
-  "七夕",
-  "ハロウィン",
-  "クリスマス",
-  "おやつ",
-  "ダイエット",
-  "その他",
-];
+export default function EditRecipeForm() {
 
-const size = ["小型犬", "中型犬", "大型犬"];
-const age = ["子犬", "成犬", "シニア犬"];
+  const {register, handleSubmit, unregister, formState: {errors}} = useForm({mode: 'onChange'});
 
-const RECIPE_TITLE = 'recipe_title';
-const RECIPE_DESCRIPTION = 'recipe_description';
-
-export default function CreateRecipeForm() {
-
-  const {register, unregister, handleSubmit} = useForm({mode: 'onChange'});
-  
   const {
-    recipeIngredientsCnt,
-    recipeInstructions,
-    deleteRecipeIngredients,
-    deleteRecipeInstructions,
-    increaseRecipeIngredients,
-    increaseRecipeInstructions,
-    onSubmit
-  } = useCreateRecipeForm(unregister);
-
+      recipeIngredientsCnt,
+      recipeInstructions,
+      deleteRecipeIngredients,
+      deleteRecipeInstructions,
+      increaseRecipeIngredients,
+      increaseRecipeInstructions,
+      onSubmit
+    } = useCreateRecipeForm(unregister);
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap justify-center gap-8 max-w-7xl h-full w-full">
+    <form suppressHydrationWarning onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap justify-center gap-8 max-w-7xl h-full w-full">
       <div className="first-section--container grid grid-cols-6 md:grid-cols-12 w-full gap-8">
         <div className="col-span-6 flex flex-col gap-4">
           <p className="flex flex-col gap-2">
             <label className="text-xl font-semibold" htmlFor="recipe_title">
               レシピタイトル
             </label>
-            <InputField {...register(RECIPE_TITLE)} placeholder="例）炊飯器で簡単！夏バテでも食べられるご飯" id="recipe_title" type="text" />
+            <InputField {...register(RECIPE_TITLE_EDIT)} placeholder="例）炊飯器で簡単！夏バテでも食べられるご飯" id="recipe_title" type="text" />
           </p>
           <p className="flex flex-col gap-2 flex-[1_0_50%]">
-            <label className="text-xl font-semibold" htmlFor={RECIPE_DESCRIPTION}>
+            <label className="text-xl font-semibold" htmlFor={RECIPE_DESCRIPTION_EDIT}>
               レシピの説明
             </label>
-            <TextareaField {...register(RECIPE_DESCRIPTION)} placeholder="レシピに説明をしてください例）愛犬が夏バテでなかなかご飯を食べなかったので、お魚ベースの手作りごはんを作りました。たくさん食べてくれたので是非作ってみてください。" className="h-full" id={RECIPE_DESCRIPTION} />
+            <TextareaField {...register(RECIPE_DESCRIPTION_EDIT)} placeholder="レシピに説明をしてください例）愛犬が夏バテでなかなかご飯を食べなかったので、お魚ベースの手作りごはんを作りました。たくさん食べてくれたので是非作ってみてください。" className="h-full" id={RECIPE_DESCRIPTION} />
           </p>
         </div>
         <div className="col-span-6">
           <p className="relative flex flex-col gap-2">
-            <label htmlFor="recipe_images" className="absolute z-10 -top-14 left-38">
+            <label htmlFor={RECIPE_IMAGES_EDIT} className="absolute z-10 -top-14 left-38">
               <Image  width={211} height={120} src={"/banner/3dogs.webp"} alt="3 dogs image background for image upload"/>
             </label>
-            <label htmlFor="recipe_images" className=" z-10 top-0 left-0 text-xl font-semibold">画像を追加する</label>
-            <label htmlFor="recipe_images" className=" cursor-pointer">
+            <label htmlFor={RECIPE_IMAGES_EDIT} className=" z-10 top-0 left-0 text-xl font-semibold">画像を追加する</label>
+            <label htmlFor={RECIPE_IMAGES_EDIT} className=" cursor-pointer">
               <span className="relative flex h-full  after:content-[''] after:transition-all after:duration-300 after:absolute after:top-0 after:left-0 after:w-full after:h-full hover:after:bg-black/10">
                 <Image className="rounded-md" width={624} height={351} src={"/banner/empty-bg.webp"} alt="empty background for image upload"/>
               </span>
             </label>
-            <InputField className="hidden" id="recipe_images" type="file"/>
+            <InputField className="hidden" id={RECIPE_IMAGES_EDIT} type="file"/>
           </p>
         </div>
       </div>
@@ -131,10 +109,10 @@ export default function CreateRecipeForm() {
                 {age.map(a => {
                   return (
                     <p key={a}>
-                      <input {...register(`checkbox-age-` + a)} id={a} type="checkbox" className="hidden"/>
-                      <label htmlFor={a}>
+                      <input {...register(`checkbox-age-edit-` + a)} id={a + '-edit'} type="checkbox" className="hidden"/>
+                      <label htmlFor={a + '-edit'}>
                         <span
-                          className={`cursor-pointer bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
+                          className={`cursor-pointer hover:brightness-80 bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
                         >
                           {a}
                         </span>
@@ -150,10 +128,10 @@ export default function CreateRecipeForm() {
                 {size.map(s => {
                   return (
                     <p key={s}>
-                      <input {...register(`checkbox-size-` + s)} id={s} type="checkbox" className="hidden"/>
-                      <label htmlFor={s}>
+                      <input {...register(`checkbox-size-edit-` + s)} id={s + '-edit'} type="checkbox" className="hidden"/>
+                      <label htmlFor={s + '-edit'}>
                         <span
-                          className={`cursor-pointer bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
+                          className={`cursor-pointer hover:brightness-80 bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
                         >
                           {s}
                         </span>
@@ -169,10 +147,10 @@ export default function CreateRecipeForm() {
                 {events.map(e => {
                   return (
                     <p key={e}>
-                      <input {...register(`checkbox-event-` + e)} id={e} type="checkbox" className="hidden"/>
-                      <label htmlFor={e}>
+                      <input {...register(`checkbox-event-edit-` + e)} id={e + '-edit'} type="checkbox" className="hidden"/>
+                      <label htmlFor={e + '-edit'}>
                         <span
-                          className={`cursor-pointer bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
+                          className={`cursor-pointer hover:brightness-80 bg-primary-text self-center flex justify-center border-2 border-transparent items-center text-white py-[5px] px-[7px] rounded-[5px] text-sm`}
                         >
                           {e}
                         </span>

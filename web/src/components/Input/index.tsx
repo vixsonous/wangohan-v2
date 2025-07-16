@@ -14,7 +14,7 @@ interface InputFieldProps {
 
 export default function InputField({className, icon, errors, type, ...props}: InputHTMLAttributes<HTMLInputElement> & InputFieldProps) {
   return (
-    <span className="relative">
+    <span className="relative w-full">
       <Input 
         type={type}
         data-slot="input"
