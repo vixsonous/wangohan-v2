@@ -5,7 +5,7 @@ import Image from "@/components/Image/client";
 import InputField from "@/components/Input";
 import TextareaField from "@/components/Textarea";
 import { age, events, size } from "@/constants/array-values";
-import { RECIPE_DESCRIPTION, RECIPE_DESCRIPTION_EDIT, RECIPE_IMAGES_EDIT, RECIPE_TITLE, RECIPE_TITLE_EDIT } from "@/constants/field-ids";
+import { RECIPE_DESCRIPTION_EDIT, RECIPE_IMAGES_EDIT, RECIPE_TITLE_EDIT } from "@/constants/field-ids";
 import { FieldValues, useForm } from "react-hook-form";
 
 export default function EditRecipeForm() {
@@ -35,7 +35,7 @@ export default function EditRecipeForm() {
             <label className="text-xl font-semibold" htmlFor={RECIPE_DESCRIPTION_EDIT}>
               レシピの説明
             </label>
-            <TextareaField {...register(RECIPE_DESCRIPTION_EDIT)} placeholder="レシピに説明をしてください例）愛犬が夏バテでなかなかご飯を食べなかったので、お魚ベースの手作りごはんを作りました。たくさん食べてくれたので是非作ってみてください。" className="h-full" id={RECIPE_DESCRIPTION} />
+            <TextareaField {...register(RECIPE_DESCRIPTION_EDIT)} placeholder="レシピに説明をしてください例）愛犬が夏バテでなかなかご飯を食べなかったので、お魚ベースの手作りごはんを作りました。たくさん食べてくれたので是非作ってみてください。" className="h-full" id={RECIPE_DESCRIPTION_EDIT} />
           </p>
         </div>
         <div className="col-span-6">
