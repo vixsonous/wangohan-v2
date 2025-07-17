@@ -64,7 +64,7 @@ export default function ShowRecipeCarousel() {
             return (
               <CarouselItem className={`basis-1/3 lg:basis-1/5 pl-1`} key={a}>
                 <Button onClick={apiScrollTo(a)}>
-                  <Card className={`p-0 ${curSlide === a ? 'brightness-100' : 'brightness-50'}`}>
+                  <Card className={`p-0 ${curSlide === a ? 'brightness-100' : 'brightness-90'}`}>
                     <CardContent className="p-0">
                       <Image height={128} src={"/image.webp"} alt="qqwe"/>
                     </CardContent>

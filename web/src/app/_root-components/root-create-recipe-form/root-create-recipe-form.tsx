@@ -51,7 +51,7 @@ export default function CreateRecipeForm() {
             <label className="text-xl font-semibold" htmlFor="recipe_title">
               レシピタイトル
             </label>
-            <InputField {...register(RECIPE_TITLE)} placeholder="例）炊飯器で簡単！夏バテでも食べられるご飯" id="recipe_title" type="text" />
+            <InputField className="sm:text-base" {...register(RECIPE_TITLE)} placeholder="例）炊飯器で簡単！夏バテでも食べられるご飯" id="recipe_title" type="text" />
           </p>
           <p className="flex flex-col gap-2 flex-[1_0_50%]">
             <label className="text-xl font-semibold" htmlFor={RECIPE_DESCRIPTION}>
