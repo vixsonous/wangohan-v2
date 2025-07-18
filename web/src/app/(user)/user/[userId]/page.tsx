@@ -1,6 +1,9 @@
 import Image from "@/components/Image/server";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import UserTabs from "./components/user-tabs";
+import UserPetsCarousel from "./components/user-pets-carousel";
+import Button from "@/components/Button";
 
 export default async function User() {
   return (
@@ -14,33 +17,11 @@ export default async function User() {
             うちのわん
           </h1>
         </div>
+        <Button className="text-lg font-bold">愛犬を登録する</Button>
+        <UserPetsCarousel />
       </section>
       <section className="w-full">
-        <Tabs defaultValue="my-recipes">
-          <TabsList>
-            <TabsTrigger value="my-recipes">自分のレシピ</TabsTrigger>
-            <TabsTrigger value="liked-recipes">
-              <Image noprocess src={"/icons/svg/primary-heart.svg"} alt="heart icon for liked recipes"/>
-              したレシピ
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="my-recipes">
-            <Card className="bg-secondary-bg">
-              <CardHeader><h1>My Recipes</h1></CardHeader>
-              <CardContent>
-                <span>My recipes here</span>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="liked-recipes">
-            <Card className="bg-secondary-bg">
-              <CardHeader><h1>Liked recipes</h1></CardHeader>
-              <CardContent>
-                <span>My liked recipes here</span>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <UserTabs />
       </section>
     </div>
   )
