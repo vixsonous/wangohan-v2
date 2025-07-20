@@ -20,7 +20,7 @@ export default function RecipeItem(recipe: RecipeDisplayDetails) {
               <StarReviews value={recipe.total_likes} interactive={false} large={true}/>
           </div>
           <div className="flex gap-[5px] items-center">
-              <span className={`text-xs`}>{recipe.total_likes} views</span>
+              <span className={`text-xs`}>{recipe.total_views} views</span>
           </div>
         </div>
         <div className={`flex justify-between`}>

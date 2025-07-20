@@ -30,6 +30,7 @@ export class RecipeRepository {
           "user_id",
           "recipes_table.created_at",
           "total_likes",
+          "total_views",
           jsonArrayFrom(
             eb.selectFrom("recipe_images_table")
               .select([
@@ -42,7 +43,6 @@ export class RecipeRepository {
               .whereRef("recipe_images_table.recipe_id","=","recipes_table.recipe_id")
           ).as("recipe_images")
         ])
-        .innerJoin("recipe_images_table", "recipes_table.recipe_id", "recipe_images_table.recipe_id")
         .orderBy("total_views", "desc")
         .limit(limit)
         .offset(OFFSET)
@@ -70,6 +70,7 @@ export class RecipeRepository {
           "user_id",
           "created_at",
           "total_likes",
+          "total_views",
           jsonArrayFrom(
             eb.selectFrom("recipe_images_table")
               .select([

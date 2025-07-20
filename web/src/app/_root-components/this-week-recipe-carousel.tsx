@@ -10,7 +10,6 @@ interface RecipeCarouselProps {
 }
 
 export default function RecipeCarousel({recipes}: RecipeCarouselProps) {
-  console.log(recipes);
   return (
     <Carousel
       opts={{

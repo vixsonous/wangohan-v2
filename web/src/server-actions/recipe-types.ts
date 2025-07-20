@@ -7,6 +7,7 @@ export interface RecipeDisplayDetails {
   recipe_event_tag: string;
   recipe_category: string;
   total_likes: number;
+  total_views: number;
   recipe_images: Array<RecipeImageDisplay>;
   user_id: number;
   created_at: Date;
