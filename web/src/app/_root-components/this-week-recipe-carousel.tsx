@@ -3,13 +3,14 @@
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import RecipeItem from "./recipe-item";
 import Autoplay from "embla-carousel-autoplay";
-import { RecipeProps } from "./recipe-carousel-wrapper";
+import { RecipeDisplayDetails } from "@/server-actions/recipe-types";
 
 interface RecipeCarouselProps {
-  recipes: Array<RecipeProps>
+  recipes: Array<RecipeDisplayDetails>
 }
 
 export default function RecipeCarousel({recipes}: RecipeCarouselProps) {
+  console.log(recipes);
   return (
     <Carousel
       opts={{

@@ -7,6 +7,7 @@ services:
       - 5432:5432
     volumes:
       - wangohan_data:/var/lib/postgresql/data    
+      - ./backend/database:/data
   server:
     container_name: wangohan_server
     build:

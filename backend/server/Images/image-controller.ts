@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ApiResponse } from "../utils/ApiUtils";
 import sharp from 'sharp';
 import z from 'zod';
-import { Image } from "../service/image-service";
+import { Image } from "./image-service";
 
 export class ImageController {
   static async transformImage(req: Request, res: Response) {
@@ -15,7 +15,7 @@ export class ImageController {
     }
 
     try {
-      const response = await fetch("http://wangohan_web:3000/" + src);
+      const response = String(src).startsWith("/") ? await fetch("http://wangohan_web:3000/" + src) : await fetch(src as string);
 
       if(!response.ok) {
         ApiResponse.error(res, "Failed to fetch image: " + response.statusText);

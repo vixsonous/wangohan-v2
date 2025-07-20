@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import RootHeader from "./_root-components/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { getRecipe } from "@/server-actions/recipe";
 import { ServerUtils } from "@/lib/server-utils";
 import RootFooter from "./_root-components/root-footer";
 
@@ -55,7 +54,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await getRecipe();
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Recipe",

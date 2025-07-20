@@ -1,28 +1,11 @@
 import React from "react";
 import ThisWeekRecipeCarousel from "./this-week-recipe-carousel";
 import RecipeCarousel from "./this-week-recipe-carousel";
-
-export interface RecipeProps {
-  recipe_image: string;
-  recipe_name: string;
-  recipe_id: number;
-  recipe_description: string;
-  recipe_age_tag: string;
-  recipe_size_tag: string;
-  recipe_event_tag: string;
-  total_likes: number;
-  total_views: number;
-  user_id: number;
-  recipe_rating_data:{
-    totalRating: number;
-    avgRating: number;
-  }
-  created_at: Date;
-}
+import { RecipeDisplayDetails } from "@/server-actions/recipe-types";
 
 interface RecipeCarouselWrapperProps {
   title: string;
-  recipes: Array<RecipeProps>;
+  recipes: Array<RecipeDisplayDetails>;
 }
 export default async function RecipeCarouselWrapper({title, recipes}: RecipeCarouselWrapperProps) {
   return (

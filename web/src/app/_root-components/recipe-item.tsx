@@ -2,10 +2,10 @@
 
 import Image from "@/components/Image/client";
 import Link from "next/link";
-import { RecipeProps } from "./recipe-carousel-wrapper";
 import StarReviews from "@/components/StarReviews";
+import { RecipeDisplayDetails } from "@/server-actions/recipe-types";
 
-export default function RecipeItem(recipe: RecipeProps) {
+export default function RecipeItem(recipe: RecipeDisplayDetails) {
   return (
     <Link className="w-full" href={`/recipe/show/${recipe.recipe_id}`}>
       <section className="relative flex flex-col gap-[8px]">
@@ -13,14 +13,14 @@ export default function RecipeItem(recipe: RecipeProps) {
           <Image src={"/icons/svg/red-heart-fill.svg"} alt={"red heart fill icon for like"} height={100}/>
           <span className="text-xs font-bold">{recipe.total_likes > 1000 ? `${recipe.total_likes / 1000}k` : recipe.total_likes}</span>
         </div>
-        <Image src={recipe.recipe_image} loading="lazy" className="will-change-transform object-cover rounded-md w-full h-[100px] sm:h-[130px] lg:h-[170px] max-w-[100%] block" height={300} width={500} />
+        <Image src={recipe.recipe_images[0].recipe_image} loading="lazy" className="will-change-transform object-cover rounded-md w-full h-[100px] sm:h-[130px] lg:h-[170px] max-w-[100%] block" height={300} width={500} />
         <h1 className={`text-xs overflow-hidden text-ellipsis font-bold line-clamp-2`}>{recipe.recipe_name}</h1>
         <div className="flex justify-between mt-[-4px]">
           <div className="flex items-center ml-[-4px]">
-              <StarReviews value={recipe.recipe_rating_data.avgRating} interactive={false} large={true}/>
+              <StarReviews value={recipe.total_likes} interactive={false} large={true}/>
           </div>
           <div className="flex gap-[5px] items-center">
-              <span className={`text-xs`}>{recipe.total_views} views</span>
+              <span className={`text-xs`}>{recipe.total_likes} views</span>
           </div>
         </div>
         <div className={`flex justify-between`}>
