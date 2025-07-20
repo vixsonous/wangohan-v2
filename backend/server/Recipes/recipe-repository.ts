@@ -1,6 +1,6 @@
 import { db } from "../../database/database";
 import { RecipeDisplayDetails } from "./recipe-types";
-import { jsonArrayFrom } from 'kysely/helpers/postgres';
+import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -41,7 +41,20 @@ export class RecipeRepository {
                 "recipe_id",
               ])
               .whereRef("recipe_images_table.recipe_id","=","recipes_table.recipe_id")
-          ).as("recipe_images")
+          ).as("recipe_images"),
+          jsonObjectFrom(
+            eb.selectFrom("recipe_comments_table")
+            .select(({ fn, val, ref }) => [
+              fn
+                .count<number>("recipe_comment_id")
+                .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                .as("total_rating"),
+              fn
+                .avg<number>("recipe_comment_rating")
+                .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                .as("avg_rating"),
+            ])
+          ).as("recipe_rating_data")
         ])
         .orderBy("total_views", "desc")
         .limit(limit)
@@ -81,7 +94,20 @@ export class RecipeRepository {
                 "recipe_id",
               ])
               .whereRef("recipe_images_table.recipe_id","=","recipes_table.recipe_id")
-          ).as("recipe_images")
+          ).as("recipe_images"),
+          jsonObjectFrom(
+            eb.selectFrom("recipe_comments_table")
+            .select(({ fn, val, ref }) => [
+              fn
+                .count<number>("recipe_comment_id")
+                .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                .as("total_rating"),
+              fn
+                .avg<number>("recipe_comment_rating")
+                .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                .as("avg_rating"),
+            ])
+          ).as("recipe_rating_data")
         ])
         .where("created_at", ">=", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
         .orderBy("created_at", "desc")

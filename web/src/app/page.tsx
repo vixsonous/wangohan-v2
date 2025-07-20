@@ -34,7 +34,7 @@ export default async function Home() {
   }
 
   return (
-    <section className={`w-full flex flex-col items-center px-6 py-6 lg:px-0 min-h-screen`}>
+    <section className={`w-full flex gap-2.5 flex-col items-center px-6 py-6 lg:px-0 min-h-screen`}>
       <HomeLogoHeader mochi={mochi} gloria={gloria}/>
       <HomeNavigation />
       <BannerSection />

@@ -1,3 +1,8 @@
+export interface RecipeRatingData {
+  avg_rating: number;
+  total_rating: number;
+}
+
 export interface RecipeDisplayDetails {
   recipe_name: string;
   recipe_id: number;
@@ -9,6 +14,7 @@ export interface RecipeDisplayDetails {
   total_likes: number;
   total_views: number;
   recipe_images: Array<RecipeImageDisplay>;
+  recipe_rating_data: RecipeRatingData | null;
   user_id: number;
   created_at: Date;
 }

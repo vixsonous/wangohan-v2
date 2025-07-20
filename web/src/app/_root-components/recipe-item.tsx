@@ -17,7 +17,7 @@ export default function RecipeItem(recipe: RecipeDisplayDetails) {
         <h1 className={`text-xs overflow-hidden text-ellipsis font-bold line-clamp-2`}>{recipe.recipe_name}</h1>
         <div className="flex justify-between mt-[-4px]">
           <div className="flex items-center ml-[-4px]">
-              <StarReviews value={recipe.total_likes} interactive={false} large={true}/>
+              <StarReviews value={recipe.recipe_rating_data?.avg_rating || 0} interactive={false} large={true}/>
           </div>
           <div className="flex gap-[5px] items-center">
               <span className={`text-xs`}>{recipe.total_views} views</span>

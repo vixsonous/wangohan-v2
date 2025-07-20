@@ -2,7 +2,7 @@ import BirthdayAvatars from "./birthday-avatars";
 
 export default async function BirthdayWrapper() {
   return (
-    <section className="w-full">
+    <section className="w-full mt-20">
       <header className="relative pb-4 flex justify-center">
         <h1
           className={`text-2xl z-10 max-w-max px-4 font-bold tracking-tighter inline-block text-primary-text relative bg-primary-bg`}

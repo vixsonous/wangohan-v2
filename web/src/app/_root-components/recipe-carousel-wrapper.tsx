@@ -18,7 +18,14 @@ export default async function RecipeCarouselWrapper({title, recipes}: RecipeCaro
         </h1>
         <p className="absolute w-full top-5/12 border border-solid border-primary-text" />
       </header>
-      <RecipeCarousel recipes={recipes} />
+      {
+        recipes.length > 0 ? (
+          <RecipeCarousel recipes={recipes} />
+        ) : (
+          <h1>レシピはありません！</h1>
+        )
+      }
+      
     </section>
   )
 }
