@@ -21,7 +21,7 @@ export class RecipeRepository {
         .selectFrom("recipes_table")
         .select((eb) => [
           "recipe_name",
-          "recipes_table.recipe_id",
+          "recipe_uuid",
           "recipe_category",
           "recipe_age_tag",
           "recipe_event_tag",
@@ -74,7 +74,7 @@ export class RecipeRepository {
         .selectFrom("recipes_table")
         .select(eb => [
           "recipe_name",
-          "recipe_id",
+          "recipe_uuid",
           "recipe_category",
           "recipe_age_tag",
           "recipe_event_tag",

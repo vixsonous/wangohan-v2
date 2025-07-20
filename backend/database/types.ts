@@ -36,6 +36,7 @@ export interface Database {
 export interface UserTable {
   user_id: Generated<number>;
   google_id: string;
+  user_uuid: string;
   email: string;
   password:string;
   user_lvl: number;
@@ -80,6 +81,7 @@ export interface AllergiesTable {
 
 export interface RecipesTable {
   recipe_id: Generated<number>;
+  recipe_uuid: string;
   recipe_name: string;
   recipe_description: string;
   recipe_age_tag: string;
