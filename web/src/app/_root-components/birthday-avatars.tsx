@@ -31,7 +31,7 @@ function Avatar({active}: AvatarProps) {
     return (
       <div className="relative flex-[0_0_100%] text-white flex flex-col items-center justify-center">
         <div style={{ scale: scale}} className={`transition-all duration-1000 w-full flex justify-center ${active ? 'animate-bubble': ''}`}>
-          <Image  width={200} height={150} src={"/pet.webp"} loading="lazy" className="aspect-square max-w-[100px] max-h-[100px] rounded-full object-cover overflow-hidden" alt="website banner" />
+          <Image  width={100} height={100} src={"/pet.webp"} loading="lazy" className="aspect-square max-w-[100px] max-h-[100px] rounded-full object-cover overflow-hidden" alt="website banner" />
         </div>
         <h1 className="whitespace-nowrap relative w-full text-sm opacity-90 z-10 bg-primary-bg font-bold text-[#523636] text-center">
           Kurumu

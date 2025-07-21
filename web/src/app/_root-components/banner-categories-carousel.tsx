@@ -150,7 +150,7 @@ export default function BannerCategoriesCarousel() {
                       >
                         <Image
                           src={category.img}
-                          width={342}
+                          width={167}
                           className="relative rounded-md"
                           alt={category.alt}
                         />
@@ -181,7 +181,7 @@ export default function BannerCategoriesCarousel() {
                         >
                           <Image
                             src={category.img}
-                            width={342}
+                            width={167}
                             className="relative rounded-md"
                             alt={category.alt}
                           />
