@@ -1,5 +1,5 @@
 import { db } from "../../database/database";
-import { RecipeDisplayDetails } from "./recipe-types";
+import { RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 
 export class RecipeRepository {
@@ -118,6 +118,81 @@ export class RecipeRepository {
     } catch (error) {
       console.error(error);
       return [];
+    }
+  }
+
+  static async getRecipe(recipe_id: number, recipe_name: string): Promise<RecipeDetailsDisplay | undefined> {
+    try {
+      const recipe: RecipeDetailsDisplay = await db
+        .selectFrom("recipes_table")
+        .select(eb => [
+          "recipe_name",
+          "recipe_id",
+          "recipe_category",
+          "recipe_age_tag",
+          "recipe_event_tag",
+          "recipe_size_tag",
+          "recipe_description",
+          "user_id",
+          "created_at",
+          "total_likes",
+          "total_views",
+          jsonArrayFrom(
+            eb.selectFrom("recipe_instructions_table")
+              .select([
+                "recipe_instructions_id",
+                "recipe_instructions_text",
+                "recipe_id",
+                "updated_at",
+                "created_at",
+              ]).whereRef("recipe_instructions_table.recipe_id","=","recipes_table.recipe_id")
+          ).as("recipe_instructions"),
+          jsonArrayFrom(
+            eb.selectFrom("recipe_ingredients_table")
+              .select([
+                "recipe_ingredient_id",
+                "recipe_ingredients_name",
+                "recipe_ingredients_amount",
+                "recipe_id",
+                "updated_at",
+                "created_at",
+              ]).whereRef("recipe_ingredients_table.recipe_id","=","recipes_table.recipe_id")
+          ).as("recipe_ingredients"),
+          jsonArrayFrom(
+            eb.selectFrom("recipe_images_table")
+              .select([
+                "recipe_image_id",
+                "recipe_image_title",
+                "recipe_image_subtext",
+                "recipe_image",
+                "recipe_id",
+              ])
+              .whereRef("recipe_images_table.recipe_id","=","recipes_table.recipe_id")
+          ).as("recipe_images"),
+          jsonObjectFrom(
+            eb.selectFrom("recipe_comments_table")
+            .select(({ fn, val, ref }) => [
+              fn
+                .count<number>("recipe_comment_id")
+                .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                .as("total_rating"),
+              fn
+                .avg<number>("recipe_comment_rating")
+                .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                .as("avg_rating"),
+            ])
+          ).as("recipe_rating_data")
+        ])
+        .where(eb => eb.and({
+          recipe_id: recipe_id,
+          recipe_name: recipe_name
+        }))
+        .executeTakeFirstOrThrow();
+
+      return recipe;
+    } catch (error) {
+      console.error(error);
+      return undefined;
     }
   }
 }

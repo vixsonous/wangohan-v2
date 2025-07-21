@@ -7,38 +7,58 @@ import Link from "next/link";
 import Image from "@/components/Image/server";
 import ShowRecipeCommentsHeader from "./show-recipe-comments-header";
 import ShowRecipeComments from "./show-recipe-comments";
-import { Metadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
+import { getRecipe } from "@/server-actions/recipe";
 
-export const metadata:Metadata = {
-  title: "クリスマス3色あんかけ",
-  keywords: ["愛犬のための手作りごはんレシピサイト",
-    "わんごはん",
-    "犬用手作りごはん",
-    "wangohan",
-    "homemade dog food",
-    "healthy pet food",
-    "dog recipe ideas",
-    "ペットレシピサイト"],
-  creator: "Victor Chiong",
-  description: "わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？",
-  openGraph: {
-    title: 'わんごはん - 愛犬のための手作りごはんレシピサイト',
-    description: 'わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？',
-    url: 'https://wangohanjp.com', // Your website URL
-    type: 'website',
-    images: [
-        { url: 'https://wangohanjp.com/logo-final.webp', width: 500, height: 500, alt: 'わんごはん' }
-    ]
-  },
-  robots: {
-    index:true,
-    follow: true,
-    nocache: false,
-  },
+type Props = {
+  params: { recipeId: String, recipeName: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata({
+  params
+}: Props, parent: ResolvingMetadata): Promise<Metadata> {
   
+  return {
+    title: "クリスマス3色あんかけ",
+    keywords: ["愛犬のための手作りごはんレシピサイト",
+      "わんごはん",
+      "犬用手作りごはん",
+      "wangohan",
+      "homemade dog food",
+      "healthy pet food",
+      "dog recipe ideas",
+      "ペットレシピサイト"],
+    creator: "Victor Chiong",
+    description: "わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？",
+    openGraph: {
+      title: 'わんごはん - 愛犬のための手作りごはんレシピサイト',
+      description: 'わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？',
+      url: 'https://wangohanjp.com', // Your website URL
+      type: 'website',
+      images: [
+          { url: 'https://wangohanjp.com/logo-final.webp', width: 500, height: 500, alt: 'わんごはん' }
+      ]
+    },
+    robots: {
+      index:true,
+      follow: true,
+      nocache: false,
+    },
+    
+  }
 }
 
-export default async function ShowRecipe() {
+export default async function ShowRecipe({params}: {
+  params: {
+    recipeId: string,
+    recipeName: string
+  }
+}) {
+  const {recipeId, recipeName} = await params;
+
+  await getRecipe(Number(recipeId), recipeName);
+  
   const recipe_data = {
     recipe_id: 6,
     user: {
@@ -101,6 +121,8 @@ export default async function ShowRecipe() {
       }
     ]
   }
+
+  
   return (
     <section className="flex max-w-3xl flex-col text-primary-text items-center w-full mt-10 gap-2">
       <ShowRecipeCarousel />

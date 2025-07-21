@@ -1,10 +1,9 @@
 import { ServerApiService } from '@/lib/server-utils';
 import { RecipeDisplayDetails } from './recipe-types';
 
-export const getRecipe = async () => {
+export const getRecipe = async (recipe_id: number, recipe_name: string) => {
   try {
-    const data = await ServerApiService.get("/get-recipe");
-    console.log(data.data);
+    const data = await ServerApiService.get(`/get-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}`);
   } catch(e) {
     console.log(e);
   }
