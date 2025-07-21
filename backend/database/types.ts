@@ -1,4 +1,4 @@
-import { Generated } from "kysely";
+import { Generated, Selectable, Insertable, Updateable } from "kysely";
 
 export interface DatabaseTableName {
   users_table: "users_table";
@@ -36,13 +36,16 @@ export interface Database {
 export interface UserTable {
   user_id: Generated<number>;
   google_id: string;
-  user_uuid: string;
   email: string;
   password:string;
   user_lvl: number;
   updated_at: Date;
   created_at: Date;
 }
+
+export type User = Selectable<UserTable>;
+export type UserInsert = Insertable<UserTable>;
+export type UserUpdate = Updateable<UserTable>;
 
 export interface UserDetailTable {
   user_detail_id: Generated<number>;
@@ -59,6 +62,10 @@ export interface UserDetailTable {
   created_at: Date;
 }
 
+export type UserDetail = Selectable<UserDetailTable>;
+export type UserDetailInsert = Insertable<UserDetailTable>;
+export type UserDetailUpdate = Updateable<UserDetailTable>;
+
 export interface PetsTable {
   pet_id: Generated<number>;
   pet_name: string;
@@ -70,6 +77,10 @@ export interface PetsTable {
   created_at: Date;
 }
 
+export type Pet = Selectable<PetsTable>;
+export type PetInsert = Insertable<PetsTable>;
+export type PetUpdate = Updateable<PetsTable>;
+
 export interface AllergiesTable {
   allergy_id: Generated<number>;
   allergy_name: string;
@@ -79,9 +90,12 @@ export interface AllergiesTable {
   created_at: Date;
 }
 
+export type Allergy = Selectable<AllergiesTable>;
+export type AllergyInsert = Insertable<AllergiesTable>;
+export type AllergyUpdate = Updateable<AllergiesTable>;
+
 export interface RecipesTable {
   recipe_id: Generated<number>;
-  recipe_uuid: string;
   recipe_name: string;
   recipe_description: string;
   recipe_age_tag: string;
@@ -96,6 +110,10 @@ export interface RecipesTable {
   created_at: Date;
 }
 
+export type Recipe = Selectable<RecipesTable>;
+export type RecipeInsert = Insertable<RecipesTable>;
+export type RecipeUpdate = Updateable<RecipesTable>;
+
 export interface RecipeCommentsTable {
   recipe_comment_id: Generated<number>;
   recipe_comment_title: string;
@@ -107,6 +125,10 @@ export interface RecipeCommentsTable {
   created_at: Date;
 }
 
+export type RecipeComment = Selectable<RecipeCommentsTable>;
+export type RecipeCommentInsert = Insertable<RecipeCommentsTable>;
+export type RecipeCommentUpdate = Updateable<RecipeCommentsTable>;
+
 export interface RecipeImagesTable {
   recipe_image_id: Generated<number>;
   recipe_image_title: string;
@@ -117,6 +139,10 @@ export interface RecipeImagesTable {
   created_at: Date;
 }
 
+export type RecipeImage = Selectable<RecipeImagesTable>;
+export type RecipeImageInsert = Insertable<RecipeImagesTable>;
+export type RecipeImageUpdate = Updateable<RecipeImagesTable>;
+
 export interface RecipeInstructionsTable {
   recipe_instructions_id: Generated<number>;
   recipe_instructions_text: string;
@@ -124,6 +150,10 @@ export interface RecipeInstructionsTable {
   updated_at: Date;
   created_at: Date;
 }
+
+export type RecipeInstruction = Selectable<RecipeInstructionsTable>;
+export type RecipeInstructionInsert = Insertable<RecipeInstructionsTable>;
+export type RecipeInstructionUpdate = Updateable<RecipeInstructionsTable>;
 
 export interface RecipeIngredientsTable {
   recipe_ingredient_id: Generated<number>;
@@ -134,6 +164,10 @@ export interface RecipeIngredientsTable {
   created_at: Date;
 }
 
+export type RecipeIngredient = Selectable<RecipeIngredientsTable>;
+export type RecipeIngredientInsert = Insertable<RecipeIngredientsTable>;
+export type RecipeIngredientUpdate = Updateable<RecipeIngredientsTable>;
+
 export interface FavouritesTable {
   favourite_id: Generated<number>;
   user_id: number;
@@ -141,6 +175,10 @@ export interface FavouritesTable {
   updated_at: Date;
   created_at: Date;
 }
+
+export type Favourite = Selectable<FavouritesTable>;
+export type FavouriteInsert = Insertable<FavouritesTable>;
+export type FavouriteUpdate = Updateable<FavouritesTable>;
 
 export interface LikesTable {
   like_id: Generated<number>;
@@ -150,6 +188,10 @@ export interface LikesTable {
   updated_at: Date;
   created_at: Date;
 }
+
+export type Like = Selectable<LikesTable>;
+export type LikeInsert = Insertable<LikesTable>;
+export type LikeUpdate = Updateable<LikesTable>;
 
 export interface NotificationsTable {
   notification_id: Generated<number>;
@@ -164,6 +206,10 @@ export interface NotificationsTable {
   updated_at: Date;
   created_at: Date;
 }
+
+export type Notification = Selectable<NotificationsTable>;
+export type NotificationInsert = Insertable<NotificationsTable>;
+export type NotificationUpdate = Updateable<NotificationsTable>;
 export interface BlogColumnsTable {
   blog_id: Generated<number>;
   user_id: number;
@@ -175,6 +221,10 @@ export interface BlogColumnsTable {
   created_at: Date;
 }
 
+export type Blog = Selectable<BlogColumnsTable>;
+export type BlogInsert = Insertable<BlogColumnsTable>;
+export type BlogUpdate = Updateable<BlogColumnsTable>;
+
 export interface BlogImagesUpload {
   blog_image_id: Generated<number>;
   blog_image_title: string;
@@ -182,3 +232,7 @@ export interface BlogImagesUpload {
   updated_at: Date;
   created_at: Date;
 }
+
+export type BlogImage = Selectable<BlogImagesUpload>;
+export type BlogImageInsert = Insertable<BlogImagesUpload>;
+export type BlogImageUpdate = Updateable<BlogImagesUpload>;

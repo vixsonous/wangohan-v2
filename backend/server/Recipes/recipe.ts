@@ -1,7 +1,7 @@
 import { RecipeDisplayDetails, RecipeImageDisplay, RecipeRatingData } from "./recipe-types";
 
 export class RecipeModel {
-  private recipe_uuid: string;
+  private recipe_id: number;
   private recipe_name: string;
   private recipe_description: string;
   private recipe_age_tag: string;
@@ -17,11 +17,11 @@ export class RecipeModel {
   private updated_at: Date;
   private created_at: Date;
   
-  constructor(recipe_uuid: string, recipe_name: string, recipe_description: string, recipe_age_tag: string,
+  constructor(recipe_id: number, recipe_name: string, recipe_description: string, recipe_age_tag: string,
     recipe_size_tag: string, recipe_event_tag: string, recipe_category: string, total_likes: number,
     total_favourites: number, total_views: number, user_id: number, recipe_images: Array<RecipeImageDisplay>, recipe_rating_data: RecipeRatingData, updated_at: Date, created_at: Date
   ) {
-    this.recipe_uuid = recipe_uuid;
+    this.recipe_id = recipe_id;
     this.recipe_name = recipe_name;
     this.recipe_description = recipe_description;
     this.recipe_age_tag = recipe_age_tag;
@@ -40,7 +40,7 @@ export class RecipeModel {
 
   async getRecipeDetails(): Promise<RecipeDisplayDetails> {
     return {
-      recipe_uuid: this.recipe_uuid,
+      recipe_id: this.recipe_id,
       recipe_name: this.recipe_name,
       recipe_description: this.recipe_description,
       recipe_age_tag: this.recipe_age_tag,
