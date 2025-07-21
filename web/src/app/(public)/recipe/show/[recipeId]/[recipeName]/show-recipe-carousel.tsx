@@ -71,7 +71,7 @@ export default function ShowRecipeCarousel({recipe_images}: ShowRecipeCarouselPr
                 <Button onClick={apiScrollTo(idx)}>
                   <Card className={`p-0 ${curSlide === idx ? 'brightness-100' : 'brightness-90'}`}>
                     <CardContent className="p-0">
-                      <Image className="w-full" width={170} height={128} src={i.recipe_image} alt="qqwe"/>
+                      <Image className="w-full max-h-[112px]" width={170} height={112} src={i.recipe_image} alt="qqwe"/>
                     </CardContent>
                   </Card>
                 </Button>

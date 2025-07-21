@@ -13,6 +13,7 @@ export default function RecipeCarousel({recipes}: RecipeCarouselProps) {
   return (
     <Carousel
       opts={{
+        loop: true,
         align: "start",
         slidesToScroll: 1,
       }}

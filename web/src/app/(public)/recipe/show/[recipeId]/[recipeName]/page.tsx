@@ -128,7 +128,7 @@ export default async function ShowRecipe({params}: {
       </h1>
     )
   }
-  console.log(recipe);
+
   return (
     <section className="flex max-w-3xl flex-col text-primary-text items-center w-full mt-10 gap-2">
       <ShowRecipeCarousel recipe_images={recipe.recipe_images} />

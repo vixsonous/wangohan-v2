@@ -23,7 +23,6 @@ export class ServerUtils {
 
   static getPreloads() {
     const preloadUrls = Array.from(this._urls);
-    console.log(preloadUrls);
     return preloadUrls;
   }
 }
