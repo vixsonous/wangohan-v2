@@ -35,6 +35,6 @@ export class RecipeController {
     }
 
     log("Recipe retrieval success!");
-    ApiResponse.success(res, "Successfully retrieved popular recipes!");
+    ApiResponse.success(res, "Successfully retrieved popular recipes!", recipe);
   }
 }

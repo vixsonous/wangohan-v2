@@ -1,10 +1,11 @@
 import Button from "@/components/Button";
 import StarReviews from "@/components/StarReviews";
+import { RecipeDetailsDisplayComments } from "@/server-actions/Recipe/recipe-types";
 import { Comment } from "@/types/recipe-types"
 import Link from "next/link";
 
 interface ShowRecipeCommentsProps {
-  comments: Array<Comment>;
+  comments: Array<RecipeDetailsDisplayComments>;
   total_comments: number;
 }
 
@@ -16,18 +17,18 @@ export default async function ShowRecipeComments({comments, total_comments}: Sho
           return (
             <div key={idx} className="review-comment flex w-[100%] gap-[10px]">
               <div className="avatar">
-                <Link href={`/user/${com.user.user_id}`}>
-                  <img src={com.user.user_image} className="relative top-[5px] w-[30px] rounded-full object-cover overflow-hidden h-[30px] max-w-none" width={10000} height={10000} alt="website banner" />
+                <Link href={`/user/${com.user?.user_id}`}>
+                  <img src={com.user?.user_image} className="relative top-[5px] w-[30px] rounded-full object-cover overflow-hidden h-[30px] max-w-none" width={10000} height={10000} alt="website banner" />
                 </Link>
               </div>
               <div className="comment-container w-[100%] flex flex-col justify-center">
                 <div className="upper-content flex justify-between items-center text-[10px] h-[40px]">
                   <div className="name-stars flex items-center justify-center self-center gap-[10px]">
-                    {com.user.user_codename}
+                    {com.user?.user_codename}
                     <StarReviews value={com.recipe_comment_rating} interactive={false}/>
                   </div>
                   <div className="date">
-                    {com.created_at}
+                    {new Date(com.created_at).toLocaleString()}
                   </div>
                 </div>
                 <div className="lower-content whitespace-pre-wrap rounded-md text-[10px] bg-[#fef1dd] p-[10px]">

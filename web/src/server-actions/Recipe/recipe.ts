@@ -1,11 +1,13 @@
 import { ServerApiService } from '@/lib/server-utils';
-import { RecipeDisplayDetails } from './recipe-types';
+import { RecipeDetailsDisplay, RecipeDisplayDetails } from './recipe-types';
 
-export const getRecipe = async (recipe_id: number, recipe_name: string) => {
+export const getRecipe = async (recipe_id: number, recipe_name: string): Promise<RecipeDetailsDisplay | undefined> => {
   try {
-    const data = await ServerApiService.get(`/get-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}`);
+    const {data} = await ServerApiService.get(`/get-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}`);
+    return data.data;
   } catch(e) {
     console.log(e);
+    return undefined;
   }
 }
 

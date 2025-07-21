@@ -3,7 +3,7 @@
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import RecipeItem from "./recipe-item";
 import Autoplay from "embla-carousel-autoplay";
-import { RecipeDisplayDetails } from "@/server-actions/recipe-types";
+import { RecipeDisplayDetails } from "@/server-actions/Recipe/recipe-types";
 
 interface RecipeCarouselProps {
   recipes: Array<RecipeDisplayDetails>

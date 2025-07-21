@@ -1,5 +1,7 @@
+import { RecipeInstruction } from "@/server-actions/Recipe/recipe-types";
+
 interface ShowRecipeInstructionsProps {
-  recipe_instructions: Array<string>;
+  recipe_instructions: Array<RecipeInstruction>;
 }
 
 export default async function ShowRecipeInstructions({recipe_instructions}: ShowRecipeInstructionsProps) {
@@ -12,7 +14,7 @@ export default async function ShowRecipeInstructions({recipe_instructions}: Show
         {recipe_instructions.map((ins, idx) => {
           return (
             <li className="whitespace-pre-line" key={idx}>
-              {ins}
+              {ins.recipe_instructions_text}
             </li>
           )
         })}

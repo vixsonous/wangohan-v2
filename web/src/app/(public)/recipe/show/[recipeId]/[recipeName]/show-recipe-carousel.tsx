@@ -6,10 +6,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import React, { useEffect, useState } from "react";
 import ShowRecipeDropdown from "./components/show-recipe-dropdown";
+import { RecipeImageDisplay } from "@/server-actions/Recipe/recipe-types";
 
 const length = 5;
 const basis = ` basis-1/` + length;
-export default function ShowRecipeCarousel() {
+
+interface ShowRecipeCarouselProps {
+  recipe_images: Array<RecipeImageDisplay>;
+}
+export default function ShowRecipeCarousel({recipe_images}: ShowRecipeCarouselProps) {
 
   const [carouselSlideCnt, setCarouselSlideCnt] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
@@ -35,23 +40,23 @@ export default function ShowRecipeCarousel() {
   return (
     <Carousel setApi={setApi} className="max-w-3xl w-full relative">
       <CarouselContent>
-        {Array.from(Array(5).keys()).map(a => {
+        {recipe_images.map(a => {
           return (
-            <CarouselItem key={a}>
-              <Card className="p-0">
-                <CardContent className="relative flex items-center justify-center p-0 ">
-                  <div className='absolute top-0 w-full h-full bg-primary-text opacity-10 z-[-1]'></div>
-                  <Image src={"/image.webp"} className="object-contain relative h-full rounded-[0px] w-full max-w-full" width={768} alt="website banner" />
+            <CarouselItem className="h-[468px]" key={a.recipe_image_id}>
+              <Card className="p-0 bg-transparent border-0">
+                <CardContent className="relative bg-transparent flex items-center justify-center p-0 ">
+                  <div className='absolute top-0 w-full h-full bg-primary-text opacity-10 z-10'></div>
+                  <Image src={a.recipe_image} className="object-contain bg-transparent relative h-full max-h-[468px] rounded-[0px] w-full max-w-full" width={768} alt="website banner" />
                 </CardContent>
               </Card>
             </CarouselItem>
           )
         })}
       </CarouselContent>
-      <CarouselPrevious className="border-primary-text left-12 md:-left-12"/>
-      <CarouselNext className="border-primary-text right-12 md:-right-12" />
+      <CarouselPrevious className="border-primary-text top-2/5 left-12 md:-left-12"/>
+      <CarouselNext className="border-primary-text top-2/5 right-12 md:-right-12" />
       <ShowRecipeDropdown />
-      <div className="absolute flex items-center gap-2 top-3/4 left-1/2 -translate-x-1/2">
+      <div className="absolute flex items-center gap-2 top-2/3 left-1/2 -translate-x-1/2">
         {Array.from(Array(carouselSlideCnt).keys()).map( (c) => {
           return (
             <Button key={c} onClick={apiScrollTo(c)} className={`w-2 h-2 rounded-full ${(curSlide) === c ? 'bg-bullet' : 'bg-inactive'}`}></Button>
@@ -60,13 +65,13 @@ export default function ShowRecipeCarousel() {
       </div>
       <Carousel className="pt-4">
         <CarouselContent className="-ml-1">
-          {Array.from(Array(length).keys()).map(a => {
+          {recipe_images.map((i, idx) => {
             return (
-              <CarouselItem className={`basis-1/3 lg:basis-1/5 pl-1`} key={a}>
-                <Button onClick={apiScrollTo(a)}>
-                  <Card className={`p-0 ${curSlide === a ? 'brightness-100' : 'brightness-90'}`}>
+              <CarouselItem className={`basis-1/3 lg:basis-1/5 pl-1`} key={i.recipe_image_id}>
+                <Button onClick={apiScrollTo(idx)}>
+                  <Card className={`p-0 ${curSlide === idx ? 'brightness-100' : 'brightness-90'}`}>
                     <CardContent className="p-0">
-                      <Image height={128} src={"/image.webp"} alt="qqwe"/>
+                      <Image className="w-full" width={170} height={128} src={i.recipe_image} alt="qqwe"/>
                     </CardContent>
                   </Card>
                 </Button>

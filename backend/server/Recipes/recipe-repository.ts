@@ -140,22 +140,14 @@ export class RecipeRepository {
           jsonArrayFrom(
             eb.selectFrom("recipe_instructions_table")
               .select([
-                "recipe_instructions_id",
                 "recipe_instructions_text",
-                "recipe_id",
-                "updated_at",
-                "created_at",
               ]).whereRef("recipe_instructions_table.recipe_id","=","recipes_table.recipe_id")
           ).as("recipe_instructions"),
           jsonArrayFrom(
             eb.selectFrom("recipe_ingredients_table")
               .select([
-                "recipe_ingredient_id",
                 "recipe_ingredients_name",
                 "recipe_ingredients_amount",
-                "recipe_id",
-                "updated_at",
-                "created_at",
               ]).whereRef("recipe_ingredients_table.recipe_id","=","recipes_table.recipe_id")
           ).as("recipe_ingredients"),
           jsonArrayFrom(
@@ -181,7 +173,25 @@ export class RecipeRepository {
                 .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
                 .as("avg_rating"),
             ])
-          ).as("recipe_rating_data")
+          ).as("recipe_rating_data"),
+          jsonArrayFrom(
+            eb.selectFrom("recipe_comments_table")
+              .select(rc => [
+                "recipe_comment_subtext",
+                "recipe_comment_rating",
+                "recipe_comments_table.created_at",
+                jsonObjectFrom(
+                  rc.selectFrom("user_details_table")
+                    .select([
+                      "user_id",
+                      "user_image",
+                      "user_codename"
+                    ])
+                    .whereRef("recipe_comments_table.user_id", "=", "user_details_table.user_id")
+                ).as("user")
+              ])
+              .whereRef("recipe_comments_table.recipe_id","=","recipes_table.recipe_id")
+          ).as("recipe_comments")
         ])
         .where(eb => eb.and({
           recipe_id: recipe_id,

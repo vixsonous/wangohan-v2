@@ -5,7 +5,7 @@ import BannerSection from "./_root-components/banner-section";
 import RecipeCarouselWrapper from "./_root-components/recipe-carousel-wrapper";
 import BirthdayWrapper from "./_root-components/birthday-wrapper";
 import ColumnBanner from "./_root-components/column-banner";
-import { getSliderRecipes } from "@/server-actions/recipe";
+import { getSliderRecipes } from "@/server-actions/Recipe/recipe";
 
 export const gloria = Gloria_Hallelujah({
   weight: "400",

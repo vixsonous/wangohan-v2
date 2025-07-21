@@ -1,4 +1,4 @@
-import { Generated, Selectable, Insertable, Updateable } from "kysely";
+import { Generated, Insertable, Updateable } from "kysely";
 
 export interface DatabaseTableName {
   users_table: "users_table";
@@ -43,7 +43,6 @@ export interface UserTable {
   created_at: Date;
 }
 
-export type User = Selectable<UserTable>;
 export type UserInsert = Insertable<UserTable>;
 export type UserUpdate = Updateable<UserTable>;
 
@@ -62,7 +61,6 @@ export interface UserDetailTable {
   created_at: Date;
 }
 
-export type UserDetail = Selectable<UserDetailTable>;
 export type UserDetailInsert = Insertable<UserDetailTable>;
 export type UserDetailUpdate = Updateable<UserDetailTable>;
 
@@ -77,7 +75,6 @@ export interface PetsTable {
   created_at: Date;
 }
 
-export type Pet = Selectable<PetsTable>;
 export type PetInsert = Insertable<PetsTable>;
 export type PetUpdate = Updateable<PetsTable>;
 
@@ -90,7 +87,6 @@ export interface AllergiesTable {
   created_at: Date;
 }
 
-export type Allergy = Selectable<AllergiesTable>;
 export type AllergyInsert = Insertable<AllergiesTable>;
 export type AllergyUpdate = Updateable<AllergiesTable>;
 
@@ -110,7 +106,6 @@ export interface RecipesTable {
   created_at: Date;
 }
 
-export type Recipe = Selectable<RecipesTable>;
 export type RecipeInsert = Insertable<RecipesTable>;
 export type RecipeUpdate = Updateable<RecipesTable>;
 
@@ -125,7 +120,6 @@ export interface RecipeCommentsTable {
   created_at: Date;
 }
 
-export type RecipeComment = Selectable<RecipeCommentsTable>;
 export type RecipeCommentInsert = Insertable<RecipeCommentsTable>;
 export type RecipeCommentUpdate = Updateable<RecipeCommentsTable>;
 
@@ -139,7 +133,6 @@ export interface RecipeImagesTable {
   created_at: Date;
 }
 
-export type RecipeImage = Selectable<RecipeImagesTable>;
 export type RecipeImageInsert = Insertable<RecipeImagesTable>;
 export type RecipeImageUpdate = Updateable<RecipeImagesTable>;
 
@@ -151,7 +144,6 @@ export interface RecipeInstructionsTable {
   created_at: Date;
 }
 
-export type RecipeInstruction = Selectable<RecipeInstructionsTable>;
 export type RecipeInstructionInsert = Insertable<RecipeInstructionsTable>;
 export type RecipeInstructionUpdate = Updateable<RecipeInstructionsTable>;
 
@@ -164,7 +156,6 @@ export interface RecipeIngredientsTable {
   created_at: Date;
 }
 
-export type RecipeIngredient = Selectable<RecipeIngredientsTable>;
 export type RecipeIngredientInsert = Insertable<RecipeIngredientsTable>;
 export type RecipeIngredientUpdate = Updateable<RecipeIngredientsTable>;
 
@@ -176,7 +167,6 @@ export interface FavouritesTable {
   created_at: Date;
 }
 
-export type Favourite = Selectable<FavouritesTable>;
 export type FavouriteInsert = Insertable<FavouritesTable>;
 export type FavouriteUpdate = Updateable<FavouritesTable>;
 
@@ -189,7 +179,6 @@ export interface LikesTable {
   created_at: Date;
 }
 
-export type Like = Selectable<LikesTable>;
 export type LikeInsert = Insertable<LikesTable>;
 export type LikeUpdate = Updateable<LikesTable>;
 
@@ -207,7 +196,6 @@ export interface NotificationsTable {
   created_at: Date;
 }
 
-export type Notification = Selectable<NotificationsTable>;
 export type NotificationInsert = Insertable<NotificationsTable>;
 export type NotificationUpdate = Updateable<NotificationsTable>;
 export interface BlogColumnsTable {
@@ -221,7 +209,6 @@ export interface BlogColumnsTable {
   created_at: Date;
 }
 
-export type Blog = Selectable<BlogColumnsTable>;
 export type BlogInsert = Insertable<BlogColumnsTable>;
 export type BlogUpdate = Updateable<BlogColumnsTable>;
 
@@ -233,6 +220,5 @@ export interface BlogImagesUpload {
   created_at: Date;
 }
 
-export type BlogImage = Selectable<BlogImagesUpload>;
 export type BlogImageInsert = Insertable<BlogImagesUpload>;
 export type BlogImageUpdate = Updateable<BlogImagesUpload>;

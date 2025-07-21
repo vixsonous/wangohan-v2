@@ -1,8 +1,7 @@
+import { RecipeIngredient } from "@/server-actions/Recipe/recipe-types";
+
 interface ShowRecipeIngredientsProps {
-  recipe_ingredients: Array<{
-    recipe_ingredients_name: string;
-    recipe_ingredients_amount: string;
-  }>;
+  recipe_ingredients: Array<RecipeIngredient>;
 }
 
 export default async function ShowRecipeIngredients({recipe_ingredients}: ShowRecipeIngredientsProps) {

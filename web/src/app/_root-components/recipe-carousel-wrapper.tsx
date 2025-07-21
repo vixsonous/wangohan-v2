@@ -1,7 +1,7 @@
 import React from "react";
 import ThisWeekRecipeCarousel from "./this-week-recipe-carousel";
 import RecipeCarousel from "./this-week-recipe-carousel";
-import { RecipeDisplayDetails } from "@/server-actions/recipe-types";
+import { RecipeDisplayDetails } from "@/server-actions/Recipe/recipe-types";
 
 interface RecipeCarouselWrapperProps {
   title: string;
