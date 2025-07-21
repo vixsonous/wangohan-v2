@@ -7,7 +7,7 @@ import { RecipeDisplayDetails } from "@/server-actions/recipe-types";
 
 export default function RecipeItem(recipe: RecipeDisplayDetails) {
   return (
-    <Link className="w-full" href={`/recipe/show/${recipe.recipe_uuid}`}>
+    <Link className="w-full" href={`/recipe/show/${recipe.recipe_id}/${recipe.recipe_name}`}>
       <section className="relative flex flex-col gap-[8px]">
         <div className="absolute flex items-center gap-2 px-2 py-1 bg-white rounded-full top-2 right-2 z-50">
           <Image src={"/icons/svg/red-heart-fill.svg"} alt={"red heart fill icon for like"} height={100}/>

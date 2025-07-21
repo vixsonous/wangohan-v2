@@ -5,7 +5,7 @@ export interface RecipeRatingData {
 
 export interface RecipeDisplayDetails {
   recipe_name: string;
-  recipe_uuid: string;
+  recipe_id: number;
   recipe_description: string;
   recipe_age_tag: string;
   recipe_size_tag: string;
