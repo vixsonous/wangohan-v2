@@ -3,17 +3,18 @@ import { ApiResponse } from "../utils/ApiUtils";
 import { RecipeService } from "./recipe-service";
 import { log } from "../utils/log";
 import { CacheUtil } from "../utils/redis";
-import { RecipeDetailsDisplay } from "./recipe-types";
+import { RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
 
 export class RecipeController {
   static async getWeeklyRecipes(_: Request, res: Response) {
-    const recipes = await RecipeService.getWeeklyRecipes();
+    const GET_WEEKLY_RECIPES_KEY = 'GET:weekly-recipes';
+    const recipes = await CacheUtil.get<RecipeDisplayDetails[], typeof RecipeService.getWeeklyRecipes>(GET_WEEKLY_RECIPES_KEY, RecipeService.getWeeklyRecipes);
     ApiResponse.success(res, "Successfully retrieved weekly recipes!", recipes, 200);
   }
 
   static async getPopularRecipes(_: Request, res: Response) {
     const GET_POPULAR_RECIPES_KEY = 'GET:popular-recipes';
-    const recipes = await CacheUtil.get(GET_POPULAR_RECIPES_KEY, RecipeService.getPopularRecipes);
+    const recipes = await CacheUtil.get<RecipeDisplayDetails[], typeof RecipeService.getPopularRecipes>(GET_POPULAR_RECIPES_KEY, RecipeService.getPopularRecipes);
     ApiResponse.success(res, "Successfully retrieved popular recipes!", recipes, 200);
   }
   
