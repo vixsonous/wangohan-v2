@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { ApiResponse } from "../utils/ApiUtils";
 import { RecipeService } from "./recipe-service";
 import { log } from "../utils/log";
+import { CacheUtil } from "../utils/redis";
+import { RecipeDetailsDisplay } from "./recipe-types";
 
 export class RecipeController {
   static async getWeeklyRecipes(_: Request, res: Response) {
@@ -10,12 +12,14 @@ export class RecipeController {
   }
 
   static async getPopularRecipes(_: Request, res: Response) {
-    const recipes = await RecipeService.getPopularRecipes();
+    const GET_POPULAR_RECIPES_KEY = 'GET:popular-recipes';
+    const recipes = await CacheUtil.get(GET_POPULAR_RECIPES_KEY, RecipeService.getPopularRecipes);
     ApiResponse.success(res, "Successfully retrieved popular recipes!", recipes, 200);
   }
   
   static async getRecipe(req: Request, res: Response) {
     const {recipe_id, recipe_name} = req.query;
+    const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
     
     if(Number.isNaN(recipe_id) || Number.isInteger(recipe_id) || recipe_id === undefined) {
       log("Recipe ID is not valid");
@@ -26,8 +30,8 @@ export class RecipeController {
       log("Recipe name is undefined");
       ApiResponse.error(res, "Please provide a valid recipe name");
     }
-
-    const recipe = await RecipeService.getRecipe(Number(recipe_id), String(recipe_name));
+    
+    const recipe = await CacheUtil.get<RecipeDetailsDisplay, typeof RecipeService.getRecipe>(GET_RECIPE_KEY, RecipeService.getRecipe, 60, Number(recipe_id), String(recipe_name)) ;
 
     if(recipe === undefined) {
       log("Recipe not found");

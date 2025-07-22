@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import Image from "@/components/Image/server";
 import StarReviews from "@/components/StarReviews";
 import { RecipeDetailsDisplayComments } from "@/server-actions/Recipe/recipe-types";
 import { Comment } from "@/types/recipe-types"
@@ -18,7 +19,7 @@ export default async function ShowRecipeComments({comments, total_comments}: Sho
             <div key={idx} className="review-comment flex w-[100%] gap-[10px]">
               <div className="avatar">
                 <Link href={`/user/${com.user?.user_id}`}>
-                  <img src={com.user?.user_image} className="relative top-[5px] w-[30px] rounded-full object-cover overflow-hidden h-[30px] max-w-none" width={10000} height={10000} alt="website banner" />
+                  <Image src={com.user?.user_image} className="relative top-[5px] w-[30px] rounded-full object-cover overflow-hidden h-[30px] max-w-none" width={30} height={30} alt="website banner" />
                 </Link>
               </div>
               <div className="comment-container w-[100%] flex flex-col justify-center">

@@ -1,4 +1,10 @@
 services:
+  redis:
+    image: redis:latest
+    container_name: wangohan_redis
+    restart: always
+    ports:
+      - 6379:6379
   postgres:
     container_name: wangohan_db
     image: postgres:latest
@@ -8,6 +14,8 @@ services:
     volumes:
       - wangohan_data:/var/lib/postgresql/data    
       - ./backend/database:/data
+    depends_on:
+      - redis
   server:
     container_name: wangohan_server
     build:
