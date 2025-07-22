@@ -4,8 +4,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserTabs from "./components/user-tabs";
 import UserPetsCarousel from "./components/user-pets-carousel";
 import Button from "@/components/Button";
+import { Metadata, ResolvingMetadata } from "next";
+import { getUser } from "@/server-actions/User/user";
 
-export default async function User() {
+interface UserProps {
+  params: {
+    userId: string;
+    userName: string;
+  }
+}
+export async function generateMetadata({
+  params
+}: UserProps, parent: ResolvingMetadata): Promise<Metadata> {
+  return {
+    title: 'User'
+  }
+}
+
+export default async function User({
+  params
+}: UserProps) {
+  const {userId, userName} = await params;
+  
+  const user = await getUser(Number(userId), String(userName));
+  console.log(user);
   return (
     <div className="flex gap-2 justify-center w-full max-w-7xl text-primary-text mt-10">
       <section className="w-full flex flex-col gap-2 items-center">

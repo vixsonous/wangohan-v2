@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {RecipeController} from "./Recipes/recipe-controller";
 import { ImageController } from "./Images/image-controller";
+import { UserController } from "./User/user-controller";
 
 export const router = Router();
 
@@ -10,3 +11,6 @@ router.get("/get-popular-recipes", RecipeController.getPopularRecipes);
 
 // Images
 router.get("/transform-image", ImageController.transformImage);
+
+// User
+router.get("/get-user", UserController.getUser);

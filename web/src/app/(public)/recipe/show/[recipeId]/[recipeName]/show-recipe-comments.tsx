@@ -18,7 +18,7 @@ export default async function ShowRecipeComments({comments, total_comments}: Sho
           return (
             <div key={idx} className="review-comment flex w-[100%] gap-[10px]">
               <div className="avatar">
-                <Link href={`/user/${com.user?.user_id}`}>
+                <Link href={`/user/${com.user?.user_id}/${com.user?.user_codename}`}>
                   <Image src={com.user?.user_image} className="relative top-[5px] w-[30px] rounded-full object-cover overflow-hidden h-[30px] max-w-none" width={30} height={30} alt="website banner" />
                 </Link>
               </div>
