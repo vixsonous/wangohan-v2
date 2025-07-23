@@ -27,12 +27,16 @@ export default async function User({
   const {userId, userName} = await params;
   
   const user = await getUser(Number(userId), String(userName));
-  console.log(user);
+
+  if(user === undefined) {
+    return <h1>User not found!</h1>;
+  }
+
   return (
     <div className="flex gap-2 justify-center w-full max-w-7xl text-primary-text mt-10">
       <section className="w-full flex flex-col gap-2 items-center">
-        <Image className="rounded-full" width={300} height={300} src={"/image.webp"} alt="profile picture"/>
-        <h1>Codename</h1>
+        <Image className="rounded-full" width={300} height={300} src={user.user_image} alt="profile picture"/>
+        <h1 className="text-3xl mb-4">{user.user_codename}</h1>
         <div className="relative">
           <Image width={300} height={122} src={"/banner/ribbon.webp"}/>
           <h1 className="absolute top-1/12 pt-1 font-semibold text-sm md:text-lg left-1/2 -translate-x-1/2">
