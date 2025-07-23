@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Gloria_Hallelujah, Inter, Mochiy_Pop_P_One } from "next/font/google";
 import React, { HTMLAttributes, memo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import Image from "@/components/Image/client";
 import Link from "next/link";
+import axios from "axios";
 
 export const mochi = Mochiy_Pop_P_One({
   weight: "400",
@@ -40,13 +41,19 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
         <Image noprocess src={"/icons/svg/primary-eye-slash.svg"} alt="hide password button icon"/>
       )}
     </ButtonX>
-  })
+  });
+
+  const onSubmit = async (data: FieldValues) => {
+    console.log(data);
+
+    const q = await axios.get("http://localhost:3001/api/transform-image");
+  }
 
   return (
     <div suppressHydrationWarning className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0 bg-secondary-bg text-primary-text">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className={`text-4xl font-bold leading-tight ${mochi.className}`}>わんごはん</h1>

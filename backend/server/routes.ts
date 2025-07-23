@@ -14,3 +14,4 @@ router.get("/transform-image", ImageController.transformImage);
 
 // User
 router.get("/get-user", UserController.getUser);
+router.post("/login", UserController.login);

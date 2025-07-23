@@ -1,6 +1,6 @@
 import express from 'express';
 import { router } from './routes';
-
+import cors from 'cors';
 const app = express();
 
 app.use("/api", router);

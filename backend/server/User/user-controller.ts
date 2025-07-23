@@ -15,4 +15,10 @@ export class UserController {
     log("Successfully retrieved user data!");
     ApiResponse.success(res, "User found!", user);
   }
+
+  static async login(req: Request, res: Response) {
+    console.log("logined!");
+
+    ApiResponse.success(res, "Successfully logged in!");
+  }
 }
