@@ -1,5 +1,5 @@
 import { UserRepository } from "./user-repository";
-import { UserData, UserDisplay } from "./user-types";
+import { UserCredentials, UserData, UserDisplay } from "./user-types";
 
 export class User {
   private user_first_name: string;
@@ -41,5 +41,11 @@ export class User {
     const user = await UserRepository.getUser(user_id, user_codename);
 
     return user ? new User(user) : user;
+  }
+
+  static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<UserCredentials | undefined> {
+    const user = await UserRepository.findUser({user_email: email, google_id: googleId});
+
+    return user;
   }
 }

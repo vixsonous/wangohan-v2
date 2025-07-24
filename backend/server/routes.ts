@@ -2,6 +2,7 @@ import { Router } from "express";
 import {RecipeController} from "./Recipes/recipe-controller";
 import { ImageController } from "./Images/image-controller";
 import { UserController } from "./User/user-controller";
+import passport from './utils/passport';
 
 export const router = Router();
 
@@ -14,4 +15,4 @@ router.get("/transform-image", ImageController.transformImage);
 
 // User
 router.get("/get-user", UserController.getUser);
-router.post("/login", UserController.login);
+router.post("/login", passport.authenticate('local'), UserController.login);

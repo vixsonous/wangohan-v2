@@ -46,7 +46,10 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
   const onSubmit = async (data: FieldValues) => {
     console.log(data);
 
-    const q = await axios.get("http://localhost:3001/api/transform-image");
+    const q = await axios.post("http://app.localhost/api/login", {
+      email: "",
+      password: ""
+    });
   }
 
   return (

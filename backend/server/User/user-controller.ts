@@ -18,7 +18,7 @@ export class UserController {
 
   static async login(req: Request, res: Response) {
     console.log("logined!");
-
+    const d = await UserService.localStrategyLogin("wqe", "qwe");
     ApiResponse.success(res, "Successfully logged in!");
   }
 }

@@ -1,7 +1,7 @@
 import {createClient, RedisArgument} from 'redis';
 import { log } from './log';
 
-const redisClient = await createClient({
+export const redisClient = await createClient({
   socket: {
     host: "redis",
     port: 6379

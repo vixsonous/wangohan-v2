@@ -6,4 +6,9 @@ export class UserService {
 
     return user;
   }
+
+  static async localStrategyLogin(email: string, password: string) {
+    const user = await User.findUser({email});
+    console.log(user);
+  }
 }

@@ -17,3 +17,9 @@ export interface UserData {
   updated_at: Date;
   created_at: Date;
 }
+
+export interface UserCredentials {
+  email?: string | undefined,
+  google_id?: string | undefined,
+  password?: string | undefined
+}

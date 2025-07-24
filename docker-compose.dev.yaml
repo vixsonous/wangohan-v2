@@ -1,4 +1,23 @@
 services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: 
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.app.localhost`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=web"
   redis:
     image: redis:latest
     container_name: wangohan_redis
@@ -31,6 +50,11 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - postgres
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=Host(`app.localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.server.entrypoints=web"
+      - "traefik.http.services.server.loadbalancer.server.port=3001"
   web:
     container_name: wangohan_web
     build: 
@@ -46,6 +70,11 @@ services:
       - 3000:3000
     depends_on:
       - server
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`app.localhost`)"
+      - "traefik.http.routers.web.entrypoints=web"
+      - "traefik.http.services.web.loadbalancer.server.port=3000"
 volumes:
   web_node_modules:
   server_node_modules:

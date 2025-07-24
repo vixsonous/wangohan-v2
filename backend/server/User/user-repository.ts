@@ -1,6 +1,6 @@
 import { db } from "../../database/database";
 import { log } from "../utils/log";
-import { UserData } from "./user-types";
+import { UserCredentials, UserData } from "./user-types";
 
 export class UserRepository {
   static async getUser(user_id: number, user_codename: string): Promise<UserData | undefined> {
@@ -23,6 +23,26 @@ export class UserRepository {
           user_id: user_id,
           user_codename: user_codename
         }))
+        .executeTakeFirstOrThrow();
+
+      return user
+    } catch (error) {
+      console.error("User not found!");
+      log(error);
+      return undefined;
+    }
+  }
+
+  static async findUser({user_email, google_id}:{user_email?: string | undefined, google_id?: string | undefined}): Promise<UserCredentials | undefined> {
+    try {
+      const user: UserCredentials = await db.selectFrom("users_table")
+        .select([
+          "email",
+          "google_id",
+          "password"
+        ])
+        .$if(user_email !== undefined, q => q.where("email","=", user_email!))
+        .$if(google_id !== undefined, q => q.where("google_id","=",google_id!))
         .executeTakeFirstOrThrow();
 
       return user
