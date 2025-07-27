@@ -11,7 +11,7 @@ app.use(urlencoded({extended: false}));
 
 app.use(session({
   store: new RedisStore({client: redisClient}),
-  secret: '',
+  secret: 'secret key',
   saveUninitialized: false,
   resave: false,
   cookie: {

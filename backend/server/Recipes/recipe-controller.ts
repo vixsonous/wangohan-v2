@@ -20,6 +20,7 @@ export class RecipeController {
   
   static async getRecipe(req: Request, res: Response) {
     const {recipe_id, recipe_name} = req.query;
+    console.log(req.user);
     const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
     
     if(Number.isNaN(recipe_id) || Number.isInteger(recipe_id) || recipe_id === undefined) {

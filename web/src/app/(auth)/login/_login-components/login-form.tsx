@@ -5,28 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Gloria_Hallelujah, Inter, Mochiy_Pop_P_One } from "next/font/google";
 import React, { HTMLAttributes, memo, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Image from "@/components/Image/client";
 import Link from "next/link";
 import axios from "axios";
-
-export const mochi = Mochiy_Pop_P_One({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-  adjustFontFallback: false,
-});
-
-export const gloria = Gloria_Hallelujah({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-  adjustFontFallback: false,
-});
-
-export const inter = Inter({ subsets: ["latin"], display: 'swap', adjustFontFallback: false });
+import { gloria, inter, mochi } from "@/app/_root-components/client-fonts";
 
 export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivElement>) {
 
@@ -46,10 +30,7 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
   const onSubmit = async (data: FieldValues) => {
     console.log(data);
 
-    const q = await axios.post("http://app.localhost/api/login", {
-      email: "",
-      password: ""
-    });
+    const q = await axios.post("http://app.localhost/api/login", data);
   }
 
   return (
@@ -67,7 +48,7 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
               <div className="grid gap-3">
                 <Label htmlFor="email">メールアドレス</Label>
                 <InputField
-                  {...register("email_login", {
+                  {...register("email", {
                     required: true,
                     onChange: (e:React.MouseEvent<HTMLInputElement>) => {
                       console.log(e.currentTarget.value);
@@ -78,7 +59,6 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
                   type="email"
                   placeholder="m@example.com"
                   className="bg-white"
-                  required
                 />
               </div>
               <div className="grid gap-3">
@@ -91,7 +71,21 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
                     Forgot your password?
                   </a>
                 </div>
-                <InputField id="password" type={passwordState} icon={<ShowPasswordBtn />} required className={`bg-white ${inter.className}`} />
+                <InputField 
+                  {...register("password", {
+                    required: true,
+                    onChange: (e:React.MouseEvent<HTMLInputElement>) => {
+                      console.log(e.currentTarget.value);
+                    }
+                  })}
+                  errors={errors}
+                  id="password"
+                  placeholder="Password"
+                  type={passwordState} 
+                  icon={<ShowPasswordBtn />} 
+                  required 
+                  className={`bg-white ${inter.className}`} 
+                />
               </div>
               <Button type="submit" className="w-full bg-primary-text">
                 ログイン

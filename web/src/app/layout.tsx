@@ -5,6 +5,7 @@ import RootHeader from "./_root-components/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ServerUtils } from "@/lib/server-utils";
 import RootFooter from "./_root-components/root-footer";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -92,6 +93,7 @@ export default async function RootLayout({
           </main>
           <RootFooter />
         </SidebarProvider>
+        <Toaster richColors position="top-center"/>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

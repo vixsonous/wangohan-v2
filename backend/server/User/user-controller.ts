@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { UserService } from "./user-service";
 import { ApiResponse } from "../utils/ApiUtils";
 import { log } from "../utils/log";
+import { UserLocalStrategyRegistrationSchema } from "./user-schema";
+import z from "zod";
+import { User } from "./user";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {
@@ -17,8 +20,41 @@ export class UserController {
   }
 
   static async login(req: Request, res: Response) {
-    console.log("logined!");
-    const d = await UserService.localStrategyLogin("wqe", "qwe");
+    console.log(req.user);
+    console.log("yes");
     ApiResponse.success(res, "Successfully logged in!");
+  }
+
+  static async register(req: Request, res: Response) {
+    const data: z.infer<typeof UserLocalStrategyRegistrationSchema> = req.body;
+    
+    const result = UserLocalStrategyRegistrationSchema.safeParse(data);
+
+    if(result.success === false) {
+      ApiResponse.error(res, result.error.errors[0].message);
+      return;
+    }
+
+    const userExist = await User.findUser({email: data.email});
+
+    if(userExist) {
+      ApiResponse.error(res, "User already exists!");
+      return;
+    }
+
+    const createResult = await UserService.localStrategyRegister(data.email, data.password);
+
+    if(!createResult) {
+      ApiResponse.error(res, "Failed to create user!");
+      return;
+    }
+
+    req.logIn(createResult.getId(), (err) => {
+      if(err) {
+        ApiResponse.error(res, "Error in saving to session!");
+      }
+    });
+
+    ApiResponse.success(res, "Successfully registered!");
   }
 }

@@ -5,48 +5,52 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Gloria_Hallelujah, Inter, Mochiy_Pop_P_One } from "next/font/google";
-import React, { HTMLAttributes, memo, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { HTMLAttributes } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 import Image from "@/components/Image/client";
 import Link from "next/link";
+import axios from "axios";
+import z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { gloria, mochi } from "@/app/_root-components/client-fonts";
+import { useMutation } from "@tanstack/react-query";
+import Error from "@/components/Error";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export const mochi = Mochiy_Pop_P_One({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-  adjustFontFallback: false,
-});
-
-export const gloria = Gloria_Hallelujah({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-  adjustFontFallback: false,
-});
-
-export const inter = Inter({ subsets: ["latin"], display: 'swap', adjustFontFallback: false });
+const UserSignupSchema = z.object({
+  email: z.email("Invalid email format!").min(1, "Email is required!").nonempty(),
+  password: z.string().min(7, "Password must be at least 7 characters!").nonempty(),
+  repeat_password: z.string(),
+}).refine(data => data.password === data.repeat_password, {
+  message: "The passwords do not match!",
+  path: ["repeat_password"]
+})
 
 export default function SignupForm({className, ...props}: HTMLAttributes<HTMLDivElement>) {
+  
+  const router = useRouter();
 
-  const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onChange'});
-  const [passwordState, setPasswordState] = useState('password');
+  const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserSignupSchema)});
+  
+  const mutation = useMutation({
+    mutationFn: (data: FieldValues) => axios.post("http://app.localhost/api/register", data),
+    onSuccess: (data) => {
+      toast.success("Successful!", {description: data.data.message});
+      router.push("/");
+    }
+  });
 
-  const ShowPasswordBtn = memo(function ShowPassword() {
-    return <ButtonX onClick={() => setPasswordState(prev => prev === 'password' ? 'text' : 'password')}>
-      {passwordState === 'text' ? (
-        <Image noprocess src={"/icons/svg/primary-eye.svg"} alt="show password button icon"/>
-      ) : (
-        <Image noprocess src={"/icons/svg/primary-eye-slash.svg"} alt="hide password button icon"/>
-      )}
-    </ButtonX>
-  })
+  const onSubmit = async (data: FieldValues) => {
+    const dt = mutation.mutate(data);
+    console.log(dt);
+  }
 
   return (
     <div suppressHydrationWarning className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0 bg-secondary-bg text-primary-text">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className={`text-4xl font-bold leading-tight ${mochi.className}`}>わんごはん</h1>
@@ -57,8 +61,11 @@ export default function SignupForm({className, ...props}: HTMLAttributes<HTMLDiv
               <div className="grid gap-3">
                 <Label htmlFor="email">メールアドレス</Label>
                 <InputField
-                  {...register("email_login", {
-                    required: true,
+                  {...register("email", {
+                    required: {
+                      value: true,
+                      message: "Email is required!"
+                    },
                     onChange: (e:React.MouseEvent<HTMLInputElement>) => {
                       console.log(e.currentTarget.value);
                     }
@@ -68,24 +75,56 @@ export default function SignupForm({className, ...props}: HTMLAttributes<HTMLDiv
                   type="email"
                   placeholder="m@example.com"
                   className="bg-white"
-                  required
                 />
               </div>
               <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">パスワード</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <InputField id="password" type={passwordState} icon={<ShowPasswordBtn />} required className={`bg-white ${inter.className}`} />
+                <Label htmlFor="password">パスワード</Label>
+                <InputField 
+                  {...register("password", {
+                    required: {
+                      value: true,
+                      message: "Password is required!"
+                    },
+                    onChange: (e:React.MouseEvent<HTMLInputElement>) => {
+                      console.log(e.currentTarget.value);
+                    }
+                  })}
+                  errors={errors}
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  className="bg-white"
+                />
               </div>
-              <Button type="submit" className="w-full bg-primary-text">
-                新規登録
-              </Button>
+              <div className="grid gap-3">
+                <Label htmlFor="repeat_password">パスワード繰り返し</Label>
+                <InputField 
+                  {...register("repeat_password", {
+                    onChange: (e:React.MouseEvent<HTMLInputElement>) => {
+                      console.log(e.currentTarget.value);
+                    }
+                  })}
+                  errors={errors}
+                  id="repeat_password"
+                  type="password"
+                  placeholder="Re-enter your password"
+                  className="bg-white" 
+                />
+              </div>
+              <div className="flex flex-col gap-2 w-full items-center">
+                <Button disabled={mutation.isSuccess} type="submit" className="w-full bg-primary-text">
+                  {mutation.isPending ? (
+                    "Loading 新規登録"
+                  ): (
+                    "新規登録"
+                  )}
+                </Button>
+                {mutation.isError && (
+                  <Error>
+                    {axios.isAxiosError(mutation.error) ? mutation.error.response?.data.message: "There was an error!"}
+                  </Error>
+                )}
+              </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-secondary-bg text-muted-foreground relative z-10 px-2">
                   Or continue with

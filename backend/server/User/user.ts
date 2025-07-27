@@ -1,7 +1,45 @@
-import { UserRepository } from "./user-repository";
-import { UserCredentials, UserData, UserDisplay } from "./user-types";
+import z from "zod";
+import { UserDetailsRepository, UserRepository } from "./user-repository";
+import { UserCredentials, UserDetailsData, UserDisplay } from "./user-types";
+import { UserCredentialsSchema, UserSchema } from "./user-schema";
 
 export class User {
+  
+  private user_id?: number;
+  private google_id?: string;
+  private email: string;
+  private password?: string;
+  private user_lvl?: number;
+  private updated_at?: Date;
+  private created_at?: Date;
+  
+  constructor(user: z.infer<typeof UserSchema>) {
+    this.user_id = user.user_id;
+    this.google_id = user.google_id;
+    this.email = user.email;
+    this.password = user.password;
+    this.user_lvl = user.user_lvl;
+    this.updated_at = user.updated_at;
+    this.created_at = user.created_at;
+  }
+  
+  static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<UserCredentials | undefined> {
+    const user = await UserRepository.findUser({user_email: email, google_id: googleId});
+
+    return user;
+  }
+
+  async createUser(): Promise<User | undefined> {
+    const createResult = await UserRepository.createUser({email: this.email, google_id: this.google_id, password: this.password});
+
+    return createResult;
+  }
+
+  getId(): number {
+    return this.user_id || -1;
+  }
+}
+export class UserDetails {
   private user_first_name: string;
   private user_last_name: string;
   private user_codename: string;
@@ -14,7 +52,7 @@ export class User {
   private updated_at: Date;
   private created_at: Date;
   constructor(
-    user: UserData
+    user: UserDetailsData
   ) {
     this.user_first_name = user.user_first_name; 
     this.user_last_name  = user.user_last_name ;
@@ -37,15 +75,10 @@ export class User {
     }
   }
 
-  static async getUser(user_id: number, user_codename: string): Promise<User | undefined> {
-    const user = await UserRepository.getUser(user_id, user_codename);
+  static async getUser(user_id: number, user_codename: string): Promise<UserDetails | undefined> {
+    const user = await UserDetailsRepository.getUser(user_id, user_codename);
 
-    return user ? new User(user) : user;
+    return user ? new UserDetails(user) : user;
   }
 
-  static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<UserCredentials | undefined> {
-    const user = await UserRepository.findUser({user_email: email, google_id: googleId});
-
-    return user;
-  }
 }

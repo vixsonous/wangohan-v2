@@ -16,3 +16,4 @@ router.get("/transform-image", ImageController.transformImage);
 // User
 router.get("/get-user", UserController.getUser);
 router.post("/login", passport.authenticate('local'), UserController.login);
+router.post("/register", UserController.register);
