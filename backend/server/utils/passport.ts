@@ -9,8 +9,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  console.log(id);
-  done(null, {id: 1, username: 'qweqwe'});
+  done(null, {id: id, username: 'qweqwe'});
 });
 
 const LocalStrategy = Local.Strategy;

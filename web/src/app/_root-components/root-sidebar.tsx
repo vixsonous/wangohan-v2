@@ -1,10 +1,9 @@
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import SidebarMenu from "./root-sidebar-menu";
-import Button from "@/components/Button";
 import Image from "@/components/Image/server";
 import { CreateRecipe } from "./root-create-recipe";
 
-export default function RootSidebar() {
+export default async function RootSidebar() {
   return (
     <Sheet>
       <SheetTrigger className="cursor-pointer">

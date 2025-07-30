@@ -40,7 +40,7 @@ export class UserDetailsRepository {
 }
 
 export class UserRepository {
-  static async findUser({user_email, google_id}:{user_email?: string | undefined, google_id?: string | undefined}): Promise<UserCredentials | undefined> {
+  static async findUser({user_email, google_id, user_id}:{user_email?: string | undefined, google_id?: string | undefined, user_id?: string | undefined}): Promise<UserCredentials | undefined> {
     try {
       const user: UserCredentials = await db.selectFrom("users_table")
         .select([
@@ -51,6 +51,7 @@ export class UserRepository {
         ])
         .$if(user_email !== undefined, q => q.where("email","=", user_email!))
         .$if(google_id !== undefined, q => q.where("google_id","=",google_id!))
+        .$if(user_id !== undefined, q => q.where("user_id","=",Number(user_id!)))
         .executeTakeFirstOrThrow();
 
       return user

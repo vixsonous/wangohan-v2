@@ -11,11 +11,22 @@ import Image from "@/components/Image/client";
 import Link from "next/link";
 import axios from "axios";
 import { gloria, inter, mochi } from "@/app/_root-components/client-fonts";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+const UserLoginSchema = z.object({
+  email: z.string().min(1, "Email is required!").email("Invalid email format!"),
+  password: z.string().min(7, "Password must be at least 7 characters!")
+});
 
 export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivElement>) {
 
-  const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onChange'});
+  const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserLoginSchema)});
   const [passwordState, setPasswordState] = useState('password');
+  const router = useRouter();
 
   const ShowPasswordBtn = memo(function ShowPassword() {
     return <ButtonX onClick={() => setPasswordState(prev => prev === 'password' ? 'text' : 'password')}>
@@ -27,11 +38,15 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
     </ButtonX>
   });
 
-  const onSubmit = async (data: FieldValues) => {
-    console.log(data);
+  const loginMutation = useMutation({
+    mutationFn: (data: FieldValues) => axios.post("http://app.localhost/api/login", data),
+    onSuccess: (data) => {
+      toast.success("Successful!", {description: data.data.message});
+      window.location.href = "/";
+    }
+  })
 
-    const q = await axios.post("http://app.localhost/api/login", data);
-  }
+  const onSubmit = async (data: FieldValues) => loginMutation.mutate(data);
 
   return (
     <div suppressHydrationWarning className={cn("flex flex-col gap-6", className)} {...props}>
@@ -48,12 +63,7 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
               <div className="grid gap-3">
                 <Label htmlFor="email">メールアドレス</Label>
                 <InputField
-                  {...register("email", {
-                    required: true,
-                    onChange: (e:React.MouseEvent<HTMLInputElement>) => {
-                      console.log(e.currentTarget.value);
-                    }
-                  })}
+                  {...register("email")}
                   errors={errors}
                   id="email"
                   type="email"
@@ -72,23 +82,21 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
                   </a>
                 </div>
                 <InputField 
-                  {...register("password", {
-                    required: true,
-                    onChange: (e:React.MouseEvent<HTMLInputElement>) => {
-                      console.log(e.currentTarget.value);
-                    }
-                  })}
+                  {...register("password")}
                   errors={errors}
                   id="password"
                   placeholder="Password"
                   type={passwordState} 
-                  icon={<ShowPasswordBtn />} 
-                  required 
+                  icon={<ShowPasswordBtn />}  
                   className={`bg-white ${inter.className}`} 
                 />
               </div>
               <Button type="submit" className="w-full bg-primary-text">
-                ログイン
+                {loginMutation.isPending ? (
+                  "Loading ログイン"
+                ): (
+                  "ログイン"
+                )}
               </Button>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-secondary-bg text-muted-foreground relative z-10 px-2">

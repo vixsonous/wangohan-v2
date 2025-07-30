@@ -8,6 +8,7 @@ import { User } from "./user";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {
+    console.log(req.user);
     const {user_id, user_codename} = req.query;
     const user = await UserService.getUser(Number(user_id), String(user_codename));
     
@@ -19,9 +20,12 @@ export class UserController {
     ApiResponse.success(res, "User found!", user);
   }
 
+  static async isAuthenticated(req: Request, res: Response) {
+    ApiResponse.success(res, req.user ? "Authenticated": "Not authenticated", req.user, 200);
+  }
+
   static async login(req: Request, res: Response) {
     console.log(req.user);
-    console.log("yes");
     ApiResponse.success(res, "Successfully logged in!");
   }
 

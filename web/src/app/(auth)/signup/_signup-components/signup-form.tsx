@@ -41,10 +41,7 @@ export default function SignupForm({className, ...props}: HTMLAttributes<HTMLDiv
     }
   });
 
-  const onSubmit = async (data: FieldValues) => {
-    const dt = mutation.mutate(data);
-    console.log(dt);
-  }
+  const onSubmit = async (data: FieldValues) => mutation.mutate(data);
 
   return (
     <div suppressHydrationWarning className={cn("flex flex-col gap-6", className)} {...props}>
