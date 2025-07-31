@@ -8,6 +8,9 @@
   --secondary-background: #FFFAF0;
   --primary-text: #523636;
   --secondary-text: #6b4528;
+  --inactive: #999999;
+  --bullet-color: #FFBA08;
+  --error: red;
   --text: 1rem;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -43,12 +46,53 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+.error>svg>path {
+  fill: var(--error);
+}
+
+@font-face {
+  font-family: 'mitimasu';
+  src: url('/fonts/mitimasu.ttf');
+}
+
+input[type="checkbox"]:checked+label>span{ 
+  background-color: var(--secondary-background);
+  color: var(--primary-text);
+  border: 2px solid var(--primary-text);
+  font-weight: bold;
+} 
+
 @theme {
   --color-primary-bg: var(--primary-background);
   --color-secondary-bg: var(--secondary-background);
   --color-primary-text: var(--primary-text);
   --color-secondary-text: var(--secondary-text);
+  --color-inactive: var(--inactive);
+  --color-bullet: var(--bullet-color);
+  --color-error: var(--error);
   --text-xxs: calc(var(--text)*0.60);
+
+  --animate-bubble: bubble 1s ease-out;
+  @keyframes bubble {
+    0% {
+      transform: scale(1);
+    }
+    20% {
+      transform: scaleY(0.95) scaleX(1.05);
+    }
+    48% {
+      transform: scaleY(1.1) scaleX(0.9);
+    }
+    68% {
+      transform: scaleY(0.98) scaleX(1.02);
+    }
+    80% {
+      transform: scaleY(1.02) scaleX(0.98);
+    }
+    97%, 100% {
+      transform: scale(1);
+    }
+  }
 }
 
 @theme inline {

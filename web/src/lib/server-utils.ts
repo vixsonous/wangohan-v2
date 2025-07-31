@@ -12,3 +12,17 @@ export class ServerApiService {
     return await axios.post(this.BACKEND_SERVER_URL + url, data, getConfig);
   }
 }
+
+
+export class ServerUtils {
+  private static _urls = new Set<string>();
+
+  static registerPreload(url: string) {
+    this._urls.add(url);
+  }
+
+  static getPreloads() {
+    const preloadUrls = Array.from(this._urls);
+    return preloadUrls;
+  }
+}

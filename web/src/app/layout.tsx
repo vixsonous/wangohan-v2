@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import RootHeader from "./_root-components/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { getRecipe } from "@/server-actions/recipe";
+import { ServerUtils } from "@/lib/server-utils";
+import RootFooter from "./_root-components/root-footer";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,7 +55,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await getRecipe();
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Recipe",
@@ -66,23 +67,33 @@ export default async function RootLayout({
     },
     "keywords": "犬用レシピ, 手作りごはん",
   };
+
+  const preloads = ServerUtils.getPreloads();
   return (
     <html lang="en">
       <head>
+        {preloads.map( l => {
+          return (
+            <link key={l} rel="preload" href={l} as="image"/>
+          )
+        })}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <meta name="google-adsense-account" content="ca-pub-9990388374961956"></meta>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9990388374961956"
           crossOrigin="anonymous"></script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary-bg`}
+        style={{fontFamily: 'mitimasu'}}
+        className={` antialiased bg-primary-bg `}
       >
-        <SidebarProvider>
+        <SidebarProvider className="grid grid-cols-1">
           <RootHeader />
           <main className={`pt-[65.68px] min-h-screen flex grow justify-center`}>
-            <div className='w-screen max-w-7xl'>{children}</div>
+            <div className='w-screen max-w-7xl flex flex-col items-center'>{children}</div>
           </main>
+          <RootFooter />
         </SidebarProvider>
+        <Toaster richColors position="top-center"/>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
