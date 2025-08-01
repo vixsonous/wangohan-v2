@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-alpine as development
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -13,3 +13,18 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
 
 CMD ["pnpm", "run", "dev"]
+
+FROM node:18-alpine as production
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+COPY . .
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build && echo "Build ran" && ls -la && ls -R build || (echo "Build failed" && exit 1)
+
+CMD [ "pnpm", "start" ]
