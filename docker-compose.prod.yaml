@@ -9,7 +9,7 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - letsencrypt:/letsencrypt-wangohan
+      - letsencrypt:/letsencrypt
     command: 
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -93,3 +93,4 @@ volumes:
   web_node_modules:
   server_node_modules:
   wangohan_data:
+  letsencrypt: 
