@@ -7,6 +7,7 @@ import passport from './utils/passport';
 export const router = Router();
 
 router.get("/get-recipe", RecipeController.getRecipe);
+router.post("/post-recipe", RecipeController.uploadRecipe);
 router.get("/get-weekly-recipes", RecipeController.getWeeklyRecipes);
 router.get("/get-popular-recipes", RecipeController.getPopularRecipes);
 

@@ -1,75 +1,138 @@
-import { RECIPE_AMOUNT, RECIPE_INGREDIENT, RECIPE_INSTRUCTION } from "@/constants/field-ids";
-import { useCallback, useState } from "react";
-import { FieldValues, UseFormUnregister } from "react-hook-form";
+import { RECIPE_AMOUNT, RECIPE_DESCRIPTION, RECIPE_INGREDIENT, RECIPE_INSTRUCTION, RECIPE_TITLE } from "@/constants/field-ids";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useCallback, useState } from "react";
+import { FieldValues, useFieldArray, useForm, UseFormUnregister } from "react-hook-form";
+import { toast } from "sonner";
 import { v4 } from "uuid";
+import z from "zod";
 
+const MAX_FILES_LENGTH = 5;
 
+const FileDisplaySchema = z.array(z.object({
+  file: z.file().min(1, "Please upload some pictures"),
+  preview_url: z.string().min(1, "Please provide preview url")
+}))
 
-export const useCreateRecipeForm = (unregister: UseFormUnregister<FieldValues>) => {
+const RecipeIngredientSchema = z.object({
+  recipe_ingredient: z.string().min(1, "Please input recipe ingredient"),
+  recipe_amount: z.string().min(1, "Please input recipe amount"),
+});
+
+const RecipeInstructionSchema = z.object({
+  recipe_instruction: z.string().min(1, "Please input recipe instructions")
+});
+
+export const RecipeSchema = z.object({
+  recipe_title: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
+  recipe_description: z.string().min(1, "内容を入力してください"),
+  recipe_instructions: z.array(RecipeInstructionSchema).min(1, "Please input recipe instructions!"),
+  recipe_ingredients: z.array(RecipeIngredientSchema).min(1, "Please input recipe ingredients!"),
+  checkbox_age: z.array(z.string().or(z.boolean()).optional()).optional(),
+  checkbox_size: z.array(z.string().or(z.boolean()).optional()).optional(),
+  checkbox_event: z.array(z.string().or(z.boolean()).optional()).optional()
+});
+
+export const useCreateRecipeForm = () => {
   
-  const [recipeIngredientsCnt, setRecipeIngredientsCnt] = useState([
-    {recipe_ingredient: `${RECIPE_INGREDIENT}_1` , recipe_amount: `${RECIPE_AMOUNT}_1`}
-  ]);
+  const {
+    register, 
+    unregister, 
+    handleSubmit, 
+    formState: {errors},
+    control,
+    watch
+  } = useForm<z.infer<typeof RecipeSchema>>({
+    mode: 'onChange', 
+    resolver: zodResolver(RecipeSchema),
+    defaultValues: {
+      recipe_title: "",
+      recipe_description: "",
+      recipe_ingredients: [
+        {
+          recipe_amount: "",
+          recipe_ingredient: ""
+        }
+      ],
+      recipe_instructions: [
+        {
+          recipe_instruction: ""
+        }
+      ]
+    }
+  });
 
-  const [recipeInstructions, setRecipeInstructions] = useState([RECIPE_INSTRUCTION]);
+  const [files, setFiles] = useState<z.infer<typeof FileDisplaySchema>>([]);
 
-  const deleteRecipeIngredients = (id: string) => (e:React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setRecipeIngredientsCnt(prev => {
+  const fileOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const files = e.currentTarget.files;
+    if(files === null) return;
+    if(files.length < 0) return;
+    setFiles( prev => {
       const temp = structuredClone(prev);
-      const idx = temp.findIndex(v => v.recipe_ingredient === id);
-      if(idx < 0) return structuredClone(temp);
+      for(let i = 0; i < files.length && temp.length < MAX_FILES_LENGTH; i++) {
+        temp.push({
+          file: files[i],
+          preview_url: URL.createObjectURL(files[i])
+        });
+      }
+
+      return structuredClone(temp);
+    })
+  }
+  
+  const deleteFiles = (preview_url: string) => (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    setFiles(prev => {
+      const temp = structuredClone(prev);
+      const idx = temp.findIndex(f => f.preview_url === preview_url);
+
+      if(idx < 0) return prev;
+
+      temp.splice(idx, 1);
       
-      unregister(id.replace(RECIPE_INGREDIENT,RECIPE_AMOUNT));
-      temp.splice(idx, 1);
-
       return structuredClone(temp);
     });
+
+    
+    
   }
 
-  const deleteRecipeInstructions = (id: string) => (e:React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setRecipeInstructions(prev => {
-      const temp = structuredClone(prev);
-      const idx = temp.findIndex(i => i === id);
-      if(idx < 0) return structuredClone(temp);
-      temp.splice(idx, 1);
-      unregister(id);
-      return structuredClone(temp);
-    });
-  }
+  const recipe_ingredients_field = useFieldArray({
+    control,
+    name: "recipe_ingredients"
+  });
 
-  const increaseRecipeIngredients = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const id = v4();
-    setRecipeIngredientsCnt(prev => [...prev, {recipe_ingredient: `${RECIPE_INGREDIENT}_` + id, recipe_amount: `${RECIPE_AMOUNT}_` + id}]);
-  }, []);
-
-  const increaseRecipeInstructions = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setRecipeInstructions(prev => [...prev, `${RECIPE_INSTRUCTION}_` + v4()]);
-  }, []);
+  const recipe_instructions_field = useFieldArray({
+    control,
+    name: "recipe_instructions"
+  });
 
   const onSubmit = (data: FieldValues) => {
-    const recipe_instructions:Array<string> = [];
-    const recipe_amounts: Array<string> = [];
-    const recipe_ingredients: Array<string> = [];
-    Object.keys(data).forEach(k => {
-      if(k.includes(RECIPE_INSTRUCTION)) recipe_instructions.push(data[k]);
-      if(k.includes(RECIPE_INGREDIENT)) recipe_ingredients.push(data[k]);
-      if(k.includes(RECIPE_AMOUNT)) recipe_amounts.push(data[k]);
-    });
+    console.log(data);
 
-    console.log(recipe_amounts);
+    const parseResult = RecipeSchema.safeParse(data);
+    console.log(parseResult);
+    if(parseResult.success === false) {
+      toast.error("Error", {
+        description: parseResult.error.issues[0].message
+      })
+    }
   }
 
   return {
-    recipeIngredientsCnt, setRecipeIngredientsCnt,
-    recipeInstructions, setRecipeInstructions,
-    deleteRecipeIngredients,
-    deleteRecipeInstructions,
-    increaseRecipeIngredients,
-    increaseRecipeInstructions,
-    onSubmit
+    onSubmit,
+    fileOnChange,
+    files,
+    register,
+    unregister,
+    handleSubmit,
+    errors,
+    recipe_ingredients_field,
+    recipe_instructions_field,
+    control,
+    deleteFiles,
+    watch
   }
 }

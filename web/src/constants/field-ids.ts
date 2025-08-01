@@ -3,6 +3,9 @@ export const RECIPE_DESCRIPTION = 'recipe_description';
 export const RECIPE_INSTRUCTION = 'recipe_instruction';
 export const RECIPE_AMOUNT = 'recipe_amount';
 export const RECIPE_INGREDIENT = 'recipe_ingredient';
+export const RECIPE_CHECKBOX_AGE = 'checkbox-age';
+export const RECIPE_CHECKBOX_EVENT = 'checkbox-event';
+export const RECIPE_CHECKBOX_SIZE = 'checkbox-size';
 
 export const RECIPE_TITLE_EDIT = 'recipe_title_edit';
 export const RECIPE_IMAGES_EDIT = 'recipe_images_edit';
