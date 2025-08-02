@@ -9,7 +9,6 @@ import { getRecipe } from "@/server-actions/Recipe/recipe";
 
 type Props = {
   params: { recipeId: string, recipeName: string };
-  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata({
