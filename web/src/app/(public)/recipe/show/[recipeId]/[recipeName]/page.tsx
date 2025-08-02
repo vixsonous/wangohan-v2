@@ -49,12 +49,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function ShowRecipe({params}: {
-  params: {
-    recipeId: string,
-    recipeName: string
-  }
-}) {
+export default async function ShowRecipe({params}: Props) {
   const {recipeId, recipeName} = await params;
 
   const recipe = await getRecipe(Number(recipeId), recipeName);
