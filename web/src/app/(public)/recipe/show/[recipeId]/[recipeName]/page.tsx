@@ -9,16 +9,13 @@ import { getRecipe } from "@/server-actions/Recipe/recipe";
 
 type Props = {
   params: Promise<{ recipeId: string, recipeName: string }>;
-  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata({
   params,
-  searchParams
 }: Props): Promise<Metadata> {
   const id = (await params).recipeId;
   const name = (await params).recipeName;
-  console.log(searchParams);
   console.log(id, name);
   return {
     title: "クリスマス3色あんかけ",
