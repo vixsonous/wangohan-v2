@@ -15,7 +15,6 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 const UserLoginSchema = z.object({
   email: z.string().min(1, "Email is required!").email("Invalid email format!"),
@@ -26,7 +25,6 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
 
   const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserLoginSchema)});
   const [passwordState, setPasswordState] = useState('password');
-  const router = useRouter();
 
   const ShowPasswordBtn = memo(function ShowPassword() {
     return <ButtonX onClick={() => setPasswordState(prev => prev === 'password' ? 'text' : 'password')}>

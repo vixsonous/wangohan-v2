@@ -10,7 +10,7 @@ export default async function MyRecipes() {
         {Array.from(Array(9).keys()).map( a => {
           return (
             <Link href={"/recipe/show/" + a} key={a} className="w-full h-full group relative">
-              <Image src={"/image.webp"} className="w-full rounded-md group-hover:brightness-50 transition-all duration-200 h-full object-cover aspect-square bg-gray-300" />
+              <Image src={"/image.webp"} alt="my recipes images" className="w-full rounded-md group-hover:brightness-50 transition-all duration-200 h-full object-cover aspect-square bg-gray-300" />
               <h1 className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 top-1/2 -translate-y-1/2 -translate-x-1/2 left-1/2 text-white font-bold text-lg">Title here</h1>
             </Link>
           )

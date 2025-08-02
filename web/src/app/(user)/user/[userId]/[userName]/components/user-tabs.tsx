@@ -1,5 +1,4 @@
 import Image from "@/components/Image/server"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import MyRecipes from "./user-tabs-my-recipes"
 import LikedRecipes from "./user-tabs-liked-recipes"

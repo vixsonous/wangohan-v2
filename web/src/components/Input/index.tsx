@@ -2,7 +2,6 @@ import React, { InputHTMLAttributes } from "react";
 import { Input } from "../ui/input";
 import { FieldErrors, FieldValues } from "react-hook-form";
 import Image from "../Image/client";
-import Button from "../Button";
 import { Inter } from "next/font/google";
 import Error from "../Error";
 

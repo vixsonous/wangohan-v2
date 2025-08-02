@@ -8,9 +8,6 @@ import React, { useEffect, useState } from "react";
 import ShowRecipeDropdown from "./components/show-recipe-dropdown";
 import { RecipeImageDisplay } from "@/server-actions/Recipe/recipe-types";
 
-const length = 5;
-const basis = ` basis-1/` + length;
-
 interface ShowRecipeCarouselProps {
   recipe_images: Array<RecipeImageDisplay>;
 }

@@ -1,9 +1,8 @@
-import { RECIPE_AMOUNT, RECIPE_DESCRIPTION, RECIPE_INGREDIENT, RECIPE_INSTRUCTION, RECIPE_TITLE } from "@/constants/field-ids";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useCallback, useState } from "react";
-import { FieldValues, useFieldArray, useForm, UseFormUnregister } from "react-hook-form";
+import React, { useState } from "react";
+import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { v4 } from "uuid";
 import z from "zod";
 
 const MAX_FILES_LENGTH = 5;
@@ -117,6 +116,14 @@ export const useCreateRecipeForm = () => {
     if(parseResult.success === false) {
       toast.error("Error", {
         description: parseResult.error.issues[0].message
+      })
+    }
+
+    const filesParseResult = FileDisplaySchema.safeParse(files);
+
+    if(filesParseResult.success === false) {
+      toast.error("Error", {
+        description: filesParseResult.error.issues[0].message
       })
     }
   }

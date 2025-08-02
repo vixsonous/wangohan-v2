@@ -25,9 +25,9 @@ export default function StarReviews({
         Array.from(Array(5).keys()).map( a => {
           return (
             <svg 
-              onClick={(e) => setState(prev => ({...prev, constVal: 1}))} 
-              onMouseLeave={(e) => setState(prev => ({...prev, starVal: prev.constVal}))} 
-              onMouseOver={(e) => setState(prev => ({...prev, starVal: 1}))}  
+              onClick={() => setState(prev => ({...prev, constVal: 1}))} 
+              onMouseLeave={() => setState(prev => ({...prev, starVal: prev.constVal}))} 
+              onMouseOver={() => setState(prev => ({...prev, starVal: 1}))}  
               key={a} 
               className={`${large ? 'w-4 h-4': 'w-[10px] h-[10px]'} 
               ${value > a ? 'text-yellow-300' : 'text-gray-300 dark:text-gray-500'} ms-1`} 
@@ -46,7 +46,7 @@ export default function StarReviews({
           <input 
             type="text" 
             value={state.constVal} 
-            onChange={(e) => {
+            onChange={() => {
               setState(prev => ({...prev, constVal: prev.constVal}))
             }} 
             className="hidden" 

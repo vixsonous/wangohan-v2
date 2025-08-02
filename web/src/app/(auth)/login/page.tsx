@@ -1,4 +1,3 @@
-import LoginForm from "./_login-components/login-form";
 import LoginWrapper from "./_login-components/login-wrapper";
 
 export default async function Login() {

@@ -1,3 +1,4 @@
+import Image from "@/components/Image/server";
 import Link from "next/link";
 
 export default async function RootFooter() {
@@ -27,7 +28,7 @@ export default async function RootFooter() {
           </div>
         </div>
         <h1 className="w-[100%] flex justify-center absolute  md:bottom-16 text-[10px] md:text-sm">@Web5Dimensional</h1>
-        <img src="/banner/footer.webp" className="w-full" alt="" />
+        <Image src="/banner/footer.webp" noprocess className="w-full" alt="" />
       </div>
     </footer>
   )

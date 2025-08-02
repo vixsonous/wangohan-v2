@@ -5,10 +5,6 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/componen
 import Link from "next/link";
 import React, { useCallback, useEffect, useState } from "react";
 
-const categories = [
-
-]
-
 const dogCategory = [
   {
     title: "年齢別で探す",

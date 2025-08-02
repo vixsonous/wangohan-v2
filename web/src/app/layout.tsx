@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import RootHeader from "./_root-components/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { ServerApiService, ServerUtils } from "@/lib/server-utils";
+import { ServerUtils } from "@/lib/server-utils";
 import RootFooter from "./_root-components/root-footer";
 import { Toaster } from "@/components/ui/sonner";
 

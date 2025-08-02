@@ -2,7 +2,6 @@ import Button from "@/components/Button";
 import Image from "@/components/Image/server";
 import StarReviews from "@/components/StarReviews";
 import { RecipeDetailsDisplayComments } from "@/server-actions/Recipe/recipe-types";
-import { Comment } from "@/types/recipe-types"
 import Link from "next/link";
 
 interface ShowRecipeCommentsProps {

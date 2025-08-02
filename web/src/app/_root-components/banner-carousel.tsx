@@ -1,8 +1,7 @@
 "use client";
 import Image from "@/components/Image/client";
-import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { useEffect, useState } from "react";
 
 const items = [
   "/logo/logo-wangohan-front.png",

@@ -3,9 +3,8 @@ import Button from "@/components/Button";
 import Image from "@/components/Image/client";
 import InputField from "@/components/Input";
 import TextareaField from "@/components/Textarea";
-import React, { useCallback, useState } from "react";
-import {v4} from 'uuid';
-import {Control, Controller, FieldPath, FieldValues, useController, useForm, useWatch} from 'react-hook-form';
+import React from "react";
+import {Control, Controller, FieldPath, useController} from 'react-hook-form';
 import { RecipeSchema, useCreateRecipeForm } from "./helper";
 import Error from "@/components/Error";
 import z from "zod";
@@ -145,7 +144,7 @@ export default function CreateRecipeForm() {
               <DialogDescription className="grid grid-cols-5 gap-1 w-full h-full">
                 {files.map((f, idx) => (
                   <span key={idx} className="relative col-span-1 w-full h-full">
-                    <Image className="w-full h-[100px] aspect-auto" src={f.preview_url} width={100} height={100} noprocess/>
+                    <Image alt="preview image of uploaded file" className="w-full h-[100px] aspect-auto" src={f.preview_url} width={100} height={100} noprocess/>
                     <Button className="absolute top-2 right-2 bg-secondary-bg rounded-full" onClick={deleteFiles(f.preview_url)}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x size-4" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
                     </Button>
