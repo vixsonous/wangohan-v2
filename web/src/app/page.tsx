@@ -7,14 +7,14 @@ import BirthdayWrapper from "./_root-components/birthday-wrapper";
 import ColumnBanner from "./_root-components/column-banner";
 import { getSliderRecipes } from "@/server-actions/Recipe/recipe";
 
-export const gloria = Gloria_Hallelujah({
+const gloria = Gloria_Hallelujah({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
   adjustFontFallback: false,
 });
 
-export const mochi = Mochiy_Pop_P_One({
+const mochi = Mochiy_Pop_P_One({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
