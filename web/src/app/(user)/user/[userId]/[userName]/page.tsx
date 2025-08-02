@@ -6,15 +6,16 @@ import { Metadata } from "next";
 import { getUser } from "@/server-actions/User/user";
 
 interface UserProps {
-  params: {
+  params: Promise<{
     userId: string;
     userName: string;
-  }
+  }>
 }
 export async function generateMetadata({
   params
 }: UserProps): Promise<Metadata> {
-  console.log(params.userId, params.userName);
+  const {userId, userName} = (await params);
+  console.log(userId, userName);
   return {
     title: 'User'
   }
