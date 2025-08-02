@@ -25,6 +25,6 @@ WORKDIR /app
 COPY . .
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build && echo "Build ran" && ls -la && ls -R build || (echo "Build failed" && exit 1)
+RUN pnpm run build && echo "Build ran"
 
 CMD [ "pnpm", "start" ]
