@@ -13,11 +13,12 @@ type Props = {
 };
 
 export async function generateMetadata({
-  params
+  params,
+  searchParams
 }: Props): Promise<Metadata> {
   const id = await params.recipeId;
   const name = await params.recipeName;
-
+  console.log(searchParams);
   console.log(id, name);
   return {
     title: "クリスマス3色あんかけ",
