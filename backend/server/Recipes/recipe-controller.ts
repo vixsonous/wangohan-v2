@@ -3,7 +3,8 @@ import { ApiResponse } from "../utils/ApiUtils";
 import { RecipeService } from "./recipe-service";
 import { log } from "../utils/log";
 import { CacheUtil } from "../utils/redis";
-import { RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
+import { PostRecipeSchema, RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
+import z from "zod";
 
 export class RecipeController {
   static async getWeeklyRecipes(_: Request, res: Response) {
@@ -45,6 +46,42 @@ export class RecipeController {
   }
 
   static async uploadRecipe(req: Request, res: Response) {
+
+    if(req.user === undefined) {
+      ApiResponse.unauthorized(res, "Please log in to submit recipe!");
+      return;
+    }
+
+    const user = req.user as {id: number, username: string};
+
+    const files: Express.Multer.File[] | undefined = req.files as Express.Multer.File[];
+
+    const formData = req.body;
     
+    const submitData = {
+      ...formData,
+      recipe_images: [...files],
+      user_id: user.id
+    }
+
+    const submitParseResult = PostRecipeSchema.safeParse(submitData);
+
+    if(submitParseResult.success === false) {
+      const message = submitParseResult.error.issues[0].message;
+      log(message);
+      ApiResponse.error(res, message);
+      return;
+    }
+
+    const insertRecipeId = await RecipeService.postRecipe(submitParseResult.data);
+
+    if(insertRecipeId === undefined) {
+      ApiResponse.error(res, "Failed to upload recipe! Please try again!");
+      return;
+    }
+
+    console.log(insertRecipeId);
+
+    ApiResponse.success(res, "Successfully posted recipe!");
   }
 }

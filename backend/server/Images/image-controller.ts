@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ApiResponse } from "../utils/ApiUtils";
 import sharp from 'sharp';
 import z from 'zod';
-import { Image } from "./image-service";
+import { ImageProcess } from "./image-service";
 
 export class ImageController {
   static async transformImage(req: Request, res: Response) {
@@ -24,7 +24,7 @@ export class ImageController {
 
       const arrayBuffer = await response.arrayBuffer();
 
-      let image = new Image(arrayBuffer);
+      let image = new ImageProcess(arrayBuffer);
       
       const widthCheck: boolean = z.number().safeParse(Number(w)).success;
       const heightCheck: boolean = z.number().safeParse(Number(h)).success;

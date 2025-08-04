@@ -22,5 +22,13 @@ export class ApiResponse {
       status: status ?? 500
     } as ResponseData<T>)
   }
+
+  static unauthorized<T>(res: Response, message?: string) {
+    res.status(401).json({
+      message: message || "Unauthorized!",
+      data: undefined,
+      status: 401
+    } as ResponseData<T>)
+  }
   
 }

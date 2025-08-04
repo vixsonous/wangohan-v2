@@ -1,5 +1,8 @@
+import z from "zod";
 import { db } from "../../database/database";
-import { RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
+import { RecipeIngredientInsert, RecipeInsert, RecipeInstructionInsert } from "../../database/types";
+import { log } from "../utils/log";
+import { PostRecipeSchema, RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 
 export class RecipeRepository {
@@ -203,6 +206,85 @@ export class RecipeRepository {
     } catch (error) {
       console.error(error);
       return undefined;
+    }
+  }
+
+  static async insertRecipe(recipe: z.infer<typeof PostRecipeSchema>): Promise<boolean> {
+    const trx = await db.startTransaction().execute();
+    try {
+
+      const recipe_age_tag = recipe.checkbox_age?.filter(a => a !== undefined && a !== 'false').join(",") || "";
+      const recipe_size_tag = recipe.checkbox_size?.filter(s => s !== undefined && s !== 'false').join(",") || "";
+      const recipe_event_tag = recipe.checkbox_event?.filter(e => e !== undefined && e !== 'false').join(",") || "";
+
+      const newRecipe = {
+        recipe_name: recipe.recipe_title,
+        recipe_description: recipe.recipe_description,
+        recipe_category: "",
+        recipe_age_tag,
+        recipe_event_tag,
+        recipe_size_tag,
+        user_id: recipe.user_id,
+        total_favourites: 0,
+        total_likes: 0,
+        total_views: 0,
+        updated_at: new Date(),
+        created_at: new Date()
+      } satisfies RecipeInsert;
+
+      const {recipe_id} = await trx.insertInto("recipes_table")
+        .values(newRecipe)
+        .returning("recipe_id")
+        .executeTakeFirstOrThrow();
+      
+      const newInstructions: RecipeInstructionInsert[] = recipe.recipe_instructions.map( (i, idx) => ({
+        recipe_instruction_order: idx,
+        recipe_instructions_text: i.recipe_instruction,
+        recipe_id,
+        updated_at: new Date(),
+        created_at: new Date(),
+      }));
+
+      await trx.insertInto("recipe_instructions_table")
+        .values(newInstructions)
+        .execute();
+
+      const newIngredients: RecipeIngredientInsert[] = recipe.recipe_ingredients.map( (i , idx) => ({
+        recipe_ingredient_order: idx,
+        recipe_ingredients_amount: i.recipe_amount,
+        recipe_ingredients_name: i.recipe_ingredient,
+        recipe_id,
+        updated_at: new Date(),
+        created_at: new Date()
+      }));
+
+      await trx.insertInto("recipe_ingredients_table")
+        .values(newIngredients)
+        .execute();
+
+      
+      console.log("Successfully inserted!");
+      // await trx.commit().execute();
+
+      return true;
+    } catch(e) {
+      log(e);
+
+      await trx.rollback().execute();
+      return false;
+    }
+  }
+
+  static async insertInstructions(recipeInstructionsInsert: RecipeInstructionInsert[]): Promise<boolean> {
+    try {
+      await db.insertInto("recipe_instructions_table")
+        .values(recipeInstructionsInsert)
+        .execute();
+
+      return true;
+    } catch (error) {
+      log(error);
+      return false;
     }
   }
 }

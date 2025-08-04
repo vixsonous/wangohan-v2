@@ -1,5 +1,7 @@
 
+import { ClientApiService } from "@/lib/client-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import React, { useState } from "react";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -30,6 +32,10 @@ export const RecipeSchema = z.object({
   checkbox_size: z.array(z.string().or(z.boolean()).optional()).optional(),
   checkbox_event: z.array(z.string().or(z.boolean()).optional()).optional()
 });
+
+const PostRecipeSchema = RecipeSchema.and(z.object({
+  recipe_images: z.array(z.file()).min(1, "Please upload recipe images!")
+}))
 
 export const useCreateRecipeForm = () => {
   
@@ -71,11 +77,11 @@ export const useCreateRecipeForm = () => {
       const temp = structuredClone(prev);
       for(let i = 0; i < files.length && temp.length < MAX_FILES_LENGTH; i++) {
         temp.push({
-          file: files[i],
+          file: files[i] as File,
           preview_url: URL.createObjectURL(files[i])
         });
       }
-
+      console.log(temp);
       return structuredClone(temp);
     })
   }
@@ -108,7 +114,7 @@ export const useCreateRecipeForm = () => {
     name: "recipe_instructions"
   });
 
-  const onSubmit = (data: FieldValues) => {
+  const onSubmit = async (data: FieldValues) => {
     console.log(data);
 
     const parseResult = RecipeSchema.safeParse(data);
@@ -116,7 +122,8 @@ export const useCreateRecipeForm = () => {
     if(parseResult.success === false) {
       toast.error("Error", {
         description: parseResult.error.issues[0].message
-      })
+      });
+      return;
     }
 
     const filesParseResult = FileDisplaySchema.safeParse(files);
@@ -124,8 +131,30 @@ export const useCreateRecipeForm = () => {
     if(filesParseResult.success === false) {
       toast.error("Error", {
         description: filesParseResult.error.issues[0].message
-      })
+      });
+      return;
     }
+
+    const submitData = {
+      ...data,
+      recipe_images: files.map(f => f.file)
+    }
+
+    const submitParseResult = PostRecipeSchema.safeParse(submitData);
+
+    if(submitParseResult.success === false) {
+      toast.error("Error", {
+        description: submitParseResult.error.issues[0].message
+      });
+      return;
+    }
+    
+    const dt = await ClientApiService.post("/post-recipe", submitData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    console.log(dt);
   }
 
   return {

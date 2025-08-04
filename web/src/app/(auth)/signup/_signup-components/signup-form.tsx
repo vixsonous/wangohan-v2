@@ -16,6 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import Error from "@/components/Error";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { ClientApiService } from "@/lib/client-utils";
 
 const UserSignupSchema = z.object({
   email: z.email("Invalid email format!").min(1, "Email is required!").nonempty(),
@@ -33,7 +34,7 @@ export default function SignupForm({className, ...props}: HTMLAttributes<HTMLDiv
   const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserSignupSchema)});
   
   const mutation = useMutation({
-    mutationFn: (data: FieldValues) => axios.post("http://app.localhost/api/register", data),
+    mutationFn: (data: FieldValues) => ClientApiService.post("/register", data),
     onSuccess: (data) => {
       toast.success("Successful!", {description: data.data.message});
       router.push("/");

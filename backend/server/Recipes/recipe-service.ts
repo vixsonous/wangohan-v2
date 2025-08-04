@@ -1,5 +1,7 @@
+import z from "zod";
 import { RecipeRepository } from "./recipe-repository";
-import { RecipeDisplayDetails } from "./recipe-types";
+import { PostRecipeSchema, RecipeDisplayDetails } from "./recipe-types";
+import { RecipeInsert, RecipeInstructionInsert } from "../../database/types";
 
 export class RecipeService {
   static async getWeeklyRecipes(): Promise<RecipeDisplayDetails[]> {
@@ -18,5 +20,12 @@ export class RecipeService {
     const recipe = await RecipeRepository.getRecipe(recipe_id, recipe_name);
 
     return recipe;
+  }
+
+  static async postRecipe(recipe: z.infer<typeof PostRecipeSchema>): Promise<boolean | undefined> {
+
+    const newRecipe = await RecipeRepository.insertRecipe(recipe);
+
+    return newRecipe;
   }
 }
