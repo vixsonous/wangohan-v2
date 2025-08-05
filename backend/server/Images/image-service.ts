@@ -1,4 +1,7 @@
+// @ts-ignore
 import sharp from "sharp";
+
+export type Formats = "webp" | "png" | "jpg" | "jpeg";
 
 export class ImageProcess {
   private image: ArrayBuffer;
@@ -11,6 +14,10 @@ export class ImageProcess {
   
   private shouldChangeToWebp: boolean = false;
   private webpOptions: sharp.WebpOptions;
+
+  // Change format
+  private shouldChangeFormat: boolean = false;
+  private format: Formats | undefined = undefined;
 
   constructor(arrayBuffer: ArrayBuffer) {
     this.image = arrayBuffer;
@@ -29,6 +36,19 @@ export class ImageProcess {
   webp(options: sharp.WebpOptions) {
     this.shouldChangeToWebp = true;
     this.webpOptions = options;
+
+    return this;
+  }
+
+  changeFormat(format: Formats) {
+    this.shouldChangeFormat = true;
+    this.format = format;
+
+    return this;
+  }
+
+  metadata() {
+    return sharp(this.image).metadata();
   }
 
   result() {
@@ -39,9 +59,13 @@ export class ImageProcess {
     }
 
     if(this.shouldChangeToWebp) {
-      procImg = procImg.webp(this.webpOptions);
+      procImg = procImg.toFormat("webp").webp(this.webpOptions);
     }
 
-    return procImg.toBuffer();
+    if(this.shouldChangeFormat) {
+      procImg = procImg.toFormat(this.format);
+    }
+
+    return procImg.withMetadata().toBuffer();
   }
 }

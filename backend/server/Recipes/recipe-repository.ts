@@ -1,17 +1,16 @@
 import z from "zod";
 import { db } from "../../database/database";
-import { RecipeIngredientInsert, RecipeInsert, RecipeInstructionInsert } from "../../database/types";
+import {RecipeImageInsert, RecipeIngredientInsert, RecipeInsert, RecipeInstructionInsert} from "../../database/types";
 import { log } from "../utils/log";
 import { PostRecipeSchema, RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
+import {ImageProcess} from "../Images/image-service";
+import {Image} from "../Images/image";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
 
   private static START_PAGE = 0;
-  static async getRecipeDetails(recipe_id: number) {
-
-  }
 
   static async getPopularRecipes(
     page: number = this.START_PAGE, 
@@ -47,7 +46,7 @@ export class RecipeRepository {
           ).as("recipe_images"),
           jsonObjectFrom(
             eb.selectFrom("recipe_comments_table")
-            .select(({ fn, val, ref }) => [
+            .select(({ fn }) => [
               fn
                 .count<number>("recipe_comment_id")
                 .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
@@ -64,8 +63,10 @@ export class RecipeRepository {
         .offset(OFFSET)
         .execute();
 
+      log("Successfully retrieved popular recipes!");
       return recipes;
     } catch (error) {
+      log("There was an error retrieving popular recipes!");
       console.error(error);
       return [];
     }
@@ -100,7 +101,7 @@ export class RecipeRepository {
           ).as("recipe_images"),
           jsonObjectFrom(
             eb.selectFrom("recipe_comments_table")
-            .select(({ fn, val, ref }) => [
+            .select(({ fn }) => [
               fn
                 .count<number>("recipe_comment_id")
                 .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
@@ -117,8 +118,11 @@ export class RecipeRepository {
         .limit(this.FRONT_PAGE_RECIPE_QUERY_LIMIT)
         .execute();
 
+      log("Successfully retrieved weekly recipes!");
+
       return recipes;
     } catch (error) {
+      log("There was an error retrieving weekly recipes!");
       console.error(error);
       return [];
     }
@@ -166,7 +170,7 @@ export class RecipeRepository {
           ).as("recipe_images"),
           jsonObjectFrom(
             eb.selectFrom("recipe_comments_table")
-            .select(({ fn, val, ref }) => [
+            .select(({ fn }) => [
               fn
                 .count<number>("recipe_comment_id")
                 .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
@@ -202,8 +206,10 @@ export class RecipeRepository {
         }))
         .executeTakeFirstOrThrow();
 
+      log("Successfully retrieved recipe details!");
       return recipe;
     } catch (error) {
+      log("There was an error retrieving recipe details.");
       console.error(error);
       return undefined;
     }
@@ -262,12 +268,47 @@ export class RecipeRepository {
         .values(newIngredients)
         .execute();
 
-      
-      console.log("Successfully inserted!");
-      // await trx.commit().execute();
+      const images = await Promise.all(recipe.recipe_images.map( async (i, idx) => {
+        const buffer: ArrayBuffer = Buffer.from(i.buffer);
+        let image = new ImageProcess(buffer);
 
+        image = image.resize(1024, undefined, {
+            withoutEnlargement: true,
+            fit: "inside"
+        });
+
+        image = image.webp({
+            quality: 80
+        });
+
+        const uploadImage = await image.result();
+
+        const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe_id).padStart(8, "0")}`;
+        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
+        console.log();
+        return {key: uploadDone.Key, order: idx, filename: i.originalname};
+      }));
+
+      const insertImages: RecipeImageInsert[] = images.map( i => ({
+          recipe_id,
+          recipe_image: `r2://${i.key}`,
+          recipe_image_order: i.order,
+          recipe_image_subtext: "",
+          recipe_image_title: i.filename,
+          updated_at: new Date(),
+          created_at: new Date()
+      }));
+
+      await trx.insertInto("recipe_images_table")
+        .values(insertImages)
+        .execute();
+
+      await trx.commit().execute();
+
+      log("Recipe insertion successful!");
       return true;
     } catch(e) {
+      log("Recipe insertion failed!");
       log(e);
 
       await trx.rollback().execute();
