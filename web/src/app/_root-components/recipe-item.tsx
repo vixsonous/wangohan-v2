@@ -5,6 +5,12 @@ import Link from "next/link";
 import StarReviews from "@/components/StarReviews";
 import { RecipeDisplayDetails } from "@/server-actions/Recipe/recipe-types";
 
+const getTags = (recipe_tag: string) => {
+  return recipe_tag.split(",").map( (tag, idx) => (
+    <span key={idx} className={`bg-[#523636] text-xs self-center flex justify-center items-center text-white py-[2px] px-[7px] rounded-[5px]`}>{tag}</span>
+  ));
+}
+
 export default function RecipeItem(recipe: RecipeDisplayDetails) {
   return (
     <Link className="w-full" href={`/recipe/show/${recipe.recipe_id}/${recipe.recipe_name}`}>
@@ -26,9 +32,9 @@ export default function RecipeItem(recipe: RecipeDisplayDetails) {
         <div className={`flex justify-between`}>
           <div className={`w-full flex gap-[5px] flex-wrap items-center `}>
             {recipe.recipe_size_tag === '' && recipe.recipe_age_tag === '' && recipe.recipe_event_tag === '' && (<span className={`bg-[#523636] text-xs opacity-[0] self-center flex justify-center items-center text-white py-[2px] px-[7px] rounded-[5px]`}>Null</span>)}
-            {recipe.recipe_size_tag !== '' ? <span className={`bg-[#523636] text-xs self-center flex justify-center items-center text-white py-[2px] px-[7px] rounded-[5px]`}>{recipe.recipe_size_tag}</span> : null}
-            {recipe.recipe_age_tag !== '' ? <span className={`bg-[#523636] text-xs self-center flex justify-center items-center text-white py-[2px] px-[7px] rounded-[5px]`}>{recipe.recipe_age_tag}</span> : null}
-            {recipe.recipe_event_tag !== '' ? <span className={`bg-[#523636] text-xs self-center flex justify-center items-center text-white py-[2px] px-[7px] rounded-[5px]`}>{recipe.recipe_event_tag}</span> : null}
+            {recipe.recipe_size_tag !== '' ? getTags(recipe.recipe_size_tag) : null}
+            {recipe.recipe_age_tag !== '' ? getTags(recipe.recipe_age_tag) : null}
+            {recipe.recipe_event_tag !== '' ? getTags(recipe.recipe_event_tag) : null}
           </div>
         </div>
       </section>

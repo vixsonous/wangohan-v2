@@ -13,3 +13,9 @@ export class ClientApiService {
     return await axios.post(this.BACKEND_SERVER_URL + url, data, {...getConfig, withCredentials: true});
   }
 }
+
+export class ClientApiResponseService {
+  static getAxiosResponseMessage(response: AxiosResponse): string {
+    return response.data.message;
+  }
+}

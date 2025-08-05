@@ -32,3 +32,27 @@ export class ApiResponse {
   }
   
 }
+
+export class ApiTest {
+  static async success(response: Response) {
+    return new Promise((res) => {
+      setTimeout(() => {
+        res("Test success!");
+        response.status(200).json({message: "Test Success!"});
+        return;
+      }, 2000);
+    });
+
+  }
+
+  static async error(response: Response) {
+    return new Promise((res) => {
+      setTimeout(() => {
+        res("Test error!");
+        response.status(500).json({message: "Test error!"});
+        return;
+      }, 2000);
+    });
+
+  }
+}

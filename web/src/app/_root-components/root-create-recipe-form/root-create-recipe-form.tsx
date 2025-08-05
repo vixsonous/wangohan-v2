@@ -79,7 +79,8 @@ export default function CreateRecipeForm() {
     errors,
     control,
     watch,
-    deleteFiles
+    deleteFiles,
+    submitMutation
   } = useCreateRecipeForm();
 
   const title = watch("recipe_title");
@@ -287,8 +288,8 @@ export default function CreateRecipeForm() {
           </div>
         </section>
       </div>
-      <Button className={`bg-[#ffb762] text-white py-2.5 rounded-md text-sm px-5 font-bold self-center`} role="submit">
-        作成する
+      <Button disabled={submitMutation.isPending} className={`bg-[#ffb762] text-white py-2.5 rounded-md text-sm px-5 font-bold self-center flex items-center gap-2`} role="submit">
+        {submitMutation.isPending && <Image className={`animate-spin`} src={"/icons/svg/primary-loading.svg"} noprocess={true}/>}作成する
       </Button>
     </form>
   )

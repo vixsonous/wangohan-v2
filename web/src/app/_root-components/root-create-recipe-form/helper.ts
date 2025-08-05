@@ -1,11 +1,13 @@
 
-import { ClientApiService } from "@/lib/client-utils";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import React, { useState } from "react";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import {useMutation} from "@tanstack/react-query";
+import heic2any from "heic2any";
 
 const MAX_FILES_LENGTH = 5;
 
@@ -44,6 +46,7 @@ export const useCreateRecipeForm = () => {
     unregister, 
     handleSubmit, 
     formState: {errors},
+    reset,
     control,
     watch
   } = useForm<z.infer<typeof RecipeSchema>>({
@@ -68,22 +71,39 @@ export const useCreateRecipeForm = () => {
 
   const [files, setFiles] = useState<z.infer<typeof FileDisplaySchema>>([]);
 
-  const fileOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const fileOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
-    const files = e.currentTarget.files;
-    if(files === null) return;
-    if(files.length < 0) return;
-    setFiles( prev => {
-      const temp = structuredClone(prev);
-      for(let i = 0; i < files.length && temp.length < MAX_FILES_LENGTH; i++) {
+    const targetFiles = e.currentTarget.files;
+    if(targetFiles === null) return;
+    if(targetFiles.length < 0) return;
+
+    const temp = structuredClone(files);
+    for(let i = 0; i < targetFiles.length && temp.length < MAX_FILES_LENGTH; i++) {
+
+      const fileExt = targetFiles[i].name.substring(targetFiles[i].name.lastIndexOf(".") + 1);
+
+      if(fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif") {
+        const image = await heic2any({
+          blob: targetFiles[i],
+          toType: "image/webp",
+          quality: 0.8
+        });
+
+        const img = !Array.isArray(image) ? [image] : image;
+        const file = new File(img, targetFiles[i].name);
         temp.push({
-          file: files[i] as File,
-          preview_url: URL.createObjectURL(files[i])
+          file: file,
+          preview_url: URL.createObjectURL(targetFiles[i])
+        });
+      } else {
+        temp.push({
+          file: targetFiles[i] as File,
+          preview_url: URL.createObjectURL(targetFiles[i])
         });
       }
-      console.log(temp);
-      return structuredClone(temp);
-    })
+
+    }
+    setFiles(structuredClone(temp));
   }
   
   const deleteFiles = (preview_url: string) => (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -99,9 +119,6 @@ export const useCreateRecipeForm = () => {
       
       return structuredClone(temp);
     });
-
-    
-    
   }
 
   const recipe_ingredients_field = useFieldArray({
@@ -114,12 +131,36 @@ export const useCreateRecipeForm = () => {
     name: "recipe_instructions"
   });
 
+  const submitMutation = useMutation({
+    mutationFn: (data: z.infer<typeof PostRecipeSchema>) => ClientApiService.post("/post-recipe", data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }),
+    onSuccess: (data: AxiosResponse) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(data);
+
+      toast.success("Recipe posted successfully!", {
+        description: message
+      });
+
+      reset();
+    },
+    onError: (error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(error.response as AxiosResponse);
+      console.log(message);
+      toast.error("There was an error posting recipe!", {
+        description: message
+      });
+    }
+  })
+
   const onSubmit = async (data: FieldValues) => {
     console.log(data);
 
     const parseResult = RecipeSchema.safeParse(data);
     console.log(parseResult);
-    if(parseResult.success === false) {
+    if(!parseResult.success) {
       toast.error("Error", {
         description: parseResult.error.issues[0].message
       });
@@ -128,7 +169,7 @@ export const useCreateRecipeForm = () => {
 
     const filesParseResult = FileDisplaySchema.safeParse(files);
 
-    if(filesParseResult.success === false) {
+    if(!filesParseResult.success) {
       toast.error("Error", {
         description: filesParseResult.error.issues[0].message
       });
@@ -142,19 +183,14 @@ export const useCreateRecipeForm = () => {
 
     const submitParseResult = PostRecipeSchema.safeParse(submitData);
 
-    if(submitParseResult.success === false) {
+    if(!submitParseResult.success) {
       toast.error("Error", {
         description: submitParseResult.error.issues[0].message
       });
       return;
     }
-    
-    const dt = await ClientApiService.post("/post-recipe", submitData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    console.log(dt);
+
+    submitMutation.mutate(submitParseResult.data);
   }
 
   return {
@@ -169,6 +205,7 @@ export const useCreateRecipeForm = () => {
     recipe_instructions_field,
     control,
     deleteFiles,
-    watch
+    watch,
+    submitMutation
   }
 }

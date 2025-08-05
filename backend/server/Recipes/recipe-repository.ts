@@ -227,9 +227,9 @@ export class RecipeRepository {
         recipe_name: recipe.recipe_title,
         recipe_description: recipe.recipe_description,
         recipe_category: "",
-        recipe_age_tag,
-        recipe_event_tag,
-        recipe_size_tag,
+        recipe_age_tag: recipe_age_tag,
+        recipe_event_tag: recipe_event_tag,
+        recipe_size_tag: recipe_size_tag,
         user_id: recipe.user_id,
         total_favourites: 0,
         total_likes: 0,
@@ -246,7 +246,7 @@ export class RecipeRepository {
       const newInstructions: RecipeInstructionInsert[] = recipe.recipe_instructions.map( (i, idx) => ({
         recipe_instruction_order: idx,
         recipe_instructions_text: i.recipe_instruction,
-        recipe_id,
+        recipe_id: recipe_id,
         updated_at: new Date(),
         created_at: new Date(),
       }));
@@ -259,7 +259,7 @@ export class RecipeRepository {
         recipe_ingredient_order: idx,
         recipe_ingredients_amount: i.recipe_amount,
         recipe_ingredients_name: i.recipe_ingredient,
-        recipe_id,
+        recipe_id: recipe_id,
         updated_at: new Date(),
         created_at: new Date()
       }));
