@@ -8,32 +8,9 @@ import { toast } from "sonner";
 import z from "zod";
 import {useMutation} from "@tanstack/react-query";
 import heic2any from "heic2any";
+import {FileDisplaySchema, RecipeSchema} from "@/types/recipe-types";
 
 const MAX_FILES_LENGTH = 5;
-
-const FileDisplaySchema = z.array(z.object({
-  file: z.file().min(1, "Please upload some pictures"),
-  preview_url: z.string().min(1, "Please provide preview url")
-}))
-
-const RecipeIngredientSchema = z.object({
-  recipe_ingredient: z.string().min(1, "Please input recipe ingredient"),
-  recipe_amount: z.string().min(1, "Please input recipe amount"),
-});
-
-const RecipeInstructionSchema = z.object({
-  recipe_instruction: z.string().min(1, "Please input recipe instructions")
-});
-
-export const RecipeSchema = z.object({
-  recipe_title: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
-  recipe_description: z.string().min(1, "内容を入力してください"),
-  recipe_instructions: z.array(RecipeInstructionSchema).min(1, "Please input recipe instructions!"),
-  recipe_ingredients: z.array(RecipeIngredientSchema).min(1, "Please input recipe ingredients!"),
-  checkbox_age: z.array(z.string().or(z.boolean()).optional()).optional(),
-  checkbox_size: z.array(z.string().or(z.boolean()).optional()).optional(),
-  checkbox_event: z.array(z.string().or(z.boolean()).optional()).optional()
-});
 
 const PostRecipeSchema = RecipeSchema.and(z.object({
   recipe_images: z.array(z.file()).min(1, "Please upload recipe images!")

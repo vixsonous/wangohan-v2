@@ -5,10 +5,11 @@ import InputField from "@/components/Input";
 import TextareaField from "@/components/Textarea";
 import React from "react";
 import {Control, Controller, FieldPath, useController} from 'react-hook-form';
-import { RecipeSchema, useCreateRecipeForm } from "./helper";
+import { useCreateRecipeForm } from "./helper";
 import Error from "@/components/Error";
 import z from "zod";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {RecipeSchema} from "@/types/recipe-types";
 
 const events = [
   "お誕生日",

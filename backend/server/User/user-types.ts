@@ -1,28 +1,70 @@
-export interface UserDisplay {
-  user_id: number;
-  user_codename: string;
-  user_image: string;
+import z from "zod";
+
+export class UserSchema {
+  public static UserDisplay = z.object({
+    user_id: z.number(),
+    user_codename: z.string(),
+    user_image: z.string(),
+  }).nullable();
+
+  public static UserDetailsData = z.object({
+    user_first_name: z.string(),
+    user_last_name: z.string(),
+    user_codename: z.string(),
+    user_image: z.string(),
+    user_agreement: z.number(),
+    user_gender: z.string(),
+    user_birthdate: z.date(),
+    user_id: z.number(),
+    user_occupation: z.string(),
+    updated_at: z.date(),
+    created_at: z.date()
+  });
 }
 
-export interface UserDetailsData {
-  user_first_name: string;
-  user_last_name: string;
-  user_codename: string;
-  user_image: string;
-  user_agreement: number;
-  user_gender: string;
-  user_birthdate: Date;
-  user_id: number;
-  user_occupation: string;
-  updated_at: Date;
-  created_at: Date;
-}
+export class UserAuthenticationSchema {
+  public static User = z.object({
+    user_id: z.number().gte(0).optional(),
+    google_id: z.string().optional(),
+    email: z.string(),
+    password: z.string().optional(),
+    user_lvl: z.number().optional(),
+    updated_at: z.date().optional(),
+    created_at: z.date().optional(),
+  })
 
-export interface UserCredentials {
-  user_id?: number | undefined,
-  email?: string | undefined,
-  google_id?: string | undefined,
-  password?: string | undefined
+  public static UserLocalStrategyRegistration = z.object({
+    email: z.string().email("Invalid email format").nonempty(),
+    password: z.string().nonempty(),
+    repeat_password: z.string().nonempty()
+  }).refine(data => data.password === data.repeat_password, {
+    message: "The passwords do not match!",
+    path: ["repeat_password"]
+  });
+
+  public static UserCredentials = z.object({
+    user_id: z.number().gte(0).optional(),
+    email: z.string().email("Invalid email format"),
+    google_id: z.string().optional(),
+    password: z.string().optional(),
+  }).refine(data => {
+    const hasEmail = data.email !== "" && data.email !== undefined;
+    const hasPassword =  data.password !== "" && data.password !== undefined;
+    const hasGoogleId = data.google_id !== "" && data.google_id !== undefined;
+
+    if(hasGoogleId && (!hasEmail || !hasPassword)) {
+      return false;
+    }
+
+    if((hasEmail || hasPassword) && !hasGoogleId) {
+      return false;
+    }
+
+    return true;
+  }, {
+    message: "Email and password must be provided, or Google Id must be provided",
+    path: ['google_id','password','email']
+  })
 }
 
 export const UserLevel = {

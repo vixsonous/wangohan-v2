@@ -1,5 +1,6 @@
 import { User, UserDetails } from "./user";
-import { UserCredentials } from "./user-types";
+import {UserAuthenticationSchema, UserSchema} from "@/server/User/user-types";
+import z from "zod";
 
 export class UserService {
   static async getUser(user_id: number, user_codename: string) {
@@ -8,9 +9,9 @@ export class UserService {
     return user;
   }
 
-  static async localStrategyLogin(email: string, password: string): Promise<UserCredentials | undefined> {
+  static async localStrategyLogin(email: string, password: string): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
     const user = await User.findUser({email});
-    
+
     return user;
   }
 

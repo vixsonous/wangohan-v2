@@ -1,16 +1,15 @@
 import z from "zod";
 import { RecipeRepository } from "./recipe-repository";
-import { PostRecipeSchema, RecipeDisplayDetails } from "./recipe-types";
-import { RecipeInsert, RecipeInstructionInsert } from "../../database/types";
+import {RecipeDisplaySchema, RecipeSchema} from "./recipe-types";
 
 export class RecipeService {
-  static async getWeeklyRecipes(): Promise<RecipeDisplayDetails[]> {
+  static async getWeeklyRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
     const recipes = await RecipeRepository.getWeeklyRecipes();
     
     return recipes;
   }
   
-  static async getPopularRecipes(): Promise<RecipeDisplayDetails[]> {
+  static async getPopularRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
     const recipes = await RecipeRepository.getPopularRecipes();
     
     return recipes;
@@ -22,7 +21,7 @@ export class RecipeService {
     return recipe;
   }
 
-  static async postRecipe(recipe: z.infer<typeof PostRecipeSchema>): Promise<boolean | undefined> {
+  static async postRecipe(recipe: z.infer<typeof RecipeSchema.PostRecipe>): Promise<boolean | undefined> {
 
     const newRecipe = await RecipeRepository.insertRecipe(recipe);
 

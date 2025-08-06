@@ -3,7 +3,8 @@ import {ApiResponse} from "../utils/ApiUtils";
 import { RecipeService } from "./recipe-service";
 import { log } from "../utils/log";
 import { CacheUtil } from "../utils/redis";
-import { PostRecipeSchema, RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
+import {RecipeDisplaySchema, RecipeSchema} from "./recipe-types";
+import z from "zod";
 
 export class RecipeController {
 
@@ -32,13 +33,13 @@ export class RecipeController {
 
   static async getWeeklyRecipes(_: Request, res: Response) {
     const GET_WEEKLY_RECIPES_KEY = 'GET:weekly-recipes';
-    const recipes = await CacheUtil.get<RecipeDisplayDetails[], typeof RecipeService.getWeeklyRecipes>(GET_WEEKLY_RECIPES_KEY, RecipeService.getWeeklyRecipes);
+    const recipes = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[], typeof RecipeService.getWeeklyRecipes>(GET_WEEKLY_RECIPES_KEY, RecipeService.getWeeklyRecipes);
     ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_WEEKLY_RECIPE, recipes, 200);
   }
 
   static async getPopularRecipes(_: Request, res: Response) {
     const GET_POPULAR_RECIPES_KEY = 'GET:popular-recipes';
-    const recipes = await CacheUtil.get<RecipeDisplayDetails[], typeof RecipeService.getPopularRecipes>(GET_POPULAR_RECIPES_KEY, RecipeService.getPopularRecipes);
+    const recipes = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[], typeof RecipeService.getPopularRecipes>(GET_POPULAR_RECIPES_KEY, RecipeService.getPopularRecipes);
     ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_POPULAR_RECIPE, recipes, 200);
   }
   
@@ -59,7 +60,7 @@ export class RecipeController {
       return;
     }
     
-    const recipe = await CacheUtil.get<RecipeDetailsDisplay, typeof RecipeService.getRecipe>(
+    const recipe = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>, typeof RecipeService.getRecipe>(
       GET_RECIPE_KEY,
       RecipeService.getRecipe, 60, Number(recipe_id), String(recipe_name)
     ) ;
@@ -93,9 +94,9 @@ export class RecipeController {
       user_id: user.id
     }
 
-    const submitParseResult = PostRecipeSchema.safeParse(submitData);
+    const submitParseResult = RecipeSchema.PostRecipe.safeParse(submitData);
 
-    if(submitParseResult.success === false) {
+    if(!submitParseResult.success) {
       const message = submitParseResult.error.issues[0].message;
       log(message);
       ApiResponse.error(res, message);

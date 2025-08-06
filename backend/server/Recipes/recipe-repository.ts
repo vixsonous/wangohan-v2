@@ -1,8 +1,8 @@
 import z from "zod";
-import { db } from "../../database/database";
-import {RecipeImageInsert, RecipeIngredientInsert, RecipeInsert, RecipeInstructionInsert} from "../../database/types";
+import { db } from "@/database/database";
+import {RecipeImageInsert, RecipeIngredientInsert, RecipeInsert, RecipeInstructionInsert} from "@/database/types";
 import { log } from "../utils/log";
-import { PostRecipeSchema, RecipeDetailsDisplay, RecipeDisplayDetails } from "./recipe-types";
+import { RecipeDisplaySchema, RecipeSchema} from "./recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import {ImageProcess} from "../Images/image-service";
 import {Image} from "../Images/image";
@@ -15,11 +15,11 @@ export class RecipeRepository {
   static async getPopularRecipes(
     page: number = this.START_PAGE, 
     limit: number = this.FRONT_PAGE_RECIPE_QUERY_LIMIT
-  ): Promise<Array<RecipeDisplayDetails>> {
+  ): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
     try {
 
       const OFFSET = page * limit;
-      const recipes: Array<RecipeDisplayDetails> = await db
+      const recipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[] = await db
         .selectFrom("recipes_table")
         .select((eb) => [
           "recipe_name",
@@ -72,9 +72,9 @@ export class RecipeRepository {
     }
   }
 
-  static async getWeeklyRecipes(): Promise<Array<RecipeDisplayDetails>> {
+  static async getWeeklyRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
     try {
-      const recipes: Array<RecipeDisplayDetails> = await db
+      const recipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[] = await db
         .selectFrom("recipes_table")
         .select(eb => [
           "recipe_name",
@@ -128,9 +128,9 @@ export class RecipeRepository {
     }
   }
 
-  static async getRecipe(recipe_id: number, recipe_name: string): Promise<RecipeDetailsDisplay | undefined> {
+  static async getRecipe(recipe_id: number, recipe_name: string): Promise<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | undefined> {
     try {
-      const recipe: RecipeDetailsDisplay = await db
+      const recipe: z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> = await db
         .selectFrom("recipes_table")
         .select(eb => [
           "recipe_name",
@@ -215,7 +215,7 @@ export class RecipeRepository {
     }
   }
 
-  static async insertRecipe(recipe: z.infer<typeof PostRecipeSchema>): Promise<boolean> {
+  static async insertRecipe(recipe: z.infer<typeof RecipeSchema.PostRecipe>): Promise<boolean> {
     const trx = await db.startTransaction().execute();
     try {
 
@@ -269,8 +269,8 @@ export class RecipeRepository {
         .execute();
 
       const images = await Promise.all(recipe.recipe_images.map( async (i, idx) => {
-        const buffer: ArrayBuffer = Buffer.from(i.buffer);
-        let image = new ImageProcess(buffer);
+        const buffer: Buffer<ArrayBuffer> = Buffer.from(i.buffer);
+        let image = new ImageProcess(buffer.buffer);
 
         image = image.resize(1024, undefined, {
             withoutEnlargement: true,

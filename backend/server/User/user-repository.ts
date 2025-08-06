@@ -1,16 +1,20 @@
 import z from "zod";
 import { db } from "../../database/database";
 import { log } from "../utils/log";
-import { UserCredentials, UserDetailsData, UserLevel } from "./user-types";
-import { UserCredentialsSchema } from "./user-schema";
+import {UserAuthenticationSchema, UserLevel, UserSchema} from "./user-types";
+import {  } from "./user-schema";
 import { UserInsert } from "../../database/types";
+// @ts-ignore
 import bcrypt from 'bcrypt';
 import { User } from "./user";
 
 export class UserDetailsRepository {
-  static async getUser(user_id: number, user_codename: string): Promise<UserDetailsData | undefined> {
+  private static USER_DETAILS_REPOSITORY_SUCCESS_LOG = {
+    GET_USER_SUCCESS: "Successfully retrieved user details data!",
+  }
+  static async getUser(user_id: number, user_codename: string): Promise<z.infer<typeof UserSchema.UserDetailsData> | undefined> {
     try {
-      const user: UserDetailsData = await db.selectFrom("user_details_table")
+      const user: z.infer<typeof UserSchema.UserDetailsData> = await db.selectFrom("user_details_table")
         .select([
           "user_first_name",
           "user_last_name",
@@ -30,6 +34,8 @@ export class UserDetailsRepository {
         }))
         .executeTakeFirstOrThrow();
 
+      log(UserDetailsRepository.USER_DETAILS_REPOSITORY_SUCCESS_LOG.GET_USER_SUCCESS);
+
       return user
     } catch (error) {
       console.error("User not found!");
@@ -40,9 +46,19 @@ export class UserDetailsRepository {
 }
 
 export class UserRepository {
-  static async findUser({user_email, google_id, user_id}:{user_email?: string | undefined, google_id?: string | undefined, user_id?: string | undefined}): Promise<UserCredentials | undefined> {
+  private static USER_REPOSITORY_SUCCESS_MESSAGE = {
+    FIND_USER_SUCCESS: "The user exists!",
+    CREATE_USER_SUCCESS: "The user is created successfully!"
+  }
+
+  private static USER_REPOSITORY_ERROR_MESSAGE = {
+    FIND_USER_ERROR: "The user does not exist!",
+    CREATE_USER_ERROR: "There was an error creating the user!"
+  }
+
+  static async findUser({user_email, google_id, user_id}:{user_email?: string | undefined, google_id?: string | undefined, user_id?: string | undefined}): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
     try {
-      const user: UserCredentials = await db.selectFrom("users_table")
+      const user: z.infer<typeof UserAuthenticationSchema.UserCredentials> = await db.selectFrom("users_table")
         .select([
           "user_id",
           "email",
@@ -54,15 +70,16 @@ export class UserRepository {
         .$if(user_id !== undefined, q => q.where("user_id","=",Number(user_id!)))
         .executeTakeFirstOrThrow();
 
+      log(UserRepository.USER_REPOSITORY_SUCCESS_MESSAGE.FIND_USER_SUCCESS);
       return user
     } catch (error) {
-      console.error("User not found!");
+      console.error(UserRepository.USER_REPOSITORY_ERROR_MESSAGE.FIND_USER_ERROR);
       log(error);
       return undefined;
     }
   }
 
-  static async createUser(user: z.infer<typeof UserCredentialsSchema>): Promise<User | undefined> {
+  static async createUser(user: z.infer<typeof UserAuthenticationSchema.UserCredentials>): Promise<User | undefined> {
     try {
       let password = '';
 
@@ -93,9 +110,10 @@ export class UserRepository {
       
       const userInstance = new User(createdUser);
 
+      log(UserRepository.USER_REPOSITORY_SUCCESS_MESSAGE.CREATE_USER_SUCCESS);
       return userInstance;
     } catch (error) {
-      console.error("Error creating user!");
+      console.error(UserRepository.USER_REPOSITORY_ERROR_MESSAGE.CREATE_USER_ERROR);
       log(error);
 
       return undefined;

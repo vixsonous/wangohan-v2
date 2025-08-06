@@ -1,7 +1,6 @@
 import z from "zod";
 import { UserDetailsRepository, UserRepository } from "./user-repository";
-import { UserCredentials, UserDetailsData, UserDisplay } from "./user-types";
-import { UserCredentialsSchema, UserSchema } from "./user-schema";
+import {UserAuthenticationSchema, UserSchema} from "./user-types";
 
 export class User {
   
@@ -13,7 +12,7 @@ export class User {
   private updated_at?: Date;
   private created_at?: Date;
   
-  constructor(user: z.infer<typeof UserSchema>) {
+  constructor(user: z.infer<typeof UserAuthenticationSchema.User>) {
     this.user_id = user.user_id;
     this.google_id = user.google_id;
     this.email = user.email;
@@ -23,7 +22,7 @@ export class User {
     this.created_at = user.created_at;
   }
   
-  static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<UserCredentials | undefined> {
+  static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
     const user = await UserRepository.findUser({user_email: email, google_id: googleId});
 
     return user;
@@ -52,7 +51,7 @@ export class UserDetails {
   private updated_at: Date;
   private created_at: Date;
   constructor(
-    user: UserDetailsData
+    user: z.infer<typeof UserSchema.UserDetailsData>
   ) {
     this.user_first_name = user.user_first_name; 
     this.user_last_name  = user.user_last_name ;
@@ -67,7 +66,7 @@ export class UserDetails {
     this.created_at = user.created_at;
   }
 
-  getDisplayUser(): UserDisplay {
+  getDisplayUser(): z.infer<typeof UserSchema.UserDisplay> {
     return {
       user_id: this.user_id,
       user_codename: this.user_codename,
@@ -76,7 +75,7 @@ export class UserDetails {
   }
 
   static async getUser(user_id: number, user_codename: string): Promise<UserDetails | undefined> {
-    const user = await UserDetailsRepository.getUser(user_id, user_codename);
+    const user: z.infer<typeof UserSchema.UserDetailsData> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
 
     return user ? new UserDetails(user) : user;
   }

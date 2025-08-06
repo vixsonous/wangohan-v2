@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { UserService } from "./user-service";
 import { ApiResponse } from "../utils/ApiUtils";
 import { log } from "../utils/log";
-import { UserLocalStrategyRegistrationSchema } from "./user-schema";
 import z from "zod";
 import { User } from "./user";
+import {UserAuthenticationSchema} from "@/server/User/user-types";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {
@@ -30,12 +30,12 @@ export class UserController {
   }
 
   static async register(req: Request, res: Response) {
-    const data: z.infer<typeof UserLocalStrategyRegistrationSchema> = req.body;
+    const data: z.infer<typeof UserAuthenticationSchema.UserLocalStrategyRegistration> = req.body;
     
-    const result = UserLocalStrategyRegistrationSchema.safeParse(data);
+    const result = UserAuthenticationSchema.UserLocalStrategyRegistration.safeParse(data);
 
-    if(result.success === false) {
-      ApiResponse.error(res, result.error.errors[0].message);
+    if(!result.success) {
+      ApiResponse.error(res, result.error.issues[0].message);
       return;
     }
 
