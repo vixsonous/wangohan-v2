@@ -70,23 +70,29 @@ export class RecipeDisplaySchema {
 
 export class RecipeSchema {
 
-  static RecipeInstruction = z.object({
-    recipe_instruction: z.string().min(1, "Please input recipe instructions")
+  static RecipeIngredient = z.object({
+    recipe_ingredient_id: z.number().optional(),
+    recipe_ingredients_name: z.string().min(1, "Please input recipe ingredient"),
+    recipe_ingredients_amount: z.string().min(1, "Please input recipe amount"),
   });
 
-  static RecipeIngredient = z.object({
-    recipe_ingredient: z.string().min(1, "Please input recipe ingredient"),
-    recipe_amount: z.string().min(1, "Please input recipe amount"),
+  static RecipeInstruction = z.object({
+    recipe_instructions_id: z.number().optional(),
+    recipe_instructions_text: z.string().min(1, "Please input recipe instructions")
   });
 
   static Recipe = z.object({
+    recipe_id: z.string().optional(),
     recipe_name: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
     recipe_description: z.string().min(1, "内容を入力してください"),
     recipe_instructions: z.array(RecipeSchema.RecipeInstruction).min(1, "Please input recipe instructions!"),
     recipe_ingredients: z.array(RecipeSchema.RecipeIngredient).min(1, "Please input recipe ingredients!"),
     checkbox_age: z.array(z.string().or(z.boolean()).optional()).optional(),
     checkbox_size: z.array(z.string().or(z.boolean()).optional()).optional(),
-    checkbox_event: z.array(z.string().or(z.boolean()).optional()).optional()
+    checkbox_event: z.array(z.string().or(z.boolean()).optional()).optional(),
+    recipe_age_tag: z.string(),
+    recipe_size_tag: z.string(),
+    recipe_event_tag: z.string(),
   });
 
   static PostRecipe = RecipeSchema.Recipe.and(z.object({
@@ -94,31 +100,8 @@ export class RecipeSchema {
     user_id: z.number(),
   }));
 
-  static UpdateRecipeInstruction = z.object({
-    recipe_instructions_id: z.number(),
-    recipe_instructions_text: z.string(),
-  });
-
-  static UpdateRecipeIngredient = z.object({
-    recipe_ingredients_id: z.number(),
-    recipe_ingredients_name: z.string(),
-    recipe_ingredients_amount: z.string(),
-  });
-
-  static UpdateRecipe = z.object({
-    recipe_name: z.string(),
-    recipe_id: z.number(),
-    recipe_description: z.string(),
-    recipe_age_tag: z.string(),
-    recipe_size_tag: z.string(),
-    recipe_event_tag: z.string(),
-    recipe_category: z.string(),
-    total_likes: z.number(),
-    total_views: z.number(),
-    recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay),
-    recipe_instructions: z.array(RecipeSchema.UpdateRecipeInstruction),
-    recipe_ingredients: z.array(RecipeSchema.UpdateRecipeIngredient),
-    recipe_comments: z.array(RecipeDisplaySchema.RecipeDetailsDisplayComments),
-    user_id: z.number(),
-  });
+  static UpdateRecipe = RecipeSchema.Recipe.and(z.object({
+    user_id: z.string().optional(),
+    recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay.or(z.file())).min(1, "Please upload recipe images!"),
+  }));
 }

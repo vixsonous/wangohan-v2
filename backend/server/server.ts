@@ -2,8 +2,8 @@ import express, { urlencoded } from 'express';
 import { router } from './routes';
 import passport from './utils/passport';
 import session from 'express-session';
-import {RedisStore} from 'connect-redis';
 import { redisClient } from './utils/redis';
+import {RedisStore} from 'connect-redis';
 
 const app = express();
 app.use(express.json());
@@ -15,7 +15,7 @@ app.use(session({
   saveUninitialized: false,
   resave: false,
   cookie: {
-    maxAge: 60000* 1
+    maxAge: 60000* 5
   }
 }))
 app.use(passport.initialize());

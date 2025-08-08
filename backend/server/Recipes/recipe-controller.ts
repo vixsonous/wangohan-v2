@@ -95,7 +95,7 @@ export class RecipeController {
     }
 
     const submitParseResult = RecipeSchema.PostRecipe.safeParse(submitData);
-
+    console.log(submitParseResult);
     if(!submitParseResult.success) {
       const message = submitParseResult.error.issues[0].message;
       log(message);

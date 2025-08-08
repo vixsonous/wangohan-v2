@@ -256,7 +256,7 @@ export class RecipeRepository {
       
       const newInstructions: RecipeInstructionInsert[] = recipe.recipe_instructions.map( (i, idx) => ({
         recipe_instruction_order: idx,
-        recipe_instructions_text: i.recipe_instruction,
+        recipe_instructions_text: i.recipe_instructions_text,
         recipe_id: recipe_id,
         updated_at: new Date(),
         created_at: new Date(),
@@ -268,8 +268,8 @@ export class RecipeRepository {
 
       const newIngredients: RecipeIngredientInsert[] = recipe.recipe_ingredients.map( (i , idx) => ({
         recipe_ingredient_order: idx,
-        recipe_ingredients_amount: i.recipe_amount,
-        recipe_ingredients_name: i.recipe_ingredient,
+        recipe_ingredients_amount: i.recipe_ingredients_amount,
+        recipe_ingredients_name: i.recipe_ingredients_name,
         recipe_id: recipe_id,
         updated_at: new Date(),
         created_at: new Date()
