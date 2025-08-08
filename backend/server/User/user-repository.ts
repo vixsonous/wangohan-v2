@@ -1,9 +1,8 @@
 import z from "zod";
-import { db } from "../../database/database";
+import { db } from "@/database/database";
 import { log } from "../utils/log";
-import {UserAuthenticationSchema, UserLevel, UserSchema} from "./user-types";
-import {  } from "./user-schema";
-import { UserInsert } from "../../database/types";
+import {UserAuthenticationSchema, UserLevel, UserSchema} from "../types/user-types";
+import { UserInsert } from "@/database/types";
 // @ts-ignore
 import bcrypt from 'bcrypt';
 import { User } from "./user";

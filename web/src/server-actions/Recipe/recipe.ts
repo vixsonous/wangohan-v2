@@ -1,9 +1,12 @@
 import { ServerApiService } from '@/lib/server-utils';
 import { RecipeDetailsDisplay, RecipeDisplayDetails } from './recipe-types';
+import z from "zod";
+import {RecipeSchema} from "@/types/recipe-types";
 
-export const getRecipe = async (recipe_id: number, recipe_name: string): Promise<RecipeDetailsDisplay | undefined> => {
+export const getRecipe = async (recipe_id: number, recipe_name: string, is_edit: boolean):
+  Promise<RecipeDetailsDisplay | z.infer<typeof RecipeSchema.UpdateRecipe> | undefined> => {
   try {
-    const {data} = await ServerApiService.get(`/get-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}`);
+    const {data} = await ServerApiService.get(`/get-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}&is_edit=${is_edit}`);
     return data.data;
   } catch(e) {
     console.log(e);

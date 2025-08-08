@@ -1,7 +1,7 @@
 import Image from "@/components/Image/server";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import CreateRecipeFormWrapper from "@/app/_root-components/root-create-recipe-form/root-create-recipe-form-wrapper";
+import RecipeFormWrapper from "@/app/_root-components/root-recipe-form/root-recipe-form-wrapper";
 
 export async function CreateRecipe() {
   return (
@@ -22,7 +22,7 @@ export async function CreateRecipe() {
               <SheetTitle className="absolute top-[55px] font-semibold text-primary-text text-[2em]">レシピを書く</SheetTitle>
               <Image src={'/icons/btn/recipe-button.webp'} loading="lazy" className="max-w-none" width={300}  alt="ribbon" />
             </header>
-            <CreateRecipeFormWrapper />
+            <RecipeFormWrapper />
             <SheetDescription className="text-sm mt-10">
               レシピを共有しましょう！
             </SheetDescription>

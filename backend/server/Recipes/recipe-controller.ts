@@ -3,7 +3,7 @@ import {ApiResponse} from "../utils/ApiUtils";
 import { RecipeService } from "./recipe-service";
 import { log } from "../utils/log";
 import { CacheUtil } from "../utils/redis";
-import {RecipeDisplaySchema, RecipeSchema} from "./recipe-types";
+import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import z from "zod";
 
 export class RecipeController {
@@ -44,9 +44,9 @@ export class RecipeController {
   }
   
   static async getRecipe(req: Request, res: Response) {
-    const {recipe_id, recipe_name} = req.query;
+    const {recipe_id, recipe_name, is_edit} = req.query;
 
-    const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
+    const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}&=is_edit=${is_edit}`;
     
     if(Number.isNaN(recipe_id) || Number.isInteger(recipe_id) || recipe_id === undefined) {
       log(RecipeController.RECIPE_ERROR_MESSAGE_LOG.INVALID_RECIPE_ID);
@@ -62,7 +62,7 @@ export class RecipeController {
     
     const recipe = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>, typeof RecipeService.getRecipe>(
       GET_RECIPE_KEY,
-      RecipeService.getRecipe, 60, Number(recipe_id), String(recipe_name)
+      RecipeService.getRecipe, 60, Number(recipe_id), String(recipe_name), Boolean(is_edit)
     ) ;
 
     if(recipe === undefined) {

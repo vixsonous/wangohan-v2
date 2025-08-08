@@ -1,6 +1,6 @@
 import z from "zod";
 import { UserDetailsRepository, UserRepository } from "./user-repository";
-import {UserAuthenticationSchema, UserSchema} from "./user-types";
+import {UserAuthenticationSchema, UserSchema} from "../types/user-types";
 
 export class User {
   

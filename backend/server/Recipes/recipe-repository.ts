@@ -2,7 +2,7 @@ import z from "zod";
 import { db } from "@/database/database";
 import {RecipeImageInsert, RecipeIngredientInsert, RecipeInsert, RecipeInstructionInsert} from "@/database/types";
 import { log } from "../utils/log";
-import { RecipeDisplaySchema, RecipeSchema} from "./recipe-types";
+import { RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import {ImageProcess} from "../Images/image-service";
 import {Image} from "../Images/image";
@@ -128,9 +128,10 @@ export class RecipeRepository {
     }
   }
 
-  static async getRecipe(recipe_id: number, recipe_name: string): Promise<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | undefined> {
+  static async getRecipe(recipe_id: number, recipe_name: string, is_edit: boolean):
+    Promise<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | z.infer<typeof RecipeSchema.UpdateRecipe> | undefined> {
     try {
-      const recipe: z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> = await db
+      const recipe: any = await db
         .selectFrom("recipes_table")
         .select(eb => [
           "recipe_name",
@@ -146,13 +147,20 @@ export class RecipeRepository {
           "total_views",
           jsonArrayFrom(
             eb.selectFrom("recipe_instructions_table")
-              .select([
+              .select(is_edit ? [
+                "recipe_instructions_id",
+                "recipe_instructions_text",
+              ] : [
                 "recipe_instructions_text",
               ]).whereRef("recipe_instructions_table.recipe_id","=","recipes_table.recipe_id")
           ).as("recipe_instructions"),
           jsonArrayFrom(
             eb.selectFrom("recipe_ingredients_table")
-              .select([
+              .select(is_edit ? [
+                "recipe_ingredient_id",
+                "recipe_ingredients_name",
+                "recipe_ingredients_amount",
+              ] : [
                 "recipe_ingredients_name",
                 "recipe_ingredients_amount",
               ]).whereRef("recipe_ingredients_table.recipe_id","=","recipes_table.recipe_id")
@@ -207,7 +215,10 @@ export class RecipeRepository {
         .executeTakeFirstOrThrow();
 
       log("Successfully retrieved recipe details!");
-      return recipe;
+
+      return is_edit ?
+        recipe as z.infer<typeof RecipeSchema.UpdateRecipe> :
+        recipe as z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>;
     } catch (error) {
       log("There was an error retrieving recipe details.");
       console.error(error);
@@ -224,7 +235,7 @@ export class RecipeRepository {
       const recipe_event_tag = recipe.checkbox_event?.filter(e => e !== undefined && e !== 'false').join(",") || "";
 
       const newRecipe = {
-        recipe_name: recipe.recipe_title,
+        recipe_name: recipe.recipe_name,
         recipe_description: recipe.recipe_description,
         recipe_category: "",
         recipe_age_tag: recipe_age_tag,

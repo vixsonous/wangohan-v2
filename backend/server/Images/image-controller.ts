@@ -3,7 +3,7 @@ import { ApiResponse } from "../utils/ApiUtils";
 import z from 'zod';
 import {Formats, ImageProcess} from "./image-service";
 // @ts-ignore
-import sharp from 'sharp';
+import sharp, {FitEnum} from 'sharp';
 import {log} from "../utils/log";
 
 export class ImageController {
@@ -44,12 +44,12 @@ export class ImageController {
 
       if(widthCheck) {
         image = heightCheck ?
-          image.resize(Number(w), Number(h), {fit, kernel: upscale ? sharp.kernel[upscaleMethod] : undefined}) :
-          image.resize(Number(w), undefined, {fit, kernel: upscale ? sharp.kernel[upscaleMethod] : undefined});
+          image.resize(Number(w), Number(h), {fit: fit as keyof FitEnum, kernel: upscale ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined}) :
+          image.resize(Number(w), undefined, {fit: fit as keyof FitEnum, kernel: upscale ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined});
       }
 
       if(quality !== undefined) {
-        image = image.webp({quality });
+        image = image.webp({quality: Number(quality) });
       }
 
       if(format !== undefined) {

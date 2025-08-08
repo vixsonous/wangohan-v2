@@ -34,7 +34,7 @@ export class UserAuthenticationSchema {
   })
 
   public static UserLocalStrategyRegistration = z.object({
-    email: z.string().email("Invalid email format").nonempty(),
+    email: z.email("Invalid email format").nonempty(),
     password: z.string().nonempty(),
     repeat_password: z.string().nonempty()
   }).refine(data => data.password === data.repeat_password, {
@@ -44,7 +44,7 @@ export class UserAuthenticationSchema {
 
   public static UserCredentials = z.object({
     user_id: z.number().gte(0).optional(),
-    email: z.string().email("Invalid email format"),
+    email: z.email("Invalid email format"),
     google_id: z.string().optional(),
     password: z.string().optional(),
   }).refine(data => {
@@ -56,11 +56,9 @@ export class UserAuthenticationSchema {
       return false;
     }
 
-    if((hasEmail || hasPassword) && !hasGoogleId) {
-      return false;
-    }
+    return !((hasEmail || hasPassword) && !hasGoogleId);
 
-    return true;
+
   }, {
     message: "Email and password must be provided, or Google Id must be provided",
     path: ['google_id','password','email']

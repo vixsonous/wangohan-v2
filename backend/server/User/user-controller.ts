@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiUtils";
 import { log } from "../utils/log";
 import z from "zod";
 import { User } from "./user";
-import {UserAuthenticationSchema} from "@/server/User/user-types";
+import {UserAuthenticationSchema} from "@/server/types/user-types";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {

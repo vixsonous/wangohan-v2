@@ -5,7 +5,7 @@ import InputField from "@/components/Input";
 import TextareaField from "@/components/Textarea";
 import React from "react";
 import {Control, Controller, FieldPath, useController} from 'react-hook-form';
-import { useCreateRecipeForm } from "./helper";
+import { useRecipeForm } from "./helper";
 import Error from "@/components/Error";
 import z from "zod";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -29,19 +29,21 @@ const events = [
 const size = ["小型犬", "中型犬", "大型犬"];
 const age = ["子犬", "成犬", "シニア犬"];
 
-const RECIPE_TITLE = 'recipe_title';
+const RECIPE_NAME = 'recipe_name';
 const RECIPE_DESCRIPTION = 'recipe_description';
 
 interface CheckboxProps {
   label: string;
-  control: Control<z.infer<typeof RecipeSchema>>;
-  name: FieldPath<z.infer<typeof RecipeSchema>>;
+  control: Control<z.infer<typeof RecipeSchema.Recipe>>;
+  name: FieldPath<z.infer<typeof RecipeSchema.Recipe>>;
+  checked: string | boolean | undefined;
 }
 
-function Checkbox({label, control, name}: CheckboxProps) {
+function Checkbox({label, control, name, checked}: CheckboxProps) {
   const {field} = useController({
     name,
     control,
+    defaultValue: checked
   });
 
   return (
@@ -67,8 +69,11 @@ function Checkbox({label, control, name}: CheckboxProps) {
   )
 }
 
-export default function CreateRecipeForm() {
-  
+interface RecipeFormProps {
+  recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe> | undefined
+}
+
+export default function RecipeForm({recipe_data}: RecipeFormProps) {
   const {
     onSubmit,
     fileOnChange,
@@ -82,12 +87,18 @@ export default function CreateRecipeForm() {
     watch,
     deleteFiles,
     submitMutation
-  } = useCreateRecipeForm();
+  } = useRecipeForm(recipe_data);
 
-  const title = watch("recipe_title");
+  const title = watch("recipe_name");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap justify-center gap-8 max-w-7xl h-full w-full">
+      {recipe_data &&
+        <>
+          <InputField {...register("recipe_id")} hidden={true} value={recipe_data.recipe_id} />
+          <InputField {...register("user_id")} hidden={true} value={recipe_data.user_id} />
+        </>
+      }
       <div className="first-section--container grid grid-cols-6 md:grid-cols-12 w-full gap-8">
         <div className="col-span-6 flex flex-col gap-4">
           <p className="flex flex-col gap-2">
@@ -101,9 +112,9 @@ export default function CreateRecipeForm() {
                 )
                 
               }
-              <Error>{errors.recipe_title?.message}</Error>
+              <Error>{errors.recipe_name?.message}</Error>
             </label>
-            <InputField aria-invalid={errors.recipe_title?.message !== undefined} className="sm:text-base" {...register(RECIPE_TITLE)} placeholder="例）炊飯器で簡単！夏バテでも食べられるご飯" id="recipe_title" type="text" />
+            <InputField aria-invalid={errors.recipe_name?.message !== undefined} className="sm:text-base" {...register(RECIPE_NAME)} placeholder="例）炊飯器で簡単！夏バテでも食べられるご飯" id="recipe_title" type="text" />
           </p>
           <p className="flex flex-col gap-2 flex-[1_0_50%]">
             <label className="text-xl font-semibold flex gap-2 items-baseline" htmlFor={RECIPE_DESCRIPTION}>
@@ -146,7 +157,7 @@ export default function CreateRecipeForm() {
               <DialogDescription className="grid grid-cols-5 gap-1 w-full h-full">
                 {files.map((f, idx) => (
                   <span key={idx} className="relative col-span-1 w-full h-full">
-                    <Image alt="preview image of uploaded file" className="w-full h-[100px] aspect-auto" src={f.preview_url} width={100} height={100} noprocess/>
+                    <Image alt="preview image of uploaded file" className="w-full h-[100px] aspect-auto" src={f.preview_url} width={100} height={100} noprocess={true}/>
                     <Button className="absolute top-2 right-2 bg-secondary-bg rounded-full" onClick={deleteFiles(f.preview_url)}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x size-4" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
                     </Button>
@@ -170,13 +181,13 @@ export default function CreateRecipeForm() {
                   <div className="flex gap-2 w-full">
                     <Controller 
                       control={control}
-                      name={`recipe_ingredients.${idx}.recipe_ingredient`}
+                      name={`recipe_ingredients.${idx}.recipe_ingredients_name`}
                       render={({field}) => (
                         <InputField 
                           aria-invalid={
                             errors && 
                             errors["recipe_ingredients"] !== undefined && 
-                            errors["recipe_ingredients"][idx]?.recipe_ingredient?.message !== undefined
+                            errors["recipe_ingredients"][idx]?.recipe_ingredients_name?.message !== undefined
                           } 
                           className="w-full" 
                           {...field} 
@@ -186,13 +197,13 @@ export default function CreateRecipeForm() {
                     />
                     <Controller 
                       control={control}
-                      name={`recipe_ingredients.${idx}.recipe_amount`}
+                      name={`recipe_ingredients.${idx}.recipe_ingredients_amount`}
                       render={({field}) => (
                         <InputField 
                           aria-invalid={
                             errors && 
                             errors["recipe_ingredients"] !== undefined && 
-                            errors["recipe_ingredients"][idx]?.recipe_amount?.message !== undefined
+                            errors["recipe_ingredients"][idx]?.recipe_ingredients_amount?.message !== undefined
                           } 
                           className="w-full" 
                           {...field} 
@@ -208,7 +219,7 @@ export default function CreateRecipeForm() {
               )
             })}
           </div>
-          <Button className="max-w-max" onClick={() => recipe_ingredients_field.append({recipe_ingredient: "", recipe_amount: ""})}>＋追加</Button>
+          <Button className="max-w-max" onClick={() => recipe_ingredients_field.append({recipe_ingredients_name: "", recipe_ingredients_amount: ""})}>＋追加</Button>
         </section>
 
         <section className="recipe_ingredients w-full flex flex-col gap-2">
@@ -226,13 +237,13 @@ export default function CreateRecipeForm() {
                   <div className="w-full">
                     <Controller 
                       control={control}
-                      name={`recipe_instructions.${idx}.recipe_instruction`}
+                      name={`recipe_instructions.${idx}.recipe_instructions_text`}
                       render={({field}) => (
                         <InputField 
                           aria-invalid={
                             errors && 
                             errors["recipe_instructions"] !== undefined && 
-                            errors["recipe_instructions"][idx]?.recipe_instruction?.message !== undefined
+                            errors["recipe_instructions"][idx]?.recipe_instructions_text?.message !== undefined
                           } 
                           {...field} 
                           placeholder="例）にんじん" 
@@ -247,7 +258,7 @@ export default function CreateRecipeForm() {
               )
             })}
           </div>
-          <Button onClick={() => recipe_instructions_field.append({recipe_instruction: ""})} className="max-w-max">＋追加</Button>
+          <Button onClick={() => recipe_instructions_field.append({recipe_instructions_text: ""})} className="max-w-max">＋追加</Button>
         </section>
         <section className="grid gap-2">
           <header className="flex">
@@ -261,7 +272,7 @@ export default function CreateRecipeForm() {
               <div className="flex gap-1 flex-wrap">
                 {age.map((a, idx) => {
                   return (
-                    <Checkbox key={a} label={a} control={control} name={`checkbox_age.${idx}`} />
+                    <Checkbox key={a} label={a} control={control} checked={recipe_data && recipe_data.recipe_age_tag.includes(a) ? a : undefined} name={`checkbox_age.${idx}`} />
                   )
                 })}
               </div>
@@ -271,7 +282,7 @@ export default function CreateRecipeForm() {
               <div className="flex gap-1 flex-wrap">
                 {size.map((s, idx) => {
                   return (
-                    <Checkbox key={s} label={s} control={control} name={`checkbox_size.${idx}`}/>
+                    <Checkbox key={s} label={s} control={control} checked={recipe_data && recipe_data.recipe_size_tag.includes(s) ? s : undefined} name={`checkbox_size.${idx}`}/>
                   )
                 })}
               </div>
@@ -281,7 +292,7 @@ export default function CreateRecipeForm() {
               <div className="flex gap-1 flex-wrap">
                 {events.map((e, idx) => {
                   return (
-                    <Checkbox key={e} label={e} control={control} name={`checkbox_event.${idx}`}/>
+                    <Checkbox key={e} label={e} control={control} checked={recipe_data && recipe_data.recipe_event_tag.includes(e) ? e : undefined} name={`checkbox_event.${idx}`}/>
                   )
                 })}
               </div>

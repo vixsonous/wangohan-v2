@@ -10,8 +10,10 @@ import { RecipeImageDisplay } from "@/server-actions/Recipe/recipe-types";
 
 interface ShowRecipeCarouselProps {
   recipe_images: Array<RecipeImageDisplay>;
+  recipe_id: number;
+  recipe_name: string;
 }
-export default function ShowRecipeCarousel({recipe_images}: ShowRecipeCarouselProps) {
+export default function ShowRecipeCarousel({recipe_images, recipe_id, recipe_name}: ShowRecipeCarouselProps) {
 
   const [carouselSlideCnt, setCarouselSlideCnt] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
@@ -52,7 +54,7 @@ export default function ShowRecipeCarousel({recipe_images}: ShowRecipeCarouselPr
       </CarouselContent>
       <CarouselPrevious className="border-primary-text top-2/5 left-12 md:-left-12"/>
       <CarouselNext className="border-primary-text top-2/5 right-12 md:-right-12" />
-      <ShowRecipeDropdown />
+      <ShowRecipeDropdown recipe_id={recipe_id} recipe_name={recipe_name} />
       <div className="absolute flex items-center gap-2 top-2/3 left-1/2 -translate-x-1/2">
         {Array.from(Array(carouselSlideCnt).keys()).map( (c) => {
           return (

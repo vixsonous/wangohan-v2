@@ -1,69 +1,105 @@
 import z from "zod";
+import {UserSchema} from "@/types/user-types";
 
-export interface DogData {
-  pet_id: number;
-  pet_image: string;
-  pet_name: string;
-  pet_birthdate: string;
-  pet_breed: string;
+export class RecipeDisplaySchema {
+
+  static RecipeRatingData = z.object({
+    avg_rating: z.number(),
+    total_rating: z.number()
+  }).nullable();
+
+  static RecipeImageDisplay =  z.object({
+    recipe_image_id: z.number(),
+    recipe_image_title: z.string(),
+    recipe_image_subtext: z.string(),
+    recipe_image: z.string(),
+    recipe_id: z.number()
+  });
+
+  static RecipeCardDisplay = z.object({
+    recipe_name: z.string(),
+    recipe_id: z.number(),
+    recipe_description: z.string(),
+    recipe_age_tag: z.string(),
+    recipe_size_tag: z.string(),
+    recipe_event_tag: z.string(),
+    recipe_category: z.string(),
+    total_likes: z.number(),
+    total_views: z.number(),
+    recipe_images: Array<typeof RecipeDisplaySchema.RecipeImageDisplay>,
+    recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
+    user_id: z.number(),
+    created_at: z.date(),
+  });
+
+  static RecipeDetailsDisplayComments = z.object({
+    recipe_comment_subtext: z.string(),
+    recipe_comment_rating: z.number(),
+    user: UserSchema.UserDisplay,
+    created_at: z.date(),
+  });
+
+  static RecipeInstruction = z.object({
+    recipe_instructions_text: z.string(),
+  });
+
+  static RecipeIngredient = z.object({
+    recipe_ingredients_name: z.string(),
+    recipe_ingredients_amount: z.string(),
+  });
+
+  static RecipeDetailsDisplay = z.object({
+    recipe_name: z.string(),
+    recipe_id: z.number(),
+    recipe_description: z.string(),
+    recipe_age_tag: z.string(),
+    recipe_size_tag: z.string(),
+    recipe_event_tag: z.string(),
+    recipe_category: z.string(),
+    total_likes: z.number(),
+    total_views: z.number(),
+    recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay),
+    recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
+    recipe_instructions: z.array(RecipeDisplaySchema.RecipeInstruction),
+    recipe_ingredients: z.array(RecipeDisplaySchema.RecipeIngredient),
+    recipe_comments: z.array(RecipeDisplaySchema.RecipeDetailsDisplayComments),
+    user_id: z.number(),
+    created_at: z.date(),
+  });
 }
 
-export interface ingredients {
-  id: number;
-  name: string;
-  amount: string;
+export class RecipeSchema {
+  static RecipeIngredient = z.object({
+    recipe_ingredient_id: z.number().optional(),
+    recipe_ingredients_name: z.string().min(1, "Please input recipe ingredient"),
+    recipe_ingredients_amount: z.string().min(1, "Please input recipe amount"),
+  });
+
+  static RecipeInstruction = z.object({
+    recipe_instructions_id: z.number().optional(),
+    recipe_instructions_text: z.string().min(1, "Please input recipe instructions")
+  });
+
+  static Recipe = z.object({
+    recipe_id: z.string().optional(),
+    recipe_name: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
+    recipe_description: z.string().min(1, "内容を入力してください"),
+    recipe_instructions: z.array(RecipeSchema.RecipeInstruction).min(1, "Please input recipe instructions!"),
+    recipe_ingredients: z.array(RecipeSchema.RecipeIngredient).min(1, "Please input recipe ingredients!"),
+    checkbox_age: z.array(z.string().or(z.boolean()).optional()).optional(),
+    checkbox_size: z.array(z.string().or(z.boolean()).optional()).optional(),
+    checkbox_event: z.array(z.string().or(z.boolean()).optional()).optional(),
+    recipe_age_tag: z.string(),
+    recipe_size_tag: z.string(),
+    recipe_event_tag: z.string(),
+    user_id: z.string().optional()
+  });
+
+  static PostRecipe = RecipeSchema.Recipe.and(z.object({
+    recipe_images: z.array(z.file()).min(1, "Please upload recipe images!")
+  }));
+
+  static UpdateRecipe = RecipeSchema.Recipe.and(z.object({
+    recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay.or(z.file())).min(1, "Please upload recipe images!"),
+  }));
 }
-
-export interface instructions {
-  id: number;
-  text: string;
-}
-
-export interface UserDetails {
-  pets?: DogData[];
-  user_codename: string;
-  user_detail_id: number;
-  user_id: number;
-  user_image: string;
-}
-
-export interface User {
-  user_id: number;
-  user_image: string;
-  user_codename: string;
-}
-
-export interface Comment {
-  recipe_comment_id: number;
-  recipe_comment_rating: number;
-  recipe_comment_subtext: string;
-  recipe_comment_title: string;
-  recipe_id: number;
-  user_id: number;
-  user: User;
-  created_at: string;
-}
-
-export const FileDisplaySchema = z.array(z.object({
-  file: z.file().min(1, "Please upload some pictures"),
-  preview_url: z.string().min(1, "Please provide preview url")
-}))
-
-export const RecipeIngredientSchema = z.object({
-  recipe_ingredient: z.string().min(1, "Please input recipe ingredient"),
-  recipe_amount: z.string().min(1, "Please input recipe amount"),
-});
-
-export const RecipeInstructionSchema = z.object({
-  recipe_instruction: z.string().min(1, "Please input recipe instructions")
-});
-
-export const RecipeSchema = z.object({
-  recipe_title: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
-  recipe_description: z.string().min(1, "内容を入力してください"),
-  recipe_instructions: z.array(RecipeInstructionSchema).min(1, "Please input recipe instructions!"),
-  recipe_ingredients: z.array(RecipeIngredientSchema).min(1, "Please input recipe ingredients!"),
-  checkbox_age: z.array(z.string().or(z.boolean()).optional()).optional(),
-  checkbox_size: z.array(z.string().or(z.boolean()).optional()).optional(),
-  checkbox_event: z.array(z.string().or(z.boolean()).optional()).optional()
-});

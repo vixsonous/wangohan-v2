@@ -1,4 +1,4 @@
-import {UserSchema} from "../User/user-types";
+import {UserSchema} from "./user-types";
 import * as z from 'zod';
 
 export class RecipeDisplaySchema {
@@ -80,7 +80,7 @@ export class RecipeSchema {
   });
 
   static Recipe = z.object({
-    recipe_title: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
+    recipe_name: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
     recipe_description: z.string().min(1, "内容を入力してください"),
     recipe_instructions: z.array(RecipeSchema.RecipeInstruction).min(1, "Please input recipe instructions!"),
     recipe_ingredients: z.array(RecipeSchema.RecipeIngredient).min(1, "Please input recipe ingredients!"),
@@ -93,4 +93,32 @@ export class RecipeSchema {
     recipe_images: z.array(z.custom<Express.Multer.File>()).min(1, "Please upload recipe images!"),
     user_id: z.number(),
   }));
+
+  static UpdateRecipeInstruction = z.object({
+    recipe_instructions_id: z.number(),
+    recipe_instructions_text: z.string(),
+  });
+
+  static UpdateRecipeIngredient = z.object({
+    recipe_ingredients_id: z.number(),
+    recipe_ingredients_name: z.string(),
+    recipe_ingredients_amount: z.string(),
+  });
+
+  static UpdateRecipe = z.object({
+    recipe_name: z.string(),
+    recipe_id: z.number(),
+    recipe_description: z.string(),
+    recipe_age_tag: z.string(),
+    recipe_size_tag: z.string(),
+    recipe_event_tag: z.string(),
+    recipe_category: z.string(),
+    total_likes: z.number(),
+    total_views: z.number(),
+    recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay),
+    recipe_instructions: z.array(RecipeSchema.UpdateRecipeInstruction),
+    recipe_ingredients: z.array(RecipeSchema.UpdateRecipeIngredient),
+    recipe_comments: z.array(RecipeDisplaySchema.RecipeDetailsDisplayComments),
+    user_id: z.number(),
+  });
 }

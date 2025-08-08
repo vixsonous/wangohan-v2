@@ -1,4 +1,6 @@
-import { RecipeDisplayDetails, RecipeImageDisplay, RecipeRatingData } from "./recipe-types";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/server/types/recipe-types";
+
 
 export class RecipeModel {
   private recipe_id: number;
@@ -12,14 +14,14 @@ export class RecipeModel {
   private total_favourites: number;
   private total_views: number;
   private user_id: number;
-  private recipe_images: Array<RecipeImageDisplay>;
-  private recipe_rating_data: RecipeRatingData;
+  private recipe_images: Array<z.infer<typeof RecipeDisplaySchema.RecipeImageDisplay>>;
+  private recipe_rating_data: z.infer<typeof RecipeDisplaySchema.RecipeRatingData>;
   private updated_at: Date;
   private created_at: Date;
   
   constructor(recipe_id: number, recipe_name: string, recipe_description: string, recipe_age_tag: string,
     recipe_size_tag: string, recipe_event_tag: string, recipe_category: string, total_likes: number,
-    total_favourites: number, total_views: number, user_id: number, recipe_images: Array<RecipeImageDisplay>, recipe_rating_data: RecipeRatingData, updated_at: Date, created_at: Date
+    total_favourites: number, total_views: number, user_id: number, recipe_images: Array<z.infer<typeof RecipeDisplaySchema.RecipeImageDisplay>>, recipe_rating_data: z.infer<typeof RecipeDisplaySchema.RecipeRatingData>, updated_at: Date, created_at: Date
   ) {
     this.recipe_id = recipe_id;
     this.recipe_name = recipe_name;
@@ -36,23 +38,5 @@ export class RecipeModel {
     this.recipe_rating_data = recipe_rating_data;
     this.updated_at = updated_at;
     this.created_at = created_at;
-  }
-
-  async getRecipeDetails(): Promise<RecipeDisplayDetails> {
-    return {
-      recipe_id: this.recipe_id,
-      recipe_name: this.recipe_name,
-      recipe_description: this.recipe_description,
-      recipe_age_tag: this.recipe_age_tag,
-      recipe_size_tag: this.recipe_size_tag,
-      recipe_event_tag: this.recipe_event_tag,
-      recipe_category: this.recipe_category,
-      total_likes: this.total_likes,
-      user_id: this.user_id,
-      created_at: this.created_at,
-      recipe_images: this.recipe_images,
-      total_views: this.total_views,
-      recipe_rating_data: this.recipe_rating_data
-    }
   }
 }
