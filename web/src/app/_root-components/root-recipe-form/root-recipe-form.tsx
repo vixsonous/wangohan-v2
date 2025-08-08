@@ -86,7 +86,9 @@ export default function RecipeForm({recipe_data}: RecipeFormProps) {
     control,
     watch,
     deleteFiles,
-    submitMutation
+    submitMutation,
+    removeInstructions,
+    removeIngredients
   } = useRecipeForm(recipe_data);
 
   const title = watch("recipe_name");
@@ -212,7 +214,7 @@ export default function RecipeForm({recipe_data}: RecipeFormProps) {
                       )}
                     />
                   </div>
-                  <Button onClick={() => recipe_ingredients_field.remove(idx)}>
+                  <Button onClick={removeIngredients(idx)}>
                     <Image width={20} src={"/icons/svg/primary-trash.svg"} alt="trash icon" noprocess/>
                   </Button>
                 </div>
@@ -251,7 +253,7 @@ export default function RecipeForm({recipe_data}: RecipeFormProps) {
                       )}
                     />
                   </div>
-                  <Button onClick={() => recipe_instructions_field.remove(idx)}>
+                  <Button onClick={removeInstructions(idx)}>
                     <Image width={20} src={"/icons/svg/primary-trash.svg"} alt="trash icon" noprocess/>
                   </Button>
                 </div>

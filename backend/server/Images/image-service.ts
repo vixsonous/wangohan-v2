@@ -13,11 +13,11 @@ export class ImageProcess {
   private resizeOptions?: sharp.ResizeOptions | undefined = undefined;
   
   private shouldChangeToWebp: boolean = false;
-  private webpOptions: sharp.WebpOptions;
+  private webpOptions: sharp.WebpOptions = {};
 
   // Change format
   private shouldChangeFormat: boolean = false;
-  private format: Formats | undefined = undefined;
+  private format: Formats = "webp";
 
   constructor(arrayBuffer: ArrayBuffer) {
     this.image = arrayBuffer;

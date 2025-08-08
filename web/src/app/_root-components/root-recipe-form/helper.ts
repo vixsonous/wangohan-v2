@@ -40,7 +40,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
         }
       ],
       recipe_instructions: recipe_data ? recipe_data.recipe_instructions.map( i => ({
-        recipe_instruction_id: i.recipe_instructions_id,
+        recipe_instructions_id: i.recipe_instructions_id,
         recipe_instructions_text: i.recipe_instructions_text
       })): [
         {
@@ -52,11 +52,32 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
       recipe_event_tag: "",
     }
   });
+  const [deleteIngredientsIds, setDeleteIngredientsIds] = useState<Array<number>>([]);
+  const [deleteInstructionsIds, setDeleteInstructionsIds] = useState<Array<number>>([]);
+  const removeIngredients = (idx: number) => () => {
+    recipe_ingredients_field.remove(idx);
+    const fieldId = recipe_ingredients_field.fields[idx].recipe_ingredient_id;
+    if(fieldId !== undefined) {
+      setDeleteIngredientsIds(prev => [...prev, fieldId]);
+    }
+
+  }
+
+  const removeInstructions = (idx: number) => () => {
+    recipe_instructions_field.remove(idx);
+    const fieldId = recipe_instructions_field.fields[idx].recipe_instructions_id;
+    if(fieldId !== undefined) {
+      setDeleteInstructionsIds(prev => [...prev, fieldId]);
+    }
+
+  }
 
   const [files, setFiles] = useState<z.infer<typeof FileSchema.FileDisplaySchema>>([]);
+  const [deleteFileIds, setDeleteFileIds] = useState<Array<number>>([]);
   useEffect(() => {
     if(recipe_data) {
       setFiles(recipe_data.recipe_images.map(i => ({
+        recipe_image_id: (i as z.infer<typeof RecipeDisplaySchema.RecipeImageDisplay>).recipe_image_id,
         preview_url: (i as z.infer<typeof RecipeDisplaySchema.RecipeImageDisplay>).recipe_image
       })));
     }
@@ -65,7 +86,6 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   const fileOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const targetFiles = e.currentTarget.files;
-
     if(targetFiles === null) return;
     if(targetFiles.length < 0) return;
 
@@ -98,19 +118,20 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     setFiles(structuredClone(temp));
   }
   
-  const deleteFiles = (preview_url: string) => (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const deleteFiles = (preview_url: string) => () => {
 
-    setFiles(prev => {
-      const temp = structuredClone(prev);
-      const idx = temp.findIndex(f => f.preview_url === preview_url);
+    const temp = structuredClone(files);
+    const idx = temp.findIndex(f => f.preview_url === preview_url);
 
-      if(idx < 0) return prev;
+    if(idx < 0) return;
+    const deleteId = temp[idx].recipe_image_id;
+    if(deleteId !== undefined) {
+      setDeleteFileIds(prev => ([...prev, deleteId]));
+    }
 
-      temp.splice(idx, 1);
-      
-      return structuredClone(temp);
-    });
+    temp.splice(idx, 1);
+
+    setFiles(structuredClone(temp));
   }
 
   const recipe_ingredients_field = useFieldArray({
@@ -172,10 +193,9 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   });
 
   const onSubmit = async (data: FieldValues) => {
-    console.log(data);
 
     const parseResult = RecipeSchema.Recipe.safeParse(data);
-    console.log(parseResult);
+
     if(!parseResult.success) {
       toast.error("Error", {
         description: parseResult.error.issues[0].message
@@ -184,7 +204,6 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     }
 
     const filesParseResult = FileSchema.FileDisplaySchema.safeParse(files);
-    console.log(filesParseResult)
     if(!filesParseResult.success) {
       toast.error("Error", {
         description: filesParseResult.error.issues[0].message
@@ -198,17 +217,18 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
       recipe_age_tag: data.checkbox_age.filter((a: string | undefined | boolean) => a !== undefined && a !== 'false').join(",") || "",
       recipe_size_tag: data.checkbox_size.filter((s: string | undefined | boolean) => s !== undefined && s !== 'false').join(",") || "",
       recipe_event_tag: data.checkbox_event.filter((e: string | undefined | boolean) => e !== undefined && e !== 'false').join(",") || "",
-      recipe_images: files.map(f => f.file || new File([new Blob([''])], f.preview_url))
+      recipe_images: files.map(f => f.file || new File([new Blob([''])], f.preview_url)),
+      delete_image_ids: [...deleteFileIds],
+      delete_recipe_instruction_ids: [...deleteInstructionsIds],
+      delete_recipe_ingredient_ids: [...deleteIngredientsIds]
+
     }
     let submitParseResult;
-    console.log(submitData);
     if(recipe_data) {
       submitParseResult = RecipeSchema.UpdateRecipe.safeParse(submitData);
     } else {
       submitParseResult = RecipeSchema.PostRecipe.safeParse(submitData);
     }
-
-    console.log(submitParseResult);
 
     if(!submitParseResult.success) {
       toast.error("Error", {
@@ -237,6 +257,8 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     control,
     deleteFiles,
     watch,
-    submitMutation
+    submitMutation,
+    removeIngredients,
+    removeInstructions
   }
 }
