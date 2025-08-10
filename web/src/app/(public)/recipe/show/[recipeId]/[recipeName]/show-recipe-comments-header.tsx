@@ -1,30 +1,35 @@
 import Image from "@/components/Image/server";
 import Link from "next/link";
+import z from "zod";
+import {UserSchema} from "@/types/user-types";
 
 interface ShowRecipeCommentsHeaderProps {
   recipe_id: number;
-  user_id: number;
-  user_picture: string;
+  user: z.infer<typeof UserSchema.UserDisplay>
   avgRating: number;
   totalRating: number;
 }
 
 export default function ShowRecipeCommentsHeader(recipe_data: ShowRecipeCommentsHeaderProps) {
+
+  const user = recipe_data.user;
+
   return (
     <div className="flex flex-col">
       <section className="relative w-full h-full text-[13px] flex justify-between items-center">
         <p>No. {recipe_data.recipe_id}</p>
         <h1 className="flex items-center gap-[10px]">
           Recipe by
-          <Link href={"/user/" + recipe_data.user_id}>
+          <Link href={user !== null ? "/user/" + user.user_id + "/" + user.user_codename : "/"}>
             <Image
-              src={recipe_data.user_picture}
+              src={user !== null ? user.user_image : "/image.webp"}
               className="h-[30px] w-[30px] rounded-[100px] object-cover"
               width={100}
               height={100}
               alt="website banner"
             />
           </Link>
+          {user ? user.user_codename : "Anonymous"}
         </h1>
       </section>
       <section className="w-full relative">

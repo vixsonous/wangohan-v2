@@ -147,7 +147,14 @@ export class RecipeRepository {
           "recipe_event_tag",
           "recipe_size_tag",
           "recipe_description",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
           "created_at",
           "total_likes",
           "total_views",

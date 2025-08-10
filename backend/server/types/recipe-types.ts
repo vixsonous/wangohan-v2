@@ -63,7 +63,7 @@ export class RecipeDisplaySchema {
     recipe_instructions: z.array(RecipeDisplaySchema.RecipeInstruction),
     recipe_ingredients: z.array(RecipeDisplaySchema.RecipeIngredient),
     recipe_comments: z.array(RecipeDisplaySchema.RecipeDetailsDisplayComments),
-    user_id: z.number(),
+    user: UserSchema.UserDisplay,
     created_at: z.date(),
   });
 }
