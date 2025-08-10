@@ -1,6 +1,12 @@
 import z from "zod";
 import { db } from "@/database/database";
-import {RecipeImageInsert, RecipeIngredientInsert, RecipeInsert, RecipeInstructionInsert} from "@/database/types";
+import {
+  RecipeImageInsert,
+  RecipeIngredientInsert,
+  RecipeInsert,
+  RecipeInstructionInsert,
+  RecipeUpdate
+} from "@/database/types";
 import { log } from "../utils/log";
 import { RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
@@ -327,15 +333,173 @@ export class RecipeRepository {
     }
   }
 
-  static async insertInstructions(recipeInstructionsInsert: RecipeInstructionInsert[]): Promise<boolean> {
+  static async updateRecipe(recipe: z.infer<typeof RecipeSchema.UpdateRecipe>): Promise<boolean> {
+    const trx = await db.startTransaction().execute();
     try {
-      await db.insertInto("recipe_instructions_table")
-        .values(recipeInstructionsInsert)
-        .execute();
 
+      const recipeId = recipe.recipe_id;
+
+      if(recipeId === undefined) {
+        console.error("Please provide recipe ID!");
+        return false;
+      }
+
+      const rcInstructionDeleteIds = recipe.delete_recipe_instruction_ids;
+      const rcIngredientDeleteIds = recipe.delete_recipe_ingredient_ids;
+      if(rcInstructionDeleteIds !== undefined) {
+        await trx.deleteFrom("recipe_instructions_table")
+          .where("recipe_instructions_id", "in", rcInstructionDeleteIds)
+          .execute();
+      }
+
+      if(rcIngredientDeleteIds !== undefined) {
+        await trx.deleteFrom("recipe_ingredients_table")
+          .where("recipe_ingredient_id", "in", rcIngredientDeleteIds)
+          .execute();
+      }
+
+      const rcImageDeleteIds = recipe.delete_image_ids;
+      if(rcImageDeleteIds !== undefined) {
+        await Promise.all(rcImageDeleteIds.map( async deleteImage => {
+
+          let key = deleteImage.delete_image_key;
+
+          if(key.startsWith("r2://")) {
+            key = key.slice(5);
+          }
+
+          return Image.deleteR2Public(key);
+        }));
+
+        const deleteIds = rcImageDeleteIds.map(deleteImage => Number(deleteImage.delete_image_id));
+
+        await trx.deleteFrom("recipe_images_table")
+          .where("recipe_image_id","in", deleteIds)
+          .returningAll()
+          .execute();
+      }
+
+      const images = await Promise.all(recipe.recipe_images.map(async image => {
+        if(image.size === 0) return undefined;
+
+        const buffer: Buffer<ArrayBuffer> = Buffer.from(image.buffer);
+
+        let imageProcess = new ImageProcess(buffer.buffer);
+
+        imageProcess = imageProcess.resize(1024, undefined, {
+          withoutEnlargement: true,
+          fit: "inside"
+        });
+
+        imageProcess = imageProcess.webp({
+          quality: 80
+        });
+
+        const uploadImage = await imageProcess.result();
+
+        const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe.recipe_id).padStart(8, "0")}`;
+        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, image.originalname.split(".")[0], "webp", "images/webp");
+
+        return {key: uploadDone.Key, order: 0, filename: image.originalname};
+      }));
+
+      const newImages: Array<RecipeImageInsert> =[];
+
+      for(let x = 0; x < images.length; x++) {
+        const img = images[x];
+        if(img !== undefined) {
+          newImages.push({
+            recipe_id: recipeId,
+            recipe_image_title: img.filename,
+            recipe_image: `r2://${img.key}`,
+            recipe_image_subtext: "",
+            recipe_image_order: 0,
+            created_at: new Date(),
+            updated_at: new Date()
+          })
+        }
+      }
+
+      if(newImages.length > 0) {
+        await trx.insertInto("recipe_images_table")
+          .values(newImages)
+          .execute();
+      }
+
+      const recipeUpdate: RecipeUpdate = {
+        recipe_name: recipe.recipe_name,
+        recipe_description: recipe.recipe_description,
+        recipe_age_tag: recipe.recipe_age_tag,
+        recipe_event_tag: recipe.recipe_event_tag,
+        recipe_size_tag: recipe.recipe_size_tag,
+        updated_at: new Date()
+      } satisfies RecipeUpdate;
+
+      await trx.updateTable("recipes_table")
+        .set(recipeUpdate)
+        .where("recipe_id", "=", recipeId)
+        .executeTakeFirstOrThrow();
+
+      // Insert or update recipe instructions
+      for(let i = 0; i < recipe.recipe_instructions.length; i++) {
+        const rcInsId = recipe.recipe_instructions[i].recipe_instructions_id;
+
+        if(rcInsId !== undefined) {
+          await trx.updateTable("recipe_instructions_table")
+            .set({
+              recipe_instructions_text: recipe.recipe_instructions[i].recipe_instructions_text,
+            })
+            .where("recipe_instructions_id","=", rcInsId)
+            .execute();
+        } else {
+          const newRecipeInstructions = {
+            recipe_instructions_text: recipe.recipe_instructions[i].recipe_instructions_text,
+            recipe_id: recipeId,
+            recipe_instruction_order: 0,
+            updated_at: new Date(),
+            created_at: new Date(),
+          } satisfies RecipeInstructionInsert;
+
+          await trx.insertInto("recipe_instructions_table")
+            .values(newRecipeInstructions)
+            .execute();
+        }
+      }
+
+      // Insert or update recipe ingredients
+      for(let i = 0; i < recipe.recipe_ingredients.length; i++) {
+        const rcIngId = recipe.recipe_ingredients[i].recipe_ingredient_id;
+
+        if(rcIngId !== undefined) {
+          await trx.updateTable("recipe_ingredients_table")
+            .set({
+              recipe_ingredients_name: recipe.recipe_ingredients[i].recipe_ingredients_name,
+              recipe_ingredients_amount: recipe.recipe_ingredients[i].recipe_ingredients_amount,
+            })
+            .where("recipe_ingredient_id","=", rcIngId)
+            .execute();
+        } else {
+          const newRecipeIngredient = {
+            recipe_ingredients_name: recipe.recipe_ingredients[i].recipe_ingredients_name,
+            recipe_ingredients_amount: recipe.recipe_ingredients[i].recipe_ingredients_amount,
+            recipe_id: recipeId,
+            recipe_ingredient_order: 0,
+            updated_at: new Date(),
+            created_at: new Date(),
+          } satisfies RecipeIngredientInsert;
+
+          await trx.insertInto("recipe_ingredients_table")
+            .values(newRecipeIngredient)
+            .execute();
+        }
+      }
+
+      await trx.commit().execute();
       return true;
-    } catch (error) {
-      log(error);
+    } catch(e) {
+      console.error("Recipe update failed!");
+      log(e);
+      await trx.rollback().execute();
       return false;
     }
   }

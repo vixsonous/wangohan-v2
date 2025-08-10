@@ -1,4 +1,4 @@
-import { CompleteMultipartUploadCommandOutput, S3Client} from '@aws-sdk/client-s3';
+import {CompleteMultipartUploadCommandOutput, DeleteObjectCommand, S3Client} from '@aws-sdk/client-s3';
 import * as dotenv from 'dotenv';
 import { Upload } from '@aws-sdk/lib-storage';
 dotenv.config();
@@ -33,5 +33,12 @@ export class Image {
     });
 
     return await upload.done();
+  }
+
+  static async deleteR2Public(key: string) {
+    await s3.send(new DeleteObjectCommand({
+      Bucket,
+      Key: key
+    }))
   }
 }

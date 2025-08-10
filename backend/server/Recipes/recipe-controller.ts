@@ -46,8 +46,8 @@ export class RecipeController {
   static async getRecipe(req: Request, res: Response) {
     const {recipe_id, recipe_name, is_edit} = req.query;
 
-    const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}&=is_edit=${is_edit}`;
-    
+    const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
+
     if(Number.isNaN(recipe_id) || Number.isInteger(recipe_id) || recipe_id === undefined) {
       log(RecipeController.RECIPE_ERROR_MESSAGE_LOG.INVALID_RECIPE_ID);
       ApiResponse.error(res, RecipeController.RECIPE_ERROR_MESSAGE_RESPONSE.INVALID_RECIPE_ID);
@@ -63,7 +63,7 @@ export class RecipeController {
     const recipe = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>, typeof RecipeService.getRecipe>(
       GET_RECIPE_KEY,
       RecipeService.getRecipe, 60, Number(recipe_id), String(recipe_name), Boolean(is_edit)
-    ) ;
+    ).catch( (err: undefined) => err);
 
     if(recipe === undefined) {
       log(RecipeController.RECIPE_ERROR_MESSAGE_LOG.UNSUCCESSFUL_RECIPE_RETRIEVAL);
@@ -112,5 +112,58 @@ export class RecipeController {
     }
 
     ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_POST_RECIPE);
+  }
+
+  static async updateRecipe(req: Request, res: Response) {
+
+    const formData = req.body;
+
+    const user = req.user ? req.user as {id: number, username: string} : undefined;
+
+    if(user === undefined || (user.id !== Number(formData.user_id))) {
+      ApiResponse.unauthorized(res, "You are not authorized to edit this recipe!");
+      return;
+    }
+
+    const files: Express.Multer.File[] | undefined = req.files as Express.Multer.File[];
+
+    const submitData = {
+      recipe_id: Number(formData.recipe_id),
+      recipe_name: formData.recipe_name,
+      recipe_description: formData.recipe_description,
+      recipe_instructions: formData.recipe_instructions.map(
+        (i: z.infer<typeof RecipeSchema.RecipeInstruction>) =>
+          ({...i, recipe_instructions_id: i.recipe_instructions_id ? Number(i.recipe_instructions_id): undefined })
+        ),
+      recipe_ingredients: formData.recipe_ingredients.map( (i: z.infer<typeof RecipeSchema.RecipeIngredient>) =>
+          ({...i, recipe_ingredient_id: i.recipe_ingredient_id ? Number(i.recipe_ingredient_id) : undefined})
+        ),
+      user_id: Number(formData.user_id),
+      checkbox_size: formData.checkbox_size,
+      checkbox_age: formData.checkbox_age,
+      checkbox_event: formData.checkbox_event,
+      recipe_event_tag: formData.recipe_event_tag,
+      recipe_age_tag: formData.recipe_age_tag,
+      recipe_size_tag: formData.recipe_size_tag,
+      recipe_images: [...files],
+      delete_image_ids: formData.delete_image_ids?.map(
+        (i: z.infer<typeof RecipeSchema.ImageDeleteSchema>) =>
+          ({delete_image_id: Number(i.delete_image_id), delete_image_key: i.delete_image_key})),
+      delete_recipe_ingredient_ids: formData.delete_recipe_ingredient_ids?.map( (i: string) => Number(i)),
+      delete_recipe_instruction_ids: formData.delete_recipe_instruction_ids?.map( (i: string) => Number(i)),
+    } satisfies z.infer<typeof RecipeSchema.UpdateRecipe>;
+
+    const submitParseResult = RecipeSchema.UpdateRecipe.safeParse(submitData);
+
+    if(!submitParseResult.success) {
+      ApiResponse.error(res, submitParseResult.error.issues[0].message);
+      return;
+    }
+
+    await RecipeService.updateRecipe(submitParseResult.data);
+    const GET_RECIPE_KEY = `GET:recipe_id=${submitParseResult.data.recipe_id}&recipe_name=${submitParseResult.data.recipe_name}`;
+    await CacheUtil.delete(GET_RECIPE_KEY);
+
+    ApiResponse.success(res, "Successfully updated the recipe!");
   }
 }

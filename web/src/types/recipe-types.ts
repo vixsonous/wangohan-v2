@@ -101,7 +101,10 @@ export class RecipeSchema {
 
   static UpdateRecipe = RecipeSchema.Recipe.and(z.object({
     recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay.or(z.file())).min(1, "Please upload recipe images!"),
-    delete_image_ids: z.array(z.number()).optional(),
+    delete_image_ids: z.array(z.object({
+      delete_image_id: z.number(),
+      delete_image_key: z.string(),
+    })).optional(),
     delete_recipe_instruction_ids: z.array(z.number()).optional(),
     delete_recipe_ingredient_ids: z.array(z.number()).optional(),
   }));

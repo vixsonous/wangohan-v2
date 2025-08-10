@@ -82,7 +82,7 @@ export class RecipeSchema {
   });
 
   static Recipe = z.object({
-    recipe_id: z.string().optional(),
+    recipe_id: z.number("Recipe ID should be a number!").optional(),
     recipe_name: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
     recipe_description: z.string().min(1, "内容を入力してください"),
     recipe_instructions: z.array(RecipeSchema.RecipeInstruction).min(1, "Please input recipe instructions!"),
@@ -100,10 +100,15 @@ export class RecipeSchema {
     user_id: z.number(),
   }));
 
+  static ImageDeleteSchema = z.object({
+    delete_image_id: z.number(),
+    delete_image_key: z.string(),
+  });
+
   static UpdateRecipe = RecipeSchema.Recipe.and(z.object({
-    user_id: z.string().optional(),
-    recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay.or(z.file())).min(1, "Please upload recipe images!"),
-    delete_image_ids: z.array(z.number()).optional(),
+    user_id: z.number(),
+    recipe_images: z.array(z.custom<Express.Multer.File>()).min(1, "Please upload recipe images!"),
+    delete_image_ids: z.array(RecipeSchema.ImageDeleteSchema).optional(),
     delete_recipe_instruction_ids: z.array(z.number()).optional(),
     delete_recipe_ingredient_ids: z.array(z.number()).optional(),
   }));

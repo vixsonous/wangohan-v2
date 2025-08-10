@@ -27,4 +27,10 @@ export class RecipeService {
 
     return newRecipe;
   }
+
+  static async updateRecipe(recipe: z.infer<typeof RecipeSchema.UpdateRecipe>): Promise<boolean | undefined> {
+    const updatedRecipe = await RecipeRepository.updateRecipe(recipe);
+
+    return updatedRecipe;
+  }
 }

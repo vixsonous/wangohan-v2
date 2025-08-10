@@ -1,4 +1,4 @@
-import {createClient, RedisArgument} from 'redis';
+import {createClient} from 'redis';
 import { log } from './log';
 
 export const redisClient = await createClient({
@@ -21,9 +21,19 @@ export class CacheUtil {
       } else {
         log(key + " Cache MISS!");
         const data = await cb(...args);
-        await redisClient.setEx(key, expire, JSON.stringify(data));
-        resolve(JSON.parse(JSON.stringify(data)) as T);
+        if(data !== undefined) {
+          await redisClient.setEx(key, expire, JSON.stringify(data));
+          resolve(JSON.parse(JSON.stringify(data)) as T);
+        } else {
+          console.log(key + " No result found!");
+          reject(undefined);
+        }
+
       }
     });
+  }
+
+  public static async delete(key: string) {
+    await redisClient.del(key);
   }
 }

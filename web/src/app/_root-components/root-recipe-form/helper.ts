@@ -73,7 +73,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   }
 
   const [files, setFiles] = useState<z.infer<typeof FileSchema.FileDisplaySchema>>([]);
-  const [deleteFileIds, setDeleteFileIds] = useState<Array<number>>([]);
+  const [deleteFileIds, setDeleteFileIds] = useState<Array<{delete_image_id: number, delete_image_key: string}>>([]);
   useEffect(() => {
     if(recipe_data) {
       setFiles(recipe_data.recipe_images.map(i => ({
@@ -122,11 +122,12 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
 
     const temp = structuredClone(files);
     const idx = temp.findIndex(f => f.preview_url === preview_url);
-
+    console.log(temp[idx].preview_url);
     if(idx < 0) return;
     const deleteId = temp[idx].recipe_image_id;
+    const previewUrl = temp[idx].preview_url;
     if(deleteId !== undefined) {
-      setDeleteFileIds(prev => ([...prev, deleteId]));
+      setDeleteFileIds(prev => ([...prev, {delete_image_id: deleteId, delete_image_key: previewUrl}]));
     }
 
     temp.splice(idx, 1);
