@@ -93,6 +93,7 @@ export class RecipeSchema {
     recipe_age_tag: z.string(),
     recipe_size_tag: z.string(),
     recipe_event_tag: z.string(),
+    user_id: z.string().optional(),
   });
 
   static PostRecipe = RecipeSchema.Recipe.and(z.object({
@@ -106,7 +107,6 @@ export class RecipeSchema {
   });
 
   static UpdateRecipe = RecipeSchema.Recipe.and(z.object({
-    user_id: z.number(),
     recipe_images: z.array(z.custom<Express.Multer.File>()).min(1, "Please upload recipe images!"),
     delete_image_ids: z.array(RecipeSchema.ImageDeleteSchema).optional(),
     delete_recipe_instruction_ids: z.array(z.number()).optional(),

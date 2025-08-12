@@ -13,7 +13,6 @@ export default async function EditRecipe({params}: Props) {
   const {recipeId, recipeName} = await params;
 
   const recipe = await getRecipe(Number(recipeId), recipeName, true) as z.infer<typeof RecipeSchema.UpdateRecipe> | undefined;
-
   if(recipe === undefined) {
     return (
       <h1>

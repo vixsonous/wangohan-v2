@@ -121,6 +121,7 @@ export class RecipeController {
     const user = req.user ? req.user as {id: number, username: string} : undefined;
 
     if(user === undefined || (user.id !== Number(formData.user_id))) {
+
       ApiResponse.unauthorized(res, "You are not authorized to edit this recipe!");
       return;
     }
@@ -138,7 +139,7 @@ export class RecipeController {
       recipe_ingredients: formData.recipe_ingredients.map( (i: z.infer<typeof RecipeSchema.RecipeIngredient>) =>
           ({...i, recipe_ingredient_id: i.recipe_ingredient_id ? Number(i.recipe_ingredient_id) : undefined})
         ),
-      user_id: Number(formData.user_id),
+      user_id: formData.user_id,
       checkbox_size: formData.checkbox_size,
       checkbox_age: formData.checkbox_age,
       checkbox_event: formData.checkbox_event,

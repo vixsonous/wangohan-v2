@@ -9,7 +9,6 @@ import React, { HTMLAttributes, memo, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Image from "@/components/Image/client";
 import Link from "next/link";
-import axios from "axios";
 import { gloria, inter, mochi } from "@/app/_root-components/client-fonts";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,9 +89,9 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
                   className={`bg-white ${inter.className}`} 
                 />
               </div>
-              <Button type="submit" className="w-full bg-primary-text">
+              <Button disabled={loginMutation.isSuccess} type="submit" className="w-full flex items-center gap-2 bg-primary-text">
                 {loginMutation.isPending ? (
-                  "Loading ログイン"
+                  <><Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} /> ログイン</>
                 ): (
                   "ログイン"
                 )}

@@ -155,6 +155,7 @@ export class RecipeRepository {
                 "user_image"
               ]).whereRef("user_id", "=", "recipes_table.user_id")
           ).as("user"),
+          "user_id",
           "created_at",
           "total_likes",
           "total_views",

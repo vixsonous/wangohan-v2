@@ -221,8 +221,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
       recipe_images: files.map(f => f.file || new File([new Blob([''])], f.preview_url)),
       delete_image_ids: [...deleteFileIds],
       delete_recipe_instruction_ids: [...deleteInstructionsIds],
-      delete_recipe_ingredient_ids: [...deleteIngredientsIds]
-
+      delete_recipe_ingredient_ids: [...deleteIngredientsIds],
     }
     let submitParseResult;
     if(recipe_data) {
