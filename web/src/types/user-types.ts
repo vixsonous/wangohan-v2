@@ -65,6 +65,20 @@ export class UserAuthenticationSchema {
   })
 }
 
+export class UserDetailSchema {
+  static PostInfo = z.object({
+    user_id: z.string(),
+    user_first_name: z.string(),
+    user_last_name: z.string(),
+    user_codename: z.string(),
+    user_image: z.string(),
+    user_agreement: z.number(),
+    user_gender: z.string(),
+    user_birthdate: z.date(),
+    user_occupation: z.string()
+  })
+}
+
 export const UserLevel = {
   super_admin: 0,
   admin: 1,

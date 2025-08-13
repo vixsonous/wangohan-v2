@@ -61,4 +61,9 @@ export class UserController {
 
     ApiResponse.success(res, "Successfully registered!");
   }
+
+  static async registerPersonalInfo(req: Request, res: Response) {
+    console.log(req.body);
+    ApiResponse.success(res, "Successfully registered personal info!");
+  }
 }

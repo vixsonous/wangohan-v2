@@ -22,3 +22,4 @@ router.get("/get-user", UserController.getUser);
 router.post("/login", passport.authenticate('local'), UserController.login);
 router.post("/register", UserController.register);
 router.get("/is-authenticated", UserController.isAuthenticated);
+router.post("/personal-info", upload.single('user_image'), UserController.registerPersonalInfo);
