@@ -6,7 +6,7 @@ import Error from "@/components/Error";
 import InputField from "@/components/Input";
 import React from "react";
 import { format } from "date-fns";
-import { enUS, ja } from 'date-fns/locale';
+import { ja } from 'date-fns/locale';
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import {Calendar} from "@/components/ui/calendar";
@@ -21,17 +21,15 @@ import {
   SelectValue
 } from "@/components/ui/select";
 
-const PERSONAL_INFO_FIELDS = {
-  USER_LAST_NAME: "user_last_name",
-  USER_FIRST_NAME: "user_first_name",
-};
-
 export default function PersonalInfoForm() {
 
-  const {uploadInfoMutation, signupInfoMutation, register, errors, control} = usePersonalForm();
+  const {uploadInfoMutation, signupInfoMutation, register, errors, control, onSubmit, handleSubmit} = usePersonalForm();
 
   return (
-    <form action="" className="w-full max-w-full sm:max-w-2xl flex flex-col gap-4 items-start pt-10">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-full sm:max-w-2xl flex flex-col gap-4 items-start pt-10">
+      <InputField hidden={true} {...register("user_id")} value={5}/>
+      <InputField hidden={true} {...register("user_agreement")} value={0}/>
+      <InputField hidden={true} {...register("user_image")} value={""}/>
       <div className="flex flex-wrap w-full justify-center gap-[1em]">
         <div className="flex-[0_0_100%] sm:flex-[0_0_50%]">
           <label htmlFor="personal-image" className="flex relative items-center justify-center">
@@ -140,20 +138,25 @@ export default function PersonalInfoForm() {
         <div className="w-full col-span-1 flex flex-col gap-2">
           <label htmlFor="gender" className={`text-xl font-semibold`}>性別 </label>
 
-          <Select {...register("user_gender")}>
-            <SelectTrigger className="w-full bg-secondary-bg border border-primary-text">
-              <SelectValue placeholder="性別を選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>性別を選択</SelectLabel>
-                <SelectItem value="男性">男性</SelectItem>
-                <SelectItem value="女性">女性</SelectItem>
-                <SelectItem value="どちらでもない">どちらでもない</SelectItem>
-                <SelectItem value="答えない">答えない</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Controller render={({field}) => (
+            <Select onValueChange={field.onChange}>
+              <SelectTrigger className="w-full bg-secondary-bg border border-primary-text">
+                <SelectValue placeholder="性別を選択" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>性別を選択</SelectLabel>
+                  <SelectItem value="男性">男性</SelectItem>
+                  <SelectItem value="女性">女性</SelectItem>
+                  <SelectItem value="どちらでもない">どちらでもない</SelectItem>
+                  <SelectItem value="答えない">答えない</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
+          name={"user_gender"}
+          control={control}
+          />
         </div>
       </div>
 

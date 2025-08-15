@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiUtils";
 import { log } from "../utils/log";
 import z from "zod";
 import { User } from "./user";
-import {UserAuthenticationSchema} from "@/server/types/user-types";
+import {UserAuthenticationSchema, UserDetailSchema} from "@/server/types/user-types";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {
@@ -63,7 +63,28 @@ export class UserController {
   }
 
   static async registerPersonalInfo(req: Request, res: Response) {
-    console.log(req.body);
+    const submitData = {
+      ...req.body,
+      user_id: Number(req.body.user_id),
+      user_agreement: Number(req.body.user_agreement),
+      user_birthdate: new Date(req.body.user_birthdate)
+    };
+
+    const personalInfoData = UserDetailSchema.UserDetails.safeParse(submitData);
+
+    if(!personalInfoData.success) {
+      console.log(personalInfoData.error);
+      ApiResponse.error(res, "Invalid personal information data!");
+      return;
+    }
+
+    const userDetail = await UserService.postPersonalInfo(personalInfoData.data);
+
+    if(userDetail === undefined) {
+      ApiResponse.error(res, "Error in saving personal information!");
+      return;
+    }
+
     ApiResponse.success(res, "Successfully registered personal info!");
   }
 }

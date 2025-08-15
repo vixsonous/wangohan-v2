@@ -15,7 +15,7 @@ const LocalStrategy = Local.Strategy;
 
 passport.use(new LocalStrategy(
   {usernameField: 'email'}, async (email, password, done) => {
-    const credentials = await UserService.localStrategyLogin(email, password);
+    const credentials = await UserService.localStrategyLogin(email);
 
     if(credentials === undefined) throw new Error("User not found!");
     if(credentials.password === undefined) throw new Error("Please login through google authentication");

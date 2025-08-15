@@ -1,19 +1,19 @@
 import z from "zod";
 import { db } from "@/database/database";
 import { log } from "../utils/log";
-import {UserAuthenticationSchema, UserLevel, UserSchema} from "../types/user-types";
-import { UserInsert } from "@/database/types";
+import {UserAuthenticationSchema, UserDetailSchema, UserLevel} from "../types/user-types";
+import {UserDetailInsert, UserInsert} from "@/database/types";
 // @ts-ignore
 import bcrypt from 'bcrypt';
-import { User } from "./user";
+import {User} from "./user";
 
 export class UserDetailsRepository {
   private static USER_DETAILS_REPOSITORY_SUCCESS_LOG = {
     GET_USER_SUCCESS: "Successfully retrieved user details data!",
   }
-  static async getUser(user_id: number, user_codename: string): Promise<z.infer<typeof UserSchema.UserDetailsData> | undefined> {
+  static async getUser(user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.UserDetails> | undefined> {
     try {
-      const user: z.infer<typeof UserSchema.UserDetailsData> = await db.selectFrom("user_details_table")
+      const user: z.infer<typeof UserDetailSchema.UserDetails> = await db.selectFrom("user_details_table")
         .select([
           "user_first_name",
           "user_last_name",
@@ -39,6 +39,38 @@ export class UserDetailsRepository {
     } catch (error) {
       console.error("User not found!");
       log(error);
+      return undefined;
+    }
+  }
+
+  static async postUserDetails(user_detail: z.infer<typeof UserDetailSchema.UserDetails>): Promise<z.infer<typeof UserDetailSchema.UserDetails> | undefined> {
+    try {
+      const newUserDetails: UserDetailInsert = {
+        ...user_detail,
+        updated_at: new Date(),
+        created_at: new Date()
+      };
+
+      const userDetails: z.infer<typeof UserDetailSchema.UserDetails> = await db.insertInto("user_details_table")
+        .values(newUserDetails)
+        .returning([
+          "user_id",
+          "user_first_name",
+          "user_last_name",
+          "user_gender",
+          "user_occupation",
+          "user_image",
+          "user_codename",
+          "user_agreement",
+          "user_birthdate",
+        ])
+        .executeTakeFirstOrThrow();
+
+      log("Successfully posted user details data!");
+
+      return userDetails;
+    } catch (e) {
+      log(e);
       return undefined;
     }
   }

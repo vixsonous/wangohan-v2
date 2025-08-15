@@ -1,6 +1,6 @@
 import z from "zod";
 import { UserDetailsRepository, UserRepository } from "./user-repository";
-import {UserAuthenticationSchema, UserSchema} from "../types/user-types";
+import {UserAuthenticationSchema, UserDetailSchema, UserSchema} from "../types/user-types";
 
 export class User {
   
@@ -48,10 +48,10 @@ export class UserDetails {
   private user_birthdate: Date;
   private user_id: number;
   private user_occupation: string;
-  private updated_at: Date;
-  private created_at: Date;
+  private updated_at: Date | undefined;
+  private created_at: Date | undefined;
   constructor(
-    user: z.infer<typeof UserSchema.UserDetailsData>
+    user: z.infer<typeof UserDetailSchema.UserDetails>
   ) {
     this.user_first_name = user.user_first_name; 
     this.user_last_name  = user.user_last_name ;
@@ -75,9 +75,25 @@ export class UserDetails {
   }
 
   static async getUser(user_id: number, user_codename: string): Promise<UserDetails | undefined> {
-    const user: z.infer<typeof UserSchema.UserDetailsData> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
+    const user: z.infer<typeof UserDetailSchema.UserDetails> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
 
     return user ? new UserDetails(user) : user;
+  }
+
+  async create() {
+    const userDetail: z.infer<typeof UserDetailSchema.UserDetails> | undefined= await UserDetailsRepository.postUserDetails({
+      user_id: this.user_id,
+      user_codename: this.user_codename,
+      user_image: this.user_image,
+      user_first_name: this.user_first_name,
+      user_last_name: this.user_last_name,
+      user_occupation: this.user_occupation,
+      user_gender: this.user_gender,
+      user_birthdate: this.user_birthdate,
+      user_agreement: this.user_agreement,
+    });
+
+    return userDetail ? new UserDetails(userDetail) : userDetail;
   }
 
 }
