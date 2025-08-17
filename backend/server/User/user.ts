@@ -82,8 +82,14 @@ export class GetUserDetails extends UserDetails {
     this.user_image = user_details.user_image;
   }
 
-  static async getUser(user_id: number, user_codename: string): Promise<UserDetails | undefined> {
+  static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
     const user: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
+
+    return user ? new GetUserDetails(user) : user;
+  }
+
+  static async getUserById(user_id: number): Promise<GetUserDetails | undefined> {
+    const user: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined = await UserDetailsRepository.getUserById(user_id);
 
     return user ? new GetUserDetails(user) : user;
   }

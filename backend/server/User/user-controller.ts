@@ -4,11 +4,11 @@ import { ApiResponse } from "../utils/ApiUtils";
 import { log } from "../utils/log";
 import z from "zod";
 import { User } from "./user";
-import {UserAuthenticationSchema, UserDetailSchema} from "@/server/types/user-types";
+import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
+import {UserDetailSchema} from "@/server/types/user-types.user-detail";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {
-    console.log(req.user);
     const {user_id, user_codename} = req.query;
     const user = await UserService.getUser(Number(user_id), String(user_codename));
     

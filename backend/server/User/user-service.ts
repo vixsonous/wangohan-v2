@@ -1,7 +1,8 @@
 import {GetUserDetails, PostUserDetails, User} from "./user";
-import {UserAuthenticationSchema, UserDetailSchema} from "@/server/types/user-types";
 import z from "zod";
 import {log} from "@/server/utils/log";
+import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
+import {UserDetailSchema} from "@/server/types/user-types.user-detail";
 
 export class UserService {
   static USER_SERVICE_SUCCESS_LOGS = {
@@ -10,7 +11,7 @@ export class UserService {
     LOCAL_STRATEGY_REGISTER_SUCCESS: "Successfully created a new user!",
     POST_USER_DETAILS_SUCCESS: "Successfully posted personal information!",
   }
-  static async getUser(user_id: number, user_codename: string) {
+  static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
     const user = await GetUserDetails.getUser(user_id, user_codename);
     log(UserService.USER_SERVICE_SUCCESS_LOGS.GET_USER_SUCCESS);
     return user;

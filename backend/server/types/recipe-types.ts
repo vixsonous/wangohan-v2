@@ -1,5 +1,6 @@
-import {UserSchema} from "./user-types";
+
 import * as z from 'zod';
+import {UserSchema} from "@/server/types/user-types.user";
 
 export class RecipeDisplaySchema {
 
