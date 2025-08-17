@@ -21,35 +21,57 @@ import {
   SelectValue
 } from "@/components/ui/select";
 
-export default function PersonalInfoForm() {
+export default function PersonalInfoForm({user_id}: {user_id: number}) {
 
-  const {uploadInfoMutation, signupInfoMutation, register, errors, control, onSubmit, handleSubmit} = usePersonalForm();
+  const { signupInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-full sm:max-w-2xl flex flex-col gap-4 items-start pt-10">
-      <InputField hidden={true} {...register("user_id")} value={5}/>
+      <InputField hidden={true} {...register("user_id")} value={user_id}/>
       <InputField hidden={true} {...register("user_agreement")} value={0}/>
-      <InputField hidden={true} {...register("user_image")} value={""}/>
-      <div className="flex flex-wrap w-full justify-center gap-[1em]">
-        <div className="flex-[0_0_100%] sm:flex-[0_0_50%]">
-          <label htmlFor="personal-image" className="flex relative items-center justify-center">
-            <img src={'/banner/3dogs.webp'} className="top-[-20.2%] absolute h-[auto] w-[20%] sm:w-[40%] max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
-            {
-              uploadInfoMutation.isPending && (
-                <div className="absolute z-10 flex justify-center gap-2 items-center">
-                  <Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>
-                  <span>アップロード中...</span>
+      <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-5">
+        <div className="col-span-2">
+          <Controller
+            control={control}
+            render={({field}) => (
+              <label htmlFor="user_image" className="flex relative items-center justify-center">
+                <img src={'/banner/3dogs.webp'} className="-top-10 z-10 absolute h-[auto] w-[20%] sm:w-[40%] max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
+                {
+                  uploadFileMutation.isPending && (
+                    <div className="absolute z-10 flex justify-center gap-2 items-center">
+                      <Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>
+                      <span>アップロード中...</span>
+                    </div>
+                  )
+                }
+                <div className="relative w-full">
+                  <Image
+                    key={field.value ? field.value.name : "image"}
+                    noprocess={true}
+                    src={field.value ? URL.createObjectURL(field.value) : "/image.webp"}
+                    className="h-full w-full top-0 aspect-square right-0 object-cover rounded-full"
+                    width={100} height={100}
+                    alt={field.value ? field.value.name : "default image"}
+                  />
                 </div>
-              )
-            }
-            <div className="relative pt-[50%] w-[50%] sm:pt-[100%] sm:w-full">
-              <Image src={"/image.webp"} className="h-full w-full top-0 right-0 object-cover absolute rounded-[200px]" width={100} height={100}  alt="website banner" />
-            </div>
-            <input disabled={true} className="hidden" type="file" name="personal-image" id="personal-image" />
-          </label>
+                <span className={"hidden"}>
+                  <InputField onChange={
+                    async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      {
+                        if(e.currentTarget.files === null) return;
+                        const file = e.currentTarget.files[0];
+                        const processedFile = await uploadFileMutation.mutateAsync(file);
+                        field.onChange(processedFile);
+                      }
+                  } disabled={uploadFileMutation.isPending} hidden={true} type="file" id="user_image" />
+                </span>
+              </label>
+            )}
+            name={"user_image"}
+          />
         </div>
-        <div className="flex-[0_0_100%] flex flex-wrap sm:flex-nowrap sm:flex-col gap-[1rem] w-full">
-          <p className="flex flex-col gap-2">
+        <div className=" grid grid-cols-1 gap-4 col-span-3 w-full">
+          <p className="col-span-1 flex flex-col gap-2">
             <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="user_last_name">
               姓
               <Error>{errors.user_last_name?.message}</Error>
@@ -63,7 +85,7 @@ export default function PersonalInfoForm() {
             />
           </p>
 
-          <p className="flex flex-col gap-2">
+          <p className="col-span-1 flex flex-col gap-2">
             <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="user_first_name">
               名
               <Error>{errors.user_first_name?.message}</Error>
@@ -76,22 +98,24 @@ export default function PersonalInfoForm() {
               type="text"
             />
           </p>
+
+          <p className="col-span-1 w-full flex flex-col gap-2">
+            <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="user_codename">
+              ユーザー名
+              <Error>{errors.user_codename?.message}</Error>
+            </label>
+            <InputField
+              aria-invalid={errors.user_codename?.message !== undefined}
+              className="sm:text-base" {...register("user_codename")}
+              placeholder="ユーザー名を入力"
+              id="user_codename"
+              type="text"
+            />
+          </p>
         </div>
       </div>
 
-      <p className="w-full flex flex-col gap-2">
-        <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="user_codename">
-          ユーザー名
-          <Error>{errors.user_codename?.message}</Error>
-        </label>
-        <InputField
-          aria-invalid={errors.user_codename?.message !== undefined}
-          className="sm:text-base" {...register("user_codename")}
-          placeholder="ユーザー名を入力"
-          id="user_codename"
-          type="text"
-        />
-      </p>
+
 
       <div className="grid grid-cols-2 gap-2 w-full">
         <Controller

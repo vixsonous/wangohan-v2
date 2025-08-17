@@ -2,12 +2,14 @@
 
 import {QueryClientProvider} from "@tanstack/react-query";
 import {queryClient} from "@/lib/tanstack-query";
-import PersonalInfoForm from "@/app/(auth)/signup/personal-info/personal-info-form";
+import dynamic from "next/dynamic";
 
-export default function PersonalInfoFormWrapper() {
+const PersonalInfoForm = dynamic(() => import("@/app/(auth)/signup/personal-info/personal-info-form"), {ssr: false, loading: () => <span>Loading</span>})
+
+export default function PersonalInfoFormWrapper({user_id}: {user_id: number}) {
   return (
     <QueryClientProvider client={queryClient}>
-      <PersonalInfoForm/>
+      <PersonalInfoForm user_id={user_id}/>
     </QueryClientProvider>
   )
 }

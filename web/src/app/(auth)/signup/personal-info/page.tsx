@@ -1,10 +1,17 @@
-import {Inter} from "next/font/google";
 import Image from "@/components/Image/server";
 import PersonalInfoFormWrapper from "@/app/(auth)/signup/personal-info/personal-info-form-wrapper";
+import {ServerApiService} from "@/lib/server-utils";
+import {redirect} from "next/navigation";
 
-const inter = Inter({ subsets: ["latin"], display: 'swap', adjustFontFallback: false });
+export default async function PersonalInfoRegistration() {
 
-export default function PersonalInfoRegistration() {
+  const isAuthenticated = await ServerApiService.get("/is-authenticated");
+
+  console.log(isAuthenticated.data.data);
+  if(isAuthenticated.data.data === undefined) {
+    redirect("/login");
+  }
+
   return (
     <div className={`flex flex-col px-[50px] py-[30px] gap-[10px] justify-center items-center w-full`}>
       <div className="flex justify-center items-center relative">
@@ -12,7 +19,7 @@ export default function PersonalInfoRegistration() {
         <Image src={'/banner/ribbon.webp'} className="h-[auto] w-[200px] sm:w-[300px] max-w-none" width={300}  alt="website banner" />
       </div>
       <h1 className="text-[8px] sm:text-[12px] mt-[20px] font-bold">メールアドレスで新規登録</h1>
-      <PersonalInfoFormWrapper />
+      <PersonalInfoFormWrapper user_id={isAuthenticated.data.data.id} />
     </div>
   )
 }

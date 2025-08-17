@@ -38,25 +38,24 @@ export class User {
     return this.user_id || -1;
   }
 }
+
 export class UserDetails {
-  private user_first_name: string;
-  private user_last_name: string;
-  private user_codename: string;
-  private user_image: string;
-  private user_agreement: number;
-  private user_gender: string;
-  private user_birthdate: Date;
-  private user_id: number;
-  private user_occupation: string;
-  private updated_at: Date | undefined;
-  private created_at: Date | undefined;
+  protected user_first_name: string;
+  protected user_last_name: string;
+  protected user_codename: string;
+  protected user_agreement: number;
+  protected user_gender: string;
+  protected user_birthdate: Date;
+  protected user_id: number;
+  protected user_occupation: string;
+  protected updated_at: Date | undefined;
+  protected created_at: Date | undefined;
   constructor(
     user: z.infer<typeof UserDetailSchema.UserDetails>
   ) {
     this.user_first_name = user.user_first_name; 
     this.user_last_name  = user.user_last_name ;
     this.user_codename  = user.user_codename ;
-    this.user_image = user.user_image;
     this.user_agreement  = user.user_agreement ;
     this.user_gender = user.user_gender;
     this.user_birthdate = user.user_birthdate;
@@ -70,18 +69,36 @@ export class UserDetails {
     return {
       user_id: this.user_id,
       user_codename: this.user_codename,
-      user_image: this.user_image
+      user_image: ""
     }
   }
 
-  static async getUser(user_id: number, user_codename: string): Promise<UserDetails | undefined> {
-    const user: z.infer<typeof UserDetailSchema.UserDetails> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
+}
 
-    return user ? new UserDetails(user) : user;
+export class GetUserDetails extends UserDetails {
+  private user_image: string;
+  constructor(user_details: z.infer<typeof UserDetailSchema.GetUserDetails>) {
+    super(user_details);
+    this.user_image = user_details.user_image;
+  }
+
+  static async getUser(user_id: number, user_codename: string): Promise<UserDetails | undefined> {
+    const user: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
+
+    return user ? new GetUserDetails(user) : user;
+  }
+}
+
+export class PostUserDetails extends UserDetails {
+  private user_image: Express.Multer.File;
+
+  constructor(user_details: z.infer<typeof UserDetailSchema.PostUserDetails>) {
+    super(user_details);
+    this.user_image = user_details.user_image;
   }
 
   async create() {
-    const userDetail: z.infer<typeof UserDetailSchema.UserDetails> | undefined= await UserDetailsRepository.postUserDetails({
+    const userDetail: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined= await UserDetailsRepository.postUserDetails({
       user_id: this.user_id,
       user_codename: this.user_codename,
       user_image: this.user_image,
@@ -95,5 +112,4 @@ export class UserDetails {
 
     return userDetail ? new UserDetails(userDetail) : userDetail;
   }
-
 }

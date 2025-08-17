@@ -71,10 +71,10 @@ export class UserDetailSchema {
     user_first_name: z.string().min(1, "Please enter the first name!").max(50, "Please provide less than 50 characters!"),
     user_last_name: z.string().min(1, "Please enter the last name!").max(50, "Please provide less than 50 characters!"),
     user_codename: z.string().min(1, "Please enter your username!").max(50, "Please provide less than 50 characters!"),
-    user_image: z.string("Please provide your profile image!"),
+    user_image: z.file("Please provide your profile image!"),
     user_agreement: z.string(),
-    user_gender: z.string().min(1, "Please select your gender!"),
-    user_birthdate: z.date(),
+    user_gender: z.string("Please select your gender!"),
+    user_birthdate: z.date("Please enter your birthdate!"),
     user_occupation: z.string().min(1, "Please enter your occupation!").max(50, "Please provide less than 50 characters!"),
     updated_at: z.date().optional(),
     created_at: z.date().optional()

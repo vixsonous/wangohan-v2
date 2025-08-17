@@ -6,14 +6,16 @@ import {UserDetailInsert, UserInsert} from "@/database/types";
 // @ts-ignore
 import bcrypt from 'bcrypt';
 import {User} from "./user";
+import {ImageProcess} from "@/server/Images/image-service";
+import {Image} from "@/server/Images/image";
 
 export class UserDetailsRepository {
   private static USER_DETAILS_REPOSITORY_SUCCESS_LOG = {
     GET_USER_SUCCESS: "Successfully retrieved user details data!",
   }
-  static async getUser(user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.UserDetails> | undefined> {
+  static async getUser(user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
     try {
-      const user: z.infer<typeof UserDetailSchema.UserDetails> = await db.selectFrom("user_details_table")
+      const user: z.infer<typeof UserDetailSchema.GetUserDetails> = await db.selectFrom("user_details_table")
         .select([
           "user_first_name",
           "user_last_name",
@@ -43,15 +45,38 @@ export class UserDetailsRepository {
     }
   }
 
-  static async postUserDetails(user_detail: z.infer<typeof UserDetailSchema.UserDetails>): Promise<z.infer<typeof UserDetailSchema.UserDetails> | undefined> {
+  static async postUserDetails(user_detail: z.infer<typeof UserDetailSchema.PostUserDetails>): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
     try {
+
+      const buffer: Buffer<ArrayBuffer> = Buffer.from(user_detail.user_image.buffer);
+
+      let image = new ImageProcess(buffer.buffer);
+
+      image = image.resize(1024, undefined, {
+        withoutEnlargement: true,
+        fit: "inside"
+      });
+
+      image = image.webp({
+        quality: 80
+      });
+
+      const uploadImage = await image.result();
+      const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
+      const uploadDone = await Image.uploadToR2Public(folder, uploadImage, user_detail.user_image.originalname.split(".")[0], "webp", "images/webp");
+
+      if(uploadDone.Key === undefined) {
+        return undefined;
+      }
+
       const newUserDetails: UserDetailInsert = {
         ...user_detail,
+        user_image: `r2://${uploadDone.Key}`,
         updated_at: new Date(),
         created_at: new Date()
       };
 
-      const userDetails: z.infer<typeof UserDetailSchema.UserDetails> = await db.insertInto("user_details_table")
+      const userDetails: z.infer<typeof UserDetailSchema.GetUserDetails> = await db.insertInto("user_details_table")
         .values(newUserDetails)
         .returning([
           "user_id",
@@ -69,6 +94,7 @@ export class UserDetailsRepository {
       log("Successfully posted user details data!");
 
       return userDetails;
+
     } catch (e) {
       log(e);
       return undefined;

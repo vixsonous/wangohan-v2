@@ -67,10 +67,11 @@ export class UserController {
       ...req.body,
       user_id: Number(req.body.user_id),
       user_agreement: Number(req.body.user_agreement),
-      user_birthdate: new Date(req.body.user_birthdate)
+      user_birthdate: new Date(req.body.user_birthdate),
+      user_image: req.file
     };
 
-    const personalInfoData = UserDetailSchema.UserDetails.safeParse(submitData);
+    const personalInfoData = UserDetailSchema.PostUserDetails.safeParse(submitData);
 
     if(!personalInfoData.success) {
       console.log(personalInfoData.error);

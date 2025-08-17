@@ -1,4 +1,4 @@
-import { User, UserDetails } from "./user";
+import {GetUserDetails, PostUserDetails, User} from "./user";
 import {UserAuthenticationSchema, UserDetailSchema} from "@/server/types/user-types";
 import z from "zod";
 import {log} from "@/server/utils/log";
@@ -11,7 +11,7 @@ export class UserService {
     POST_USER_DETAILS_SUCCESS: "Successfully posted personal information!",
   }
   static async getUser(user_id: number, user_codename: string) {
-    const user = await UserDetails.getUser(user_id, user_codename);
+    const user = await GetUserDetails.getUser(user_id, user_codename);
     log(UserService.USER_SERVICE_SUCCESS_LOGS.GET_USER_SUCCESS);
     return user;
   }
@@ -28,8 +28,8 @@ export class UserService {
     return createResult;
   }
 
-  static async postPersonalInfo(personal_info: z.infer<typeof UserDetailSchema.UserDetails>) {
-    const createResult = await new UserDetails(personal_info).create();
+  static async postPersonalInfo(personal_info: z.infer<typeof UserDetailSchema.PostUserDetails>) {
+    const createResult = await new PostUserDetails(personal_info).create();
     log(UserService.USER_SERVICE_SUCCESS_LOGS.POST_USER_DETAILS_SUCCESS);
     return createResult;
   }

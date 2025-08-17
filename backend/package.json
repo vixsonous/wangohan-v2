@@ -25,6 +25,7 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
+    "heic-convert": "^2.1.0",
     "kysely": "^0.28.2",
     "multer": "^2.0.2",
     "passport": "^0.7.0",
@@ -42,6 +43,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express-session": "^1.18.2",
+    "@types/heic-convert": "^2.1.0",
     "@types/multer": "^2.0.0",
     "@types/passport": "^1.0.17",
     "@types/passport-local": "^1.0.38"
