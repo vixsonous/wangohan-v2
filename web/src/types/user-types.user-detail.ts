@@ -19,6 +19,6 @@ export class UserDetailSchema {
   }))
 
   static PostUserDetails = UserDetailSchema.UserDetails.and(z.object({
-    user_image: z.custom<Express.Multer.File>()
+    user_image: z.file("Please provide your profile image!")
   }))
 }

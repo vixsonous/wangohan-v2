@@ -2,10 +2,10 @@ import {useMutation} from "@tanstack/react-query";
 import {FieldValues, useForm} from "react-hook-form";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import z from "zod";
-import {UserDetailSchema} from "@/types/user-types";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import heic2any from "heic2any";
+import {UserDetailSchema} from "@/types/user-types.user-detail";
 
 export const usePersonalForm = () => {
 
@@ -50,9 +50,9 @@ export const usePersonalForm = () => {
 
 
 
-  const {register, handleSubmit, control, formState: {errors}} = useForm<z.infer<typeof UserDetailSchema.UserDetails>>({
+  const {register, handleSubmit, control, formState: {errors}} = useForm<z.infer<typeof UserDetailSchema.PostUserDetails>>({
     mode: "onBlur",
-    resolver: zodResolver(UserDetailSchema.UserDetails)
+    resolver: zodResolver(UserDetailSchema.PostUserDetails)
   });
 
   return {

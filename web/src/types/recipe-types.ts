@@ -1,5 +1,5 @@
 import z from "zod";
-import {UserSchema} from "@/types/user-types";
+import {UserSchema} from "@/types/user-types.user";
 
 export class RecipeDisplaySchema {
 

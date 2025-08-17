@@ -10,7 +10,6 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id: number, done) => {
   const user = await UserRepository.getUserById(id);
-  console.log(user);
   done(null, user);
 });
 

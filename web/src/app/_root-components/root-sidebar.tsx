@@ -2,8 +2,13 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from 
 import SidebarMenu from "./root-sidebar-menu";
 import Image from "@/components/Image/server";
 import { CreateRecipe } from "./root-create-recipe";
+import z from "zod";
+import {UserSchema} from "@/types/user-types.user";
 
-export default async function RootSidebar() {
+export default async function RootSidebar(
+  {user_data}:
+  {user_data: z.infer<typeof UserSchema.User> | undefined}
+) {
   return (
     <Sheet>
       <SheetTrigger className="cursor-pointer">
@@ -16,7 +21,7 @@ export default async function RootSidebar() {
         <SheetDescription>
           description
         </SheetDescription>
-        <SidebarMenu />
+        <SidebarMenu user_data={user_data} />
       </SheetContent>
     </Sheet>
   )

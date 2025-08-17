@@ -1,7 +1,7 @@
 import Image from "@/components/Image/server";
 import Link from "next/link";
 import z from "zod";
-import {UserSchema} from "@/types/user-types";
+import {UserSchema} from "@/types/user-types.user";
 
 interface ShowRecipeCommentsHeaderProps {
   recipe_id: number;
