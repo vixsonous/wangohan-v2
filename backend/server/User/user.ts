@@ -1,6 +1,8 @@
 import z from "zod";
 import { UserDetailsRepository, UserRepository } from "./user-repository";
-import {UserAuthenticationSchema, UserDetailSchema, UserSchema} from "../types/user-types";
+import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
+import {UserDetailSchema} from "@/server/types/user-types.user-detail";
+import {UserSchema} from "@/server/types/user-types.user";
 
 export class User {
   
@@ -87,12 +89,6 @@ export class GetUserDetails extends UserDetails {
 
     return user ? new GetUserDetails(user) : user;
   }
-
-  static async getUserById(user_id: number): Promise<GetUserDetails | undefined> {
-    const user: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined = await UserDetailsRepository.getUserById(user_id);
-
-    return user ? new GetUserDetails(user) : user;
-  }
 }
 
 export class PostUserDetails extends UserDetails {
@@ -116,6 +112,6 @@ export class PostUserDetails extends UserDetails {
       user_agreement: this.user_agreement,
     });
 
-    return userDetail ? new UserDetails(userDetail) : userDetail;
+    return userDetail ? new GetUserDetails(userDetail) : userDetail;
   }
 }

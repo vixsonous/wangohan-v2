@@ -6,9 +6,12 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import heic2any from "heic2any";
 import {UserDetailSchema} from "@/types/user-types.user-detail";
+import {UserSchema} from "@/types/user-types.user";
+import {useRouter} from "next/navigation";
 
 export const usePersonalForm = () => {
 
+  const router = useRouter();
   const signupInfoMutation = useMutation({
     mutationFn: (data: FieldValues) => ClientApiService.post("/personal-info", data, {
       headers: {
@@ -17,9 +20,11 @@ export const usePersonalForm = () => {
       withCredentials: true
     }),
     onSuccess: (data) => {
+      const dt = ClientApiResponseService.getAxiosResponseData(data) as z.infer<typeof UserSchema.UserDisplay>;
       toast.success("Successful!", {
         description: ClientApiResponseService.getAxiosResponseMessage(data)
-      })
+      });
+      router.push("/user/" + dt?.user_id + "/" + dt?.user_codename);
     }
   });
 

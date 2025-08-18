@@ -15,6 +15,10 @@ export class ApiResponse {
     } as ResponseData<T>)
   }
 
+  static redirect(res: Response, url: string) {
+    res.status(302).redirect(url);
+  }
+
   static error<T>(res: Response, message?: string, data?:T, status?: number) {
     res.status(status || 500).json({
       message: message || "Unsuccessful!",

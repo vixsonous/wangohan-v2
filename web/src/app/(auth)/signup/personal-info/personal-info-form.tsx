@@ -22,19 +22,17 @@ import {
 } from "@/components/ui/select";
 
 export default function PersonalInfoForm({user_id}: {user_id: number}) {
-
   const { signupInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-full sm:max-w-2xl flex flex-col gap-4 items-start pt-10">
-      <InputField hidden={true} {...register("user_id")} value={user_id}/>
-      <InputField hidden={true} {...register("user_agreement")} value={0}/>
+      <InputField hidden={true} {...register("user_id", {valueAsNumber: true})} value={Number(user_id)}/>
       <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-5">
         <div className="col-span-2">
           <Controller
             control={control}
             render={({field}) => (
-              <label htmlFor="user_image" className="flex relative items-center justify-center">
+              <label htmlFor="user_image" className="flex flex-col justify-center relative items-center justify-center">
                 <img src={'/banner/3dogs.webp'} className="-top-10 z-10 absolute h-[auto] w-[20%] sm:w-[40%] max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
                 {
                   uploadFileMutation.isPending && (
@@ -65,6 +63,7 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
                       }
                   } disabled={uploadFileMutation.isPending} hidden={true} type="file" id="user_image" />
                 </span>
+                <Error>{errors.user_image?.message}</Error>
               </label>
             )}
             name={"user_image"}
@@ -115,8 +114,6 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
         </div>
       </div>
 
-
-
       <div className="grid grid-cols-2 gap-2 w-full">
         <Controller
           control={control}
@@ -160,11 +157,14 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
         />
 
         <div className="w-full col-span-1 flex flex-col gap-2">
-          <label htmlFor="gender" className={`text-xl font-semibold`}>性別 </label>
+          <label htmlFor="user_gender" className={`text-xl flex gap-2 items-center font-semibold`}>
+            性別
+            <Error>{errors.user_gender?.message}</Error>
+          </label>
 
           <Controller render={({field}) => (
             <Select onValueChange={field.onChange}>
-              <SelectTrigger className="w-full bg-secondary-bg border border-primary-text">
+              <SelectTrigger id={"user_gender"} className="w-full bg-secondary-bg border border-primary-text">
                 <SelectValue placeholder="性別を選択" />
               </SelectTrigger>
               <SelectContent>
@@ -198,8 +198,25 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
         />
       </p>
 
-
-
+      <Controller
+        render={({field}) => (
+          <p className="w-full flex flex-col justify-center items-center gap-2">
+            <label className="text-sm font-semibold flex items-baseline gap-2" htmlFor="user_agreement">
+              <input
+                aria-invalid={errors.user_agreement?.message !== undefined}
+                className="sm:text-base"
+                onChange={(e:React.ChangeEvent<HTMLInputElement>) => field.onChange(e.currentTarget.checked ? 1 : 0)}
+                id="user_agreement"
+                type="checkbox"
+              />
+              I have read and agree to the Terms and Conditions
+            </label>
+            <Error>{errors.user_agreement?.message}</Error>
+          </p>
+        )}
+        name={"user_agreement"}
+        control={control}
+      />
       <div className="w-full flex justify-center flex-col items-center gap-[10px]">
         <Button disabled={signupInfoMutation.isPending || signupInfoMutation.isSuccess} type="submit" className="w-full flex items-center gap-2 bg-primary-text">
           {signupInfoMutation.isPending ? (

@@ -1,10 +1,10 @@
 import { ServerApiService } from "@/lib/server-utils";
-import { UserData } from "./user-types";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import {log} from "@/lib/log";
+import {UserDetailSchema} from "@/types/user-types.user-detail";
 
-export const getUser = async (user_id: number, user_codename: string): Promise<UserData | undefined> => {
+export const getUser = async (user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> => {
   try {
     const {data} = await ServerApiService.get(`/get-user?user_id=${user_id}&user_codename=${user_codename}`);
     return data.data;

@@ -2,7 +2,7 @@ import passport from 'passport';
 import Local from 'passport-local';
 import { UserService } from '../User/user-service';
 import bcrypt from 'bcrypt';
-import {UserDetailsRepository, UserRepository} from "@/server/User/user-repository";
+import { UserRepository} from "@/server/User/user-repository";
 
 passport.serializeUser((user, done) => {
   done(null, user);

@@ -18,4 +18,8 @@ export class ClientApiResponseService {
   static getAxiosResponseMessage(response: AxiosResponse): string {
     return response.data.message;
   }
+
+  static getAxiosResponseData<T>(response: AxiosResponse): T {
+    return response.data.data as T;
+  }
 }

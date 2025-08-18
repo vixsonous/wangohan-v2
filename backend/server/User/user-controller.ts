@@ -86,6 +86,13 @@ export class UserController {
       return;
     }
 
-    ApiResponse.success(res, "Successfully registered personal info!");
+    const userData = userDetail.getDisplayUser();
+
+    if(userData === null) {
+      ApiResponse.error(res, "Error in saving personal information!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully registered personal info!", userData);
   }
 }
