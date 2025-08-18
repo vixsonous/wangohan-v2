@@ -42,6 +42,43 @@ export class UserDetailsRepository {
               "pets_table.created_at",
             ]).whereRef("pets_table.user_id", "=", "user_details_table.user_id")
           ).as("pets"),
+          jsonArrayFrom(
+            eb.selectFrom("likes_table")
+              .innerJoin("recipes_table", "recipes_table.recipe_id", "likes_table.recipe_id")
+              .select(lteb => [
+                "recipes_table.recipe_id",
+                "recipes_table.recipe_name",
+                lteb.fn.coalesce(
+                  lteb.selectFrom("recipe_images_table")
+                    .select("recipe_image")
+                    .limit(1)
+                    ,
+                  lteb.val("")
+                ).as("recipe_image"),
+                "recipes_table.user_id",
+                "recipes_table.updated_at",
+                "recipes_table.created_at"
+              ]).where("likes_table.user_id", "=", user_id)
+          ).as("liked_recipes"),
+          jsonArrayFrom(
+            eb.selectFrom("recipes_table")
+              .select(lteb => [
+                "recipes_table.recipe_id",
+                "recipes_table.recipe_name",
+                lteb.fn.coalesce(
+                  lteb.selectFrom("recipe_images_table")
+                    .select("recipe_image")
+                    .limit(1)
+                    .whereRef("recipes_table.recipe_id", "=", "recipe_images_table.recipe_id")
+                  ,
+                  lteb.val("")
+                ).as("recipe_image"),
+                "recipes_table.user_id",
+                "recipes_table.updated_at",
+                "recipes_table.created_at"
+              ])
+              .where("recipes_table.user_id", "=", user_id)
+          ).as("my_recipes"),
           "updated_at",
           "created_at"
         ])

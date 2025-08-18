@@ -74,6 +74,7 @@ export class RecipeSchema {
   static GetBasicRecipe = z.object({
     recipe_id: z.number(),
     recipe_name: z.string(),
+    recipe_image: z.string(),
     user_id: z.number(),
     updated_at: z.date(),
     created_at: z.date()

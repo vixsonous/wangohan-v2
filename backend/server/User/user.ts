@@ -82,17 +82,19 @@ export class UserDetails {
 export class GetUserDetails extends UserDetails {
   private user_image: string;
   private pets?: Array<z.infer<typeof PetSchema.GetPet>> | undefined;
-  private liked_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
-  private my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private liked_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private my_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
 
   constructor(user_details: z.infer<typeof UserDetailSchema.GetUserDetails>) {
     super(user_details);
     this.user_image = user_details.user_image;
+    this.pets = user_details.pets;
+    this.liked_recipes = user_details.liked_recipes;
+    this.my_recipes = user_details.my_recipes;
   }
 
   static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
     const user: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
-
     return user ? new GetUserDetails(user) : user;
   }
 }

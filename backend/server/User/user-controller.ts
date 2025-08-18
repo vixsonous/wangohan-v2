@@ -11,7 +11,7 @@ export class UserController {
   static async getUser(req: Request, res: Response) {
     const {user_id, user_codename} = req.query;
     const user = await UserService.getUser(Number(user_id), String(user_codename));
-    
+
     if(user === undefined) {
       ApiResponse.error(res, "User not found!", user);
       return;

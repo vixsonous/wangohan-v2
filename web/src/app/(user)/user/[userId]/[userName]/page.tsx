@@ -27,7 +27,7 @@ export default async function User({
   const {userId, userName} = await params;
   
   const user = await getUser(Number(userId), String(userName));
-
+  console.log(user);
   if(user === undefined) {
     return <h1>User not found!</h1>;
   }
