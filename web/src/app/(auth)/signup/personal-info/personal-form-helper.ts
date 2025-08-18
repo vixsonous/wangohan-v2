@@ -20,7 +20,7 @@ export const usePersonalForm = () => {
       withCredentials: true
     }),
     onSuccess: (data) => {
-      const dt = ClientApiResponseService.getAxiosResponseData(data) as z.infer<typeof UserSchema.UserDisplay>;
+      const dt = ClientApiResponseService.getAxiosResponseData<z.infer<typeof UserSchema.UserDisplay>>(data);
       toast.success("Successful!", {
         description: ClientApiResponseService.getAxiosResponseMessage(data)
       });

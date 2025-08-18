@@ -17,6 +17,12 @@ export class UserService {
     return user;
   }
 
+  static async getUserFullDisplay(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
+    const user = await GetUserDetails.getUser(user_id, user_codename);
+    log(UserService.USER_SERVICE_SUCCESS_LOGS.GET_USER_SUCCESS);
+    return user;
+  }
+
   static async localStrategyLogin(email: string): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
     const user = await User.findUser({email});
     log(UserService.USER_SERVICE_SUCCESS_LOGS.LOCAL_STRATEGY_LOGIN_SUCCESS);

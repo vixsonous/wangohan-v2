@@ -1,4 +1,6 @@
 import z from "zod";
+import {PetSchema} from "@/server/types/pet-types.pet";
+import {RecipeSchema} from "@/server/types/recipe-types";
 
 export class UserDetailSchema {
   static UserDetails = z.object({
@@ -15,8 +17,11 @@ export class UserDetailSchema {
   });
 
   static GetUserDetails = UserDetailSchema.UserDetails.and(z.object({
-    user_image: z.string()
-  }))
+    user_image: z.string(),
+    pets: z.array(PetSchema.GetPet).optional(),
+    liked_recipes: z.array(z.lazy(() => RecipeSchema.GetBasicRecipe)).optional(),
+    my_recipes: z.array(z.lazy(() => RecipeSchema.GetBasicRecipe)).optional(),
+  }));
 
   static PostUserDetails = UserDetailSchema.UserDetails.and(z.object({
     user_image: z.custom<Express.Multer.File>()

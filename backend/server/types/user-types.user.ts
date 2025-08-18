@@ -12,5 +12,6 @@ export class UserSchema {
     user_id: z.number(),
     email: z.email(),
     user_details: UserDetailSchema.GetUserDetails.nullable()
-  })
+  });
+
 }

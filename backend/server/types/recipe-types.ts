@@ -71,6 +71,14 @@ export class RecipeDisplaySchema {
 
 export class RecipeSchema {
 
+  static GetBasicRecipe = z.object({
+    recipe_id: z.number(),
+    recipe_name: z.string(),
+    user_id: z.number(),
+    updated_at: z.date(),
+    created_at: z.date()
+  });
+
   static RecipeIngredient = z.object({
     recipe_ingredient_id: z.number().optional(),
     recipe_ingredients_name: z.string().min(1, "Please input recipe ingredient"),
@@ -113,4 +121,6 @@ export class RecipeSchema {
     delete_recipe_instruction_ids: z.array(z.number()).optional(),
     delete_recipe_ingredient_ids: z.array(z.number()).optional(),
   }));
+
+
 }

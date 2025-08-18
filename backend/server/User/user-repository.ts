@@ -8,7 +8,7 @@ import bcrypt from 'bcrypt';
 import {User} from "./user";
 import {ImageProcess} from "@/server/Images/image-service";
 import {Image} from "@/server/Images/image";
-import {jsonObjectFrom} from "kysely/helpers/postgres";
+import {jsonArrayFrom, jsonObjectFrom} from "kysely/helpers/postgres";
 import {UserDetailSchema} from "@/server/types/user-types.user-detail";
 import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
 import {UserSchema} from "@/server/types/user-types.user";
@@ -21,7 +21,7 @@ export class UserDetailsRepository {
   static async getUser(user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
     try {
       const user: z.infer<typeof UserDetailSchema.GetUserDetails> = await db.selectFrom("user_details_table")
-        .select([
+        .select(eb => [
           "user_first_name",
           "user_last_name",
           "user_codename",
@@ -31,6 +31,17 @@ export class UserDetailsRepository {
           "user_birthdate",
           "user_id",
           "user_occupation",
+          jsonArrayFrom(eb.selectFrom("pets_table")
+            .select([
+              "pets_table.pet_id",
+              "pets_table.pet_name",
+              "pets_table.pet_breed",
+              "pets_table.pet_image",
+              "pets_table.pet_birthdate",
+              "pets_table.updated_at",
+              "pets_table.created_at",
+            ]).whereRef("pets_table.user_id", "=", "user_details_table.user_id")
+          ).as("pets"),
           "updated_at",
           "created_at"
         ])

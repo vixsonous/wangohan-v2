@@ -3,6 +3,8 @@ import { UserDetailsRepository, UserRepository } from "./user-repository";
 import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
 import {UserDetailSchema} from "@/server/types/user-types.user-detail";
 import {UserSchema} from "@/server/types/user-types.user";
+import {PetSchema} from "@/server/types/pet-types.pet";
+import {RecipeSchema} from "@/server/types/recipe-types";
 
 export class User {
   
@@ -79,6 +81,10 @@ export class UserDetails {
 
 export class GetUserDetails extends UserDetails {
   private user_image: string;
+  private pets?: Array<z.infer<typeof PetSchema.GetPet>> | undefined;
+  private liked_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+
   constructor(user_details: z.infer<typeof UserDetailSchema.GetUserDetails>) {
     super(user_details);
     this.user_image = user_details.user_image;
