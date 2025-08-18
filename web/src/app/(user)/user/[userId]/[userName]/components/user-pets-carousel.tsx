@@ -4,10 +4,26 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/componen
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
+import z from "zod";
+import {PetSchema} from "@/types/pet-types.pet";
+import {UserSchema} from "@/types/user-types.user";
 
-export default function UserPetsCarousel() {
+export default function UserPetsCarousel(
+  {pets, user_data, user_id, user_codename}: {
+    pets: Array<z.infer<typeof PetSchema.GetPet>> | undefined,
+    user_data: z.infer<typeof UserSchema.User> | undefined,
+    user_id: number,
+    user_codename: string,
+  }
+) {
   const [api, setApi] = useState<CarouselApi>();
   const [curSlide, setCurSlide] = useState(0);
+  console.log(user_data);
+  if(pets === undefined || pets.length === 0) {
+    return (
+      <h1>{user_id === user_data?.user_id ? `You don't` : `${user_codename} doesn't`} have any pets!</h1>
+    )
+  }
   useEffect(() => {
     if(!api) return;
 

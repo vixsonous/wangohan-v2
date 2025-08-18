@@ -3,7 +3,7 @@ import UserTabs from "./components/user-tabs";
 import UserPetsCarousel from "./components/user-pets-carousel";
 import Button from "@/components/Button";
 import { Metadata } from "next";
-import { getUser } from "@/server-actions/User/user";
+import {getUser, isAuthenticated} from "@/server-actions/User/user";
 
 interface UserProps {
   params: Promise<{
@@ -27,13 +27,15 @@ export default async function User({
   const {userId, userName} = await params;
   
   const user = await getUser(Number(userId), String(userName));
-  console.log(user);
+
   if(user === undefined) {
     return <h1>User not found!</h1>;
   }
 
+  const userData = await isAuthenticated();
+
   return (
-    <div className="flex gap-2 justify-center w-full max-w-7xl text-primary-text mt-10">
+    <div className="flex gap-2 flex-col md:flex-row justify-center w-full max-w-7xl text-primary-text mt-10 px-4">
       <section className="w-full flex flex-col gap-2 items-center">
         <Image className="rounded-full" width={300} height={300} src={user.user_image} alt="profile picture"/>
         <h1 className="text-3xl mb-4">{user.user_codename}</h1>
@@ -44,10 +46,10 @@ export default async function User({
           </h1>
         </div>
         <Button className="text-lg font-bold">愛犬を登録する</Button>
-        <UserPetsCarousel />
+        <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
       </section>
       <section className="w-full">
-        <UserTabs />
+        <UserTabs liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
       </section>
     </div>
   )

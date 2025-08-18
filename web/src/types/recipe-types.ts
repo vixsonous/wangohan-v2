@@ -108,4 +108,13 @@ export class RecipeSchema {
     delete_recipe_instruction_ids: z.array(z.number()).optional(),
     delete_recipe_ingredient_ids: z.array(z.number()).optional(),
   }));
+
+  static GetBasicRecipe = z.object({
+    recipe_id: z.number(),
+    recipe_name: z.string(),
+    recipe_image: z.string(),
+    user_id: z.number(),
+    updated_at: z.date(),
+    created_at: z.date()
+  });
 }
