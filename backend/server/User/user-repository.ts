@@ -18,6 +18,8 @@ export class UserDetailsRepository {
     GET_USER_SUCCESS: "Successfully retrieved user details data!",
   }
 
+  private static USER_DETAILS_DISPLAY_RECIPES_LIMIT = 9;
+
   static async getUser(user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
     try {
       const user: z.infer<typeof UserDetailSchema.GetUserDetails> = await db.selectFrom("user_details_table")
@@ -51,6 +53,7 @@ export class UserDetailsRepository {
                 lteb.fn.coalesce(
                   lteb.selectFrom("recipe_images_table")
                     .select("recipe_image")
+                    .whereRef("recipes_table.recipe_id", "=", "recipe_images_table.recipe_id")
                     .limit(1)
                     ,
                   lteb.val("")
@@ -59,6 +62,7 @@ export class UserDetailsRepository {
                 "recipes_table.updated_at",
                 "recipes_table.created_at"
               ]).where("likes_table.user_id", "=", user_id)
+              .limit(UserDetailsRepository.USER_DETAILS_DISPLAY_RECIPES_LIMIT)
           ).as("liked_recipes"),
           jsonArrayFrom(
             eb.selectFrom("recipes_table")
@@ -78,7 +82,14 @@ export class UserDetailsRepository {
                 "recipes_table.created_at"
               ])
               .where("recipes_table.user_id", "=", user_id)
+              .limit(UserDetailsRepository.USER_DETAILS_DISPLAY_RECIPES_LIMIT)
           ).as("my_recipes"),
+          eb.fn.coalesce(eb.selectFrom("recipes_table").select(({fn}) => [
+            fn.count<number>("recipes_table.user_id").as("total_recipes")
+          ]).where("recipes_table.user_id", "=", user_id), eb.val(0)).as("total_recipes"),
+          eb.fn.coalesce(eb.selectFrom("likes_table").select(({fn}) => [
+            fn.count<number>("likes_table.user_id").as("total_liked")
+          ]).where("likes_table.user_id", "=", user_id), eb.val(0)).as("total_liked"),
           "updated_at",
           "created_at"
         ])
@@ -89,7 +100,6 @@ export class UserDetailsRepository {
         .executeTakeFirstOrThrow();
 
       log(UserDetailsRepository.USER_DETAILS_REPOSITORY_SUCCESS_LOG.GET_USER_SUCCESS);
-
       return user
     } catch (error) {
       console.error("User not found!");

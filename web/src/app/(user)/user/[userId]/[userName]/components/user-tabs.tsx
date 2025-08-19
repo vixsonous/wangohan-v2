@@ -4,11 +4,16 @@ import MyRecipes from "./user-tabs-my-recipes"
 import LikedRecipes from "./user-tabs-liked-recipes"
 import z from "zod";
 import {RecipeSchema} from "@/types/recipe-types";
+import {UserSchema} from "@/types/user-types.user";
 
 export default async function UserTabs(
-  {liked_recipes, my_recipes}:
+  {liked_recipes, my_recipes, user_id, user_codename, user_data}:
   {liked_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
-    my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined}
+    my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
+    user_id: number,
+    user_codename: string,
+    user_data: z.infer<typeof UserSchema.User> | undefined
+  }
 ) {
   return (
     <Tabs defaultValue="my-recipes">
@@ -20,10 +25,10 @@ export default async function UserTabs(
         </TabsTrigger>
       </TabsList>
       <TabsContent value="my-recipes">
-       <MyRecipes my_recipes={my_recipes} />
+       <MyRecipes user_id={user_id} user_codename={user_codename} user_data={user_data} my_recipes={my_recipes} />
       </TabsContent>
       <TabsContent value="liked-recipes">
-        <LikedRecipes liked_recipes={liked_recipes} />
+        <LikedRecipes user_id={user_id} user_codename={user_codename} user_data={user_data} liked_recipes={liked_recipes} />
       </TabsContent>
     </Tabs>
   )

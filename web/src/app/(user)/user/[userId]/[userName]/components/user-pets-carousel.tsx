@@ -18,7 +18,7 @@ export default function UserPetsCarousel(
 ) {
   const [api, setApi] = useState<CarouselApi>();
   const [curSlide, setCurSlide] = useState(0);
-  console.log(user_data);
+
   if(pets === undefined || pets.length === 0) {
     return (
       <h1>{user_id === user_data?.user_id ? `You don't` : `${user_codename} doesn't`} have any pets!</h1>
@@ -38,15 +38,15 @@ export default function UserPetsCarousel(
           })
         ]} setApi={setApi} className="max-w-xs">
       <CarouselContent>
-        {Array.from(Array(10).keys()).map(a => {
+        {pets.map((a, idx) => {
           return (
-            <CarouselItem className="basis-2/3" key={a}>
+            <CarouselItem className="basis-2/3" key={idx}>
               <HoverCard>
                 <HoverCardTrigger asChild>
-                  <Image src={"/image.webp"} className={`${curSlide === a ? 'opacity-100 pointer-events-auto' : 'opacity-50 pointer-events-none'} transition-all border-4 border-primary-text duration-500 w-full h-full aspect-square object-cover`} style={{clipPath: curSlide === a ? 'circle(70% at 50% 50%)': 'circle(50% at 50% 50%)'}} alt="image" />
+                  <Image src={a.pet_image} className={`${curSlide === idx ? 'opacity-100 pointer-events-auto' : 'opacity-50 pointer-events-none'} transition-all border-4 border-primary-text duration-500 w-full h-full aspect-square object-cover`} style={{clipPath: curSlide === idx ? 'circle(70% at 50% 50%)': 'circle(50% at 50% 50%)'}} alt={a.pet_name} />
                 </HoverCardTrigger>
                 <HoverCardContent>
-                  Wanwan
+                  {a.pet_name}
                 </HoverCardContent>
               </HoverCard>
             </CarouselItem>

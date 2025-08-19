@@ -33,7 +33,6 @@ export default async function User({
   }
 
   const userData = await isAuthenticated();
-
   return (
     <div className="flex gap-2 flex-col md:flex-row justify-center w-full max-w-7xl text-primary-text mt-10 px-4">
       <section className="w-full flex flex-col gap-2 items-center">
@@ -45,11 +44,13 @@ export default async function User({
             うちのわん
           </h1>
         </div>
-        <Button className="text-lg font-bold">愛犬を登録する</Button>
+        {userData !== undefined && (
+          <Button className="text-lg font-bold">愛犬を登録する</Button>
+        )}
         <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
       </section>
       <section className="w-full">
-        <UserTabs liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
+        <UserTabs user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
       </section>
     </div>
   )

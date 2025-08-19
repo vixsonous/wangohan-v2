@@ -84,6 +84,8 @@ export class GetUserDetails extends UserDetails {
   private pets?: Array<z.infer<typeof PetSchema.GetPet>> | undefined;
   private liked_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
   private my_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private total_liked?: number | undefined;
+  private total_recipes?: number | undefined;
 
   constructor(user_details: z.infer<typeof UserDetailSchema.GetUserDetails>) {
     super(user_details);
@@ -91,6 +93,8 @@ export class GetUserDetails extends UserDetails {
     this.pets = user_details.pets;
     this.liked_recipes = user_details.liked_recipes;
     this.my_recipes = user_details.my_recipes;
+    this.total_liked = user_details.total_liked;
+    this.total_recipes = user_details.total_recipes;
   }
 
   static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {

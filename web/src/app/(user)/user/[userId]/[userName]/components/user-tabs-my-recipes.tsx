@@ -1,15 +1,21 @@
-import Image from "@/components/Image/server"
+import Image from "@/components/Image/client"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import Link from "next/link"
 import z from "zod";
 import {RecipeSchema} from "@/types/recipe-types";
+import {UserSchema} from "@/types/user-types.user";
 
-export default async function MyRecipes(
-  {my_recipes}: {my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined}
+export default function MyRecipes(
+  {my_recipes, user_id, user_codename, user_data}: {
+    my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
+    user_id: number,
+    user_codename: string,
+    user_data: z.infer<typeof UserSchema.User> | undefined
+  }
 ) {
   return (
     <Card className="bg-secondary-bg pb-0 rounded-b-none">
-      <CardHeader><h1>My Recipes</h1></CardHeader>
+      <CardHeader><h1>{user_id === user_data?.user_id ? `My` : `${user_codename}'s`} Recipes</h1></CardHeader>
       <CardContent className="grid p-1 grid-cols-3 gap-1 grid-rows-3">
         {my_recipes !== undefined && my_recipes.length > 0 ? (
           my_recipes.map( a => {
