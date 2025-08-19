@@ -18,6 +18,10 @@ export class RecipeRepository {
 
   private static START_PAGE = 0;
 
+  private static RECIPE_SUCCESS_LOGS = {
+    GET_LIKED_RECIPE_SUCCESS: "Successfully retrieved liked recipes!"
+  }
+
   static async getPopularRecipes(
     page: number = this.START_PAGE, 
     limit: number = this.FRONT_PAGE_RECIPE_QUERY_LIMIT
@@ -509,6 +513,72 @@ export class RecipeRepository {
       log(e);
       await trx.rollback().execute();
       return false;
+    }
+  }
+
+  private static BASIC_RECIPES_LIMIT = 9;
+
+  static async getLikedRecipes(user_id: number, page: number) : Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {
+    try {
+      const likedRecipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = await db.selectFrom("likes_table")
+        .innerJoin("recipes_table", "recipes_table.recipe_id", "likes_table.recipe_id")
+        .select(lteb => [
+          "recipes_table.recipe_id",
+          "recipes_table.recipe_name",
+          lteb.fn.coalesce(
+            lteb.selectFrom("recipe_images_table")
+              .select("recipe_image")
+              .limit(1)
+              .whereRef("recipes_table.recipe_id", "=", "recipe_images_table.recipe_id")
+            ,
+            lteb.val("")
+          ).as("recipe_image"),
+          "recipes_table.user_id",
+          "recipes_table.updated_at",
+          "recipes_table.created_at"
+        ])
+        .where("recipes_table.user_id", "=", user_id)
+        .where("likes_table.is_liked", "=", true)
+        .limit(RecipeRepository.BASIC_RECIPES_LIMIT)
+        .offset(RecipeRepository.BASIC_RECIPES_LIMIT * page)
+        .execute();
+
+      log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
+      return likedRecipes;
+    } catch(e) {
+      log(e);
+      return undefined;
+    }
+  }
+
+  static async getOwnedRecipes(user_id: number, page: number) : Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {
+    try {
+      const likedRecipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = await db.selectFrom("recipes_table")
+        .select(lteb => [
+          "recipes_table.recipe_id",
+          "recipes_table.recipe_name",
+          lteb.fn.coalesce(
+            lteb.selectFrom("recipe_images_table")
+              .select("recipe_image")
+              .limit(1)
+              .whereRef("recipes_table.recipe_id", "=", "recipe_images_table.recipe_id")
+            ,
+            lteb.val("")
+          ).as("recipe_image"),
+          "recipes_table.user_id",
+          "recipes_table.updated_at",
+          "recipes_table.created_at"
+        ])
+        .where("recipes_table.user_id", "=", user_id)
+        .limit(RecipeRepository.BASIC_RECIPES_LIMIT)
+        .offset(RecipeRepository.BASIC_RECIPES_LIMIT * page)
+        .execute();
+
+      log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
+      return likedRecipes;
+    } catch(e) {
+      log(e);
+      return undefined;
     }
   }
 }

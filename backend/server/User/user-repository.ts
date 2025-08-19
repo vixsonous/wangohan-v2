@@ -62,6 +62,7 @@ export class UserDetailsRepository {
                 "recipes_table.updated_at",
                 "recipes_table.created_at"
               ]).where("likes_table.user_id", "=", user_id)
+              .where("likes_table.is_liked", "=", true)
               .limit(UserDetailsRepository.USER_DETAILS_DISPLAY_RECIPES_LIMIT)
           ).as("liked_recipes"),
           jsonArrayFrom(

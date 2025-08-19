@@ -8,9 +8,12 @@ import {UserSchema} from "@/types/user-types.user";
 import {Button} from "@/components/ui/button";
 import {useMutation} from "@tanstack/react-query";
 import {useState} from "react";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
+import {AxiosResponse} from "axios";
+import {toast} from "sonner";
 
 export default function LikedRecipes(
-  {liked_recipes, user_id, user_codename, user_data}: {
+  {liked_recipes, user_id, user_codename, user_data, total_liked}: {
     liked_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
     user_id: number,
     user_codename: string,
@@ -23,13 +26,21 @@ export default function LikedRecipes(
   const [page, setPage] = useState(1);
 
   const getMoreLikedRecipesMutation = useMutation({
-    mutationFn: (): Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>> => new Promise(
-      res => res([{recipe_id: 1, recipe_name: "test", recipe_image: "/image.webp", user_id: user_id, updated_at: new Date(), created_at: new Date()}])),
-    onSuccess: (data: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>) => {
+    mutationFn: () => ClientApiService.get(`/get-liked-recipes?user_id=${user_id}&page=${page}`),
+    onSuccess: (data: AxiosResponse) => {
+      const dt: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>>(data);
+      const message: string = ClientApiResponseService.getAxiosResponseMessage(data);
+
+      toast.success('Successful!', {description: message});
+      setPage(prev => prev + 1);
       setRecipes(prev => {
-        const newArray = prev === undefined ? ([] as Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>).concat(data): prev.concat(data);
+        const newArray = prev === undefined ? ([] as Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>).concat(dt): prev.concat(dt);
         return structuredClone(newArray);
       })
+    },
+    onError: (error: AxiosResponse) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(error);
+      toast.error("Error!", {description: message});
     }
   });
 
@@ -62,7 +73,7 @@ export default function LikedRecipes(
           )}
         </CardContent>
       </Card>
-      {recipes && recipes.length < 15 && (
+      {recipes && total_liked && recipes.length < total_liked && (
         <div className={"w-full flex justify-center mt-2"}>
           <Button onClick={() => getMoreLikedRecipesMutation.mutate()} className={"flex items-center self-center gap-2 bg-primary-text"}>
             Get more recipes

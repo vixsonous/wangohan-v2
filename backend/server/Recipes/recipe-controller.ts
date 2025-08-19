@@ -95,7 +95,7 @@ export class RecipeController {
     }
 
     const submitParseResult = RecipeSchema.PostRecipe.safeParse(submitData);
-    console.log(submitParseResult);
+
     if(!submitParseResult.success) {
       const message = submitParseResult.error.issues[0].message;
       log(message);
@@ -166,5 +166,31 @@ export class RecipeController {
     await CacheUtil.delete(GET_RECIPE_KEY);
 
     ApiResponse.success(res, "Successfully updated the recipe!");
+  }
+
+  static async getLikedRecipes(req: Request, res: Response) {
+    const {user_id, page} = req.query;
+
+    const likedRecipes = await RecipeService.getLikedRecipe(Number(user_id), Number(page));
+
+    if(likedRecipes === undefined) {
+      ApiResponse.error(res, "There was an error retrieving liked recipes!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully retrieved additional liked recipes!", likedRecipes);
+  }
+
+  static async getOwnRecipes(req: Request, res: Response) {
+    const {user_id, page} = req.query;
+
+    const ownedRecipes = await RecipeService.getOwnedRecipe(Number(user_id), Number(page));
+
+    if(ownedRecipes === undefined) {
+      ApiResponse.error(res, "There was an error retrieving owned recipes!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully retrieved additional owned recipes!", ownedRecipes);
   }
 }

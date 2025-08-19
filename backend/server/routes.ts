@@ -13,6 +13,8 @@ router.post("/post-recipe", upload.array('recipe_images[]'), RecipeController.up
 router.post("/update-recipe", upload.array("recipe_images[]"), RecipeController.updateRecipe);
 router.get("/get-weekly-recipes", RecipeController.getWeeklyRecipes);
 router.get("/get-popular-recipes", RecipeController.getPopularRecipes);
+router.get("/get-liked-recipes", RecipeController.getLikedRecipes);
+router.get("/get-owned-recipes", RecipeController.getOwnRecipes);
 
 // Images
 router.get("/transform-image", ImageController.transformImage);

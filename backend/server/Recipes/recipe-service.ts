@@ -33,4 +33,14 @@ export class RecipeService {
 
     return updatedRecipe;
   }
+
+  static async getLikedRecipe(user_id: number, page: number): Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {
+
+    return await RecipeRepository.getLikedRecipes(user_id, page);
+  }
+
+  static async getOwnedRecipe(user_id: number, page: number): Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {
+
+    return await RecipeRepository.getOwnedRecipes(user_id, page);
+  }
 }
