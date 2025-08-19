@@ -50,7 +50,7 @@ export default async function User({
         <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
       </section>
       <section className="w-full">
-        <UserTabs user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
+        <UserTabs total_recipes={user.total_recipes} total_liked={user.total_liked} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
       </section>
     </div>
   )

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "@/components/Image/client"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import Link from "next/link"
@@ -10,7 +12,8 @@ export default function MyRecipes(
     my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
     user_id: number,
     user_codename: string,
-    user_data: z.infer<typeof UserSchema.User> | undefined
+    user_data: z.infer<typeof UserSchema.User> | undefined,
+    total_recipes: number | undefined,
   }
 ) {
   return (
