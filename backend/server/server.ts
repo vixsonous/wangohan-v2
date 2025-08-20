@@ -5,6 +5,8 @@ import session from 'express-session';
 import { redisClient } from './utils/redis';
 import {RedisStore} from 'connect-redis';
 
+const SESSION_MINUTES = 30;
+
 const app = express();
 app.use(express.json());
 app.use(urlencoded({extended: false}));
@@ -15,7 +17,7 @@ app.use(session({
   saveUninitialized: false,
   resave: false,
   cookie: {
-    maxAge: 60000* 5
+    maxAge: 60000 * SESSION_MINUTES
   }
 }))
 app.use(passport.initialize());

@@ -26,7 +26,7 @@ export class RecipeDisplaySchema {
     recipe_category: z.string(),
     total_likes: z.number(),
     total_views: z.number(),
-    recipe_images: Array<typeof RecipeDisplaySchema.RecipeImageDisplay>,
+    recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay),
     recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
     user_id: z.number(),
     created_at: z.date(),

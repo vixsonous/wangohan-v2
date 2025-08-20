@@ -2,6 +2,8 @@
 import Image from "@/components/Image/client";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
 
 const items = [
   "/logo/logo-wangohan-front.png",
@@ -9,7 +11,7 @@ const items = [
   "/logo/logo-wangohan-front.png",
 ]
 
-export default function BannerCarousel() {
+export default function BannerCarousel({recipes}: {recipes: Array<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>}) {
 
   return (
     <Carousel opts={{loop: true, duration: 50}} plugins={[
@@ -19,10 +21,10 @@ export default function BannerCarousel() {
     ]} className="w-full h-[400px] col-span-3">
       <CarouselContent hfull>
         {
-          items.map((i, x) => {
+          recipes.map((i, x) => {
             return (
               <CarouselItem key={x}>
-                <Image className="h-full w-full" src={i} alt={i} width={768} height={400}/>
+                <Image className="h-full w-full" src={i.recipe_images[0].recipe_image} alt={i.recipe_images[0].recipe_image_title} width={768} height={400}/>
               </CarouselItem>
             )
           })

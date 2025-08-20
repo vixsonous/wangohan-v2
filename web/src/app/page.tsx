@@ -37,7 +37,7 @@ export default async function Home() {
     <section className={`w-full flex gap-2.5 flex-col items-center px-6 py-6 lg:px-0 min-h-screen`}>
       <HomeLogoHeader mochi={mochi} gloria={gloria}/>
       <HomeNavigation />
-      <BannerSection />
+      <BannerSection recipes={sliderData.popularRecipes} />
       <RecipeCarouselWrapper title="今週のレシピ" recipes={sliderData.weeklyRecipes}/>
       <RecipeCarouselWrapper title="人気レシピ" recipes={sliderData.popularRecipes}/>
       <BirthdayWrapper />
