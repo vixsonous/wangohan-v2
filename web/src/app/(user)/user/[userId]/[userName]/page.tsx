@@ -1,9 +1,9 @@
 import Image from "@/components/Image/server";
 import UserTabs from "./components/user-tabs";
 import UserPetsCarousel from "./components/user-pets-carousel";
-import Button from "@/components/Button";
 import { Metadata } from "next";
 import {getUser, isAuthenticated} from "@/server-actions/User/user";
+import AddPetsDialog from "@/app/(user)/user/[userId]/[userName]/components/add-pets-dialog";
 
 interface UserProps {
   params: Promise<{
@@ -45,7 +45,7 @@ export default async function User({
           </h1>
         </div>
         {userData !== undefined && (
-          <Button className="text-lg font-bold">愛犬を登録する</Button>
+          <AddPetsDialog />
         )}
         <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
       </section>
