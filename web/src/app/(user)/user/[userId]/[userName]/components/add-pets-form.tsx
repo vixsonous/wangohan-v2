@@ -22,11 +22,11 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
           control={petForm.control}
           render={({field}) => (
             <label htmlFor="pet_image" className="col-span-1 flex flex-col justify-center relative items-center">
-              <img src={'/banner/3dogs.webp'} className="-top-8 md:-top-4 z-10 absolute h-[auto] w-24 max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
+              <Image src={'/banner/3dogs.webp'}  className="-top-8 md:-top-4 z-10 absolute h-[auto] w-24 max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
               {
                 uploadFileMutation.isPending && (
                   <div className="absolute z-10 flex justify-center gap-2 items-center">
-                    <Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>
+                    <Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>
                     <span>アップロード中...</span>
                   </div>
                 )
@@ -86,12 +86,12 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
                     {field.value ? (
                       <>
                         {format(field.value, "PPP", {locale: ja})}
-                        <Image src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
+                        <Image alt={"circle loading svg"} src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
                       </>
                     ) : (
                       <>
                         <span>誕生日を入力</span>
-                        <Image src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
+                        <Image alt={"circle loading svg"} src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
                       </>
                     )}
                   </span>
@@ -115,7 +115,7 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
 
           <p className="col-span-1 flex flex-col gap-2">
             <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="pet_breed">
-              犬種
+              姓
               <Error>{errors.pet_breed?.message}</Error>
             </label>
             <InputField
@@ -129,7 +129,7 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
         </div>
       </section>
       <Button disabled={postPetMutation.isPending || postPetMutation.isSuccess} className={"w-full mt-6 flex items-center gap-2 bg-primary-text"}>
-        <>{postPetMutation.isPending && <Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} />} 家族を追加</>
+        <>{postPetMutation.isPending && <Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} />} 家族を追加</>
       </Button>
     </form>
   )

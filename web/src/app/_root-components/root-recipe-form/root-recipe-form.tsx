@@ -303,7 +303,7 @@ export default function RecipeForm({recipe_data}: RecipeFormProps) {
         </section>
       </div>
       <Button disabled={submitMutation.isPending} className={`bg-[#ffb762] text-white py-2.5 rounded-md text-sm px-5 font-bold self-center flex items-center gap-2`} role="submit">
-        {submitMutation.isPending && <Image className={`animate-spin`} src={"/icons/svg/primary-loading.svg"} noprocess={true}/>}作成する
+        {submitMutation.isPending && <Image alt={"circle loading svg"} className={`animate-spin`} src={"/icons/svg/primary-loading.svg"} noprocess={true}/>}作成する
       </Button>
     </form>
   )

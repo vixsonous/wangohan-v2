@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import TermsAndConditions from "@/app/(auth)/signup/personal-info/terms-and-conditions";
 
 export default function PersonalInfoForm({user_id}: {user_id: number}) {
   const { signupInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm();
@@ -32,12 +33,12 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
           <Controller
             control={control}
             render={({field}) => (
-              <label htmlFor="user_image" className="flex flex-col justify-center relative items-center justify-center">
-                <img src={'/banner/3dogs.webp'} className="-top-10 z-10 absolute h-[auto] w-[20%] sm:w-[40%] max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
+              <label htmlFor="user_image" className="flex flex-col relative items-center justify-center">
+                <Image src={'/banner/3dogs.webp'} className="-top-10 z-10 absolute h-[auto] w-[20%] sm:w-[40%] max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
                 {
                   uploadFileMutation.isPending && (
                     <div className="absolute z-10 flex justify-center gap-2 items-center">
-                      <Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>
+                      <Image src={"/icons/svg/primary-loading.svg"} alt={"circle loading svg"} noprocess={true} className={"animate-spin"}/>
                       <span>アップロード中...</span>
                     </div>
                   )
@@ -129,12 +130,12 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
                     {field.value ? (
                       <>
                         {format(field.value, "PPP", {locale: ja})}
-                        <Image src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
+                        <Image alt={"circle loading svg"} src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
                       </>
                     ) : (
                       <>
                         <span>誕生日を入力</span>
-                        <Image src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
+                        <Image alt={"circle loading svg"} src={"/icons/svg/primary-calendar.svg"} noprocess={true}/>
                       </>
                     )}
                   </span>
@@ -209,7 +210,7 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
                 id="user_agreement"
                 type="checkbox"
               />
-              I have read and agree to the Terms and Conditions
+              I have read and agree to the <TermsAndConditions />
             </label>
             <Error>{errors.user_agreement?.message}</Error>
           </p>
@@ -220,7 +221,7 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
       <div className="w-full flex justify-center flex-col items-center gap-[10px]">
         <Button disabled={signupInfoMutation.isPending || signupInfoMutation.isSuccess} type="submit" className="w-full flex items-center gap-2 bg-primary-text">
           {signupInfoMutation.isPending ? (
-            <><Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} /> 新規登録</>
+            <><Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} /> 新規登録</>
           ): (
             "新規登録"
           )}

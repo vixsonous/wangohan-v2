@@ -1,5 +1,5 @@
 import { ServerApiService } from '@/lib/server-utils';
-import { RecipeDetailsDisplay, RecipeDisplayDetails } from './recipe-types';
+import { RecipeDisplayDetails } from './recipe-types';
 import z from "zod";
 import {RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
 

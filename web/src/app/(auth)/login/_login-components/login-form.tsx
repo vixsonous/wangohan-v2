@@ -91,7 +91,7 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
               </div>
               <Button disabled={loginMutation.isSuccess} type="submit" className="w-full flex items-center gap-2 bg-primary-text">
                 {loginMutation.isPending ? (
-                  <><Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} /> ログイン</>
+                  <><Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} /> ログイン</>
                 ): (
                   "ログイン"
                 )}

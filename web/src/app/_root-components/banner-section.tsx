@@ -1,6 +1,5 @@
 import BannerCarousel from "./banner-carousel";
 import BannerCategories from "./banner-categories";
-import {RecipeDisplayDetails} from "@/server-actions/Recipe/recipe-types";
 import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
 

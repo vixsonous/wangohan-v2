@@ -4,9 +4,8 @@ import {PetSchema} from "@/types/pet-types.pet";
 import {useMutation} from "@tanstack/react-query";
 import heic2any from "heic2any";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
-import {useRouter} from "next/navigation";
 import {toast} from "sonner";
-import {AxiosError, AxiosResponse} from "axios";
+import {AxiosError} from "axios";
 
 export const useAddPet = () => {
 

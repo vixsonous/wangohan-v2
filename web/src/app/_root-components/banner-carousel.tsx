@@ -5,12 +5,6 @@ import Autoplay from "embla-carousel-autoplay";
 import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
 
-const items = [
-  "/logo/logo-wangohan-front.png",
-  "/logo/logo-wangohan-front.png",
-  "/logo/logo-wangohan-front.png",
-]
-
 export default function BannerCarousel({recipes}: {recipes: Array<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>}) {
 
   return (

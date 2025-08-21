@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import z from "zod";
 import {PetSchema} from "@/types/pet-types.pet";
 import {UserSchema} from "@/types/user-types.user";
+import {format} from "date-fns";
 
 export default function UserPetsCarousel(
   {pets, user_data, user_id, user_codename}: {
@@ -19,11 +20,6 @@ export default function UserPetsCarousel(
   const [api, setApi] = useState<CarouselApi>();
   const [curSlide, setCurSlide] = useState(0);
 
-  if(pets === undefined || pets.length === 0) {
-    return (
-      <h1>{user_id === user_data?.user_id ? `You don't` : `${user_codename} doesn't`} have any pets!</h1>
-    )
-  }
   useEffect(() => {
     if(!api) return;
 
@@ -31,6 +27,13 @@ export default function UserPetsCarousel(
       setCurSlide(api.selectedScrollSnap());
     });
   }, [api]);
+
+  if(pets === undefined || pets.length === 0) {
+    return (
+      <h1>{user_id === user_data?.user_id ? `You don't` : `${user_codename} doesn't`} have any pets!</h1>
+    )
+  }
+
   return (
     <Carousel opts={{loop: true}} plugins={[
           Autoplay({
@@ -46,7 +49,9 @@ export default function UserPetsCarousel(
                   <Image src={a.pet_image} className={`${curSlide === idx ? 'opacity-100 pointer-events-auto' : 'opacity-50 pointer-events-none'} transition-all border-4 border-primary-text duration-500 w-full h-full aspect-square object-cover`} style={{clipPath: curSlide === idx ? 'circle(70% at 50% 50%)': 'circle(50% at 50% 50%)'}} alt={a.pet_name} />
                 </HoverCardTrigger>
                 <HoverCardContent>
-                  {a.pet_name}
+                  <p>{a.pet_name}</p>
+                  <p>{format(new Date(a.pet_birthdate).toDateString(), "MMMM do yyyy")}</p>
+                  <p>{a.pet_breed}</p>
                 </HoverCardContent>
               </HoverCard>
             </CarouselItem>

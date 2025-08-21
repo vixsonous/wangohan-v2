@@ -81,7 +81,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
         preview_url: (i as z.infer<typeof RecipeDisplaySchema.RecipeImageDisplay>).recipe_image
       })));
     }
-  }, []);
+  }, [recipe_data]);
 
   const fileOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
