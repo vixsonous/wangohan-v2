@@ -4,6 +4,7 @@ import { ImageController } from "./Images/image-controller";
 import { UserController } from "./User/user-controller";
 import passport from './utils/passport';
 import multer from 'multer';
+import {PetController} from "@/server/Pet/pet-controller";
 
 export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
@@ -25,3 +26,6 @@ router.post("/login", passport.authenticate('local'), UserController.login);
 router.post("/register", UserController.register);
 router.get("/is-authenticated", UserController.isAuthenticated);
 router.post("/personal-info", upload.single('user_image'), UserController.registerPersonalInfo);
+
+// Pets
+router.post("/post-pet", upload.single('pet_image'), PetController.postPet);

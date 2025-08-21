@@ -1,5 +1,5 @@
 "use client";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 
 export class ClientApiService {
 
@@ -21,5 +21,9 @@ export class ClientApiResponseService {
 
   static getAxiosResponseData<T>(response: AxiosResponse): T {
     return response.data.data as T;
+  }
+
+  static getAxiosErrorMessage(error: AxiosError) {
+    return (error.response as AxiosResponse).data.message;
   }
 }

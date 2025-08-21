@@ -2,7 +2,7 @@ import z from "zod";
 
 export class PetSchema {
   public static Pet = z.object({
-    pet_id: z.number(),
+    user_id: z.number(),
     pet_name: z.string(),
     pet_birthdate: z.date(),
     pet_breed: z.string(),
@@ -11,10 +11,11 @@ export class PetSchema {
   });
 
   public static GetPet = z.object({
+    pet_id: z.number(),
     pet_image: z.string(),
   }).and(PetSchema.Pet);
 
   public static PostPet = z.object({
     pet_image: z.custom<Express.Multer.File>()
-  });
+  }).and(PetSchema.Pet);
 }

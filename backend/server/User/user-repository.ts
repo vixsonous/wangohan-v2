@@ -40,6 +40,7 @@ export class UserDetailsRepository {
               "pets_table.pet_breed",
               "pets_table.pet_image",
               "pets_table.pet_birthdate",
+              "pets_table.user_id",
               "pets_table.updated_at",
               "pets_table.created_at",
             ]).whereRef("pets_table.user_id", "=", "user_details_table.user_id")

@@ -2,7 +2,7 @@ import z from "zod";
 
 export class PetSchema {
   public static Pet = z.object({
-    pet_id: z.number().optional(),
+    user_id: z.number(),
     pet_name: z.string().min(1, "Please enter your pet's name!"),
     pet_birthdate: z.date("Please enter your pet's birthdate!"),
     pet_breed: z.string().min(1, "Please enter your pet's breed!"),
@@ -11,7 +11,8 @@ export class PetSchema {
   });
 
   public static GetPet = z.object({
-    pet_image: z.string(),
+  pet_id: z.number(),
+  pet_image: z.string(),
   }).and(PetSchema.Pet);
 
   public static PostPet = z.object({

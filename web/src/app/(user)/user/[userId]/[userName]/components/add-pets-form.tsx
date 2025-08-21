@@ -4,18 +4,19 @@ import InputField from "@/components/Input";
 import React from "react";
 import Error from "@/components/Error";
 import {Button} from "@/components/ui/button";
-import {useAddPet} from "@/app/(user)/user/[userId]/[userName]/components/use-add-pet";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {format} from "date-fns";
 import {ja} from "date-fns/locale";
 import {Calendar} from "@/components/ui/calendar";
+import {useAddPet} from "@/app/(user)/user/[userId]/[userName]/components/use-add-pet";
 
-export default function AddPetsForm() {
+export default function AddPetsForm({user_id}: {user_id: number}) {
 
-  const {petForm, onSubmit, uploadFileMutation} = useAddPet();
+  const {petForm, onSubmit, uploadFileMutation, postPetMutation} = useAddPet();
   const errors = petForm.formState.errors;
   return (
     <form className={"pt-8"} onSubmit={petForm.handleSubmit(onSubmit)}>
+      <InputField hidden value={Number(user_id)} {...petForm.register("user_id", {valueAsNumber: true})}/>
       <section className={"grid grid-cols-1 md:grid-cols-2 gap-6"}>
         <Controller
           control={petForm.control}
@@ -59,7 +60,7 @@ export default function AddPetsForm() {
         <div className={"col-span-1 grid grid-cols-1 gap-4"}>
           <p className="col-span-1 flex flex-col gap-2">
             <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="pet_name">
-              姓
+              愛犬の名前
               <Error>{errors.pet_name?.message}</Error>
             </label>
             <InputField
@@ -114,7 +115,7 @@ export default function AddPetsForm() {
 
           <p className="col-span-1 flex flex-col gap-2">
             <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="pet_breed">
-              姓
+              犬種
               <Error>{errors.pet_breed?.message}</Error>
             </label>
             <InputField
@@ -127,8 +128,8 @@ export default function AddPetsForm() {
           </p>
         </div>
       </section>
-      <Button className={"w-full mt-6 flex items-center gap-2 bg-primary-text"}>
-        Submit
+      <Button disabled={postPetMutation.isPending || postPetMutation.isSuccess} className={"w-full mt-6 flex items-center gap-2 bg-primary-text"}>
+        <>{postPetMutation.isPending && <Image src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} />} 家族を追加</>
       </Button>
     </form>
   )

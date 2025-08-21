@@ -45,7 +45,7 @@ export default async function User({
           </h1>
         </div>
         {userData !== undefined && (
-          <AddPetsDialog />
+          <AddPetsDialog user_id={userData.user_id} />
         )}
         <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
       </section>

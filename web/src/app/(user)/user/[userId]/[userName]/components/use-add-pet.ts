@@ -3,8 +3,30 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {PetSchema} from "@/types/pet-types.pet";
 import {useMutation} from "@tanstack/react-query";
 import heic2any from "heic2any";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
+import {useRouter} from "next/navigation";
+import {toast} from "sonner";
+import {AxiosError, AxiosResponse} from "axios";
 
 export const useAddPet = () => {
+
+  const postPetMutation = useMutation({
+    mutationFn: (data: FieldValues) => ClientApiService.post("/post-pet", data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      withCredentials: true
+    }),
+    onSuccess: (data) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(data);
+      toast.success("Successful!", {description: message});
+    },
+    onError: (error: AxiosError) => {
+      console.log(error);
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
+    }
+  });
 
   const uploadFileMutation = useMutation({
     mutationFn: async (file: File): Promise<File> => new Promise(async (resolve) => {
@@ -33,12 +55,13 @@ export const useAddPet = () => {
   });
 
   const onSubmit = (data: FieldValues) => {
-    console.log(data);
+    postPetMutation.mutate(data);
   }
 
   return {
     petForm,
     onSubmit,
-    uploadFileMutation
+    uploadFileMutation,
+    postPetMutation
   }
 }
