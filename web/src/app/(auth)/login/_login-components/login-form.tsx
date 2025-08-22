@@ -14,7 +14,8 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ClientApiService } from "@/lib/client-utils";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
+import {AxiosError} from "axios";
 
 const UserLoginSchema = z.object({
   email: z.string().min(1, "Email is required!").email("Invalid email format!"),
@@ -41,6 +42,10 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
     onSuccess: (data) => {
       toast.success("Successful!", {description: data.data.message});
       window.location.href = "/";
+    },
+    onError:(error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
     }
   })
 

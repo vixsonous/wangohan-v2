@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
+import {NextFunction, Request, Response} from "express";
 import { UserService } from "./user-service";
-import { ApiResponse } from "../utils/ApiUtils";
+import {ApiResponse} from "../utils/ApiUtils";
 import { log } from "../utils/log";
 import z from "zod";
 import { User } from "./user";
 import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
 import {UserDetailSchema} from "@/server/types/user-types.user-detail";
+import passport from "@/server/utils/passport";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {
@@ -24,9 +25,28 @@ export class UserController {
     ApiResponse.success(res, req.user ? "Authenticated": "Not authenticated", req.user, 200);
   }
 
-  static async login(req: Request, res: Response) {
-    console.log(req.user);
-    ApiResponse.success(res, "Successfully logged in!");
+  static async login(req: Request, res: Response, next: NextFunction) {
+    console.log("came here");
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if(err) {
+        ApiResponse.error(res, err);
+        return;
+      }
+
+      log(info);
+
+      req.logIn(user, (loginError) => {
+        if(loginError){
+          ApiResponse.error(res, loginError);
+          return;
+        }
+
+        ApiResponse.success(res, "Successfully logged in!");
+      })
+
+
+    })(req, res, next);
+
   }
 
   static async register(req: Request, res: Response) {

@@ -2,7 +2,6 @@ import { Router } from "express";
 import {RecipeController} from "./Recipes/recipe-controller";
 import { ImageController } from "./Images/image-controller";
 import { UserController } from "./User/user-controller";
-import passport from './utils/passport';
 import multer from 'multer';
 import {PetController} from "@/server/Pet/pet-controller";
 
@@ -22,7 +21,7 @@ router.get("/transform-image", ImageController.transformImage);
 
 // User
 router.get("/get-user", UserController.getUser);
-router.post("/login", passport.authenticate('local'), UserController.login);
+router.post("/login", UserController.login);
 router.post("/register", UserController.register);
 router.get("/is-authenticated", UserController.isAuthenticated);
 router.post("/personal-info", upload.single('user_image'), UserController.registerPersonalInfo);

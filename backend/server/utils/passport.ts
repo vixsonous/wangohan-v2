@@ -10,6 +10,9 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id: number, done) => {
   const user = await UserRepository.getUserById(id);
+
+  if(user === undefined) done("User not found!", false);
+
   done(null, user);
 });
 
@@ -19,12 +22,22 @@ passport.use(new LocalStrategy(
   {usernameField: 'email'}, async (email, password, done) => {
     const credentials = await UserService.localStrategyLogin(email);
 
-    if(credentials === undefined) throw new Error("User not found!");
-    if(credentials.password === undefined) throw new Error("Please login through google authentication");
+    if(credentials === undefined) {
+      done("User not found!", false);
+      return;
+    }
+
+    if(credentials.password === undefined) {
+      done("Please login through google authentication!", false);
+      return;
+    }
 
     const matching = await bcrypt.compare(password, credentials.password);
 
-    if(!matching) throw new Error("Wrong password!");
+    if(!matching) {
+      done("Wrong password!", false);
+      return;
+    }
 
     done(null, credentials.user_id);
   }

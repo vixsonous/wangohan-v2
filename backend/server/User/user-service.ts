@@ -19,7 +19,9 @@ export class UserService {
 
   static async localStrategyLogin(email: string): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
     const user = await User.findUser({email});
-    log(UserService.USER_SERVICE_SUCCESS_LOGS.LOCAL_STRATEGY_LOGIN_SUCCESS);
+
+    if(user !== undefined) log(UserService.USER_SERVICE_SUCCESS_LOGS.LOCAL_STRATEGY_LOGIN_SUCCESS);
+
     return user;
   }
 

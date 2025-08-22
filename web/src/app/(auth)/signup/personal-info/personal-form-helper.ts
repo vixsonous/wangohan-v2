@@ -8,6 +8,7 @@ import heic2any from "heic2any";
 import {UserDetailSchema} from "@/types/user-types.user-detail";
 import {UserSchema} from "@/types/user-types.user";
 import {useRouter} from "next/navigation";
+import {AxiosError} from "axios";
 
 export const usePersonalForm = () => {
 
@@ -25,6 +26,10 @@ export const usePersonalForm = () => {
         description: ClientApiResponseService.getAxiosResponseMessage(data)
       });
       router.push("/user/" + dt?.user_id + "/" + dt?.user_codename);
+    },
+    onError: (error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
     }
   });
 
