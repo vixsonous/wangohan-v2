@@ -26,7 +26,6 @@ export class UserController {
   }
 
   static async login(req: Request, res: Response, next: NextFunction) {
-    console.log("came here");
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if(err) {
         ApiResponse.error(res, err);
@@ -76,10 +75,13 @@ export class UserController {
     req.logIn(createResult.getId(), (err) => {
       if(err) {
         ApiResponse.error(res, "Error in saving to session!");
+        return;
       }
+
+      ApiResponse.success(res, "Successfully registered!");
     });
 
-    ApiResponse.success(res, "Successfully registered!");
+
   }
 
   static async registerPersonalInfo(req: Request, res: Response) {
@@ -94,7 +96,6 @@ export class UserController {
     const personalInfoData = UserDetailSchema.PostUserDetails.safeParse(submitData);
 
     if(!personalInfoData.success) {
-      console.log(personalInfoData.error);
       ApiResponse.error(res, "Invalid personal information data!");
       return;
     }

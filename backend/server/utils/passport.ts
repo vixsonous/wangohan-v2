@@ -23,7 +23,7 @@ passport.use(new LocalStrategy(
     const credentials = await UserService.localStrategyLogin(email);
 
     if(credentials === undefined) {
-      done("User not found!", false);
+      done("Email not found!", false);
       return;
     }
 

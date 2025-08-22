@@ -15,7 +15,6 @@ import { gloria, mochi } from "@/app/_root-components/client-fonts";
 import { useMutation } from "@tanstack/react-query";
 import Error from "@/components/Error";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { ClientApiService } from "@/lib/client-utils";
 
 const UserSignupSchema = z.object({
@@ -28,8 +27,6 @@ const UserSignupSchema = z.object({
 })
 
 export default function SignupForm({className, ...props}: HTMLAttributes<HTMLDivElement>) {
-  
-  const router = useRouter();
 
   const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserSignupSchema)});
   
@@ -37,7 +34,7 @@ export default function SignupForm({className, ...props}: HTMLAttributes<HTMLDiv
     mutationFn: (data: FieldValues) => ClientApiService.post("/register", data),
     onSuccess: (data) => {
       toast.success("Successful!", {description: data.data.message});
-      router.push("/");
+      window.location.href = "/";
     }
   });
 
