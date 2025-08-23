@@ -8,8 +8,11 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    command: 
+    command:
+      - "--api.insecure=true"
+      - "--log.level=DEBUG"
       - "--providers.docker=true"
+      - "--accesslog=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--api.dashboard=true"
@@ -70,7 +73,7 @@ services:
       - server
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`app.localhost`)"
+      - "traefik.http.routers.web.rule=Host(`app.localhost`) && PathPrefix(`/`)"
       - "traefik.http.routers.web.entrypoints=web"
       - "traefik.http.services.web.loadbalancer.server.port=3000"
 volumes:

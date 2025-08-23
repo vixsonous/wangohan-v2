@@ -58,7 +58,7 @@ export default function ShowRecipeCarousel({recipe_images, recipe_id, recipe_nam
       <div className="absolute flex items-center gap-2 top-2/3 left-1/2 -translate-x-1/2">
         {Array.from(Array(carouselSlideCnt).keys()).map( (c) => {
           return (
-            <Button key={c} onClick={apiScrollTo(c)} className={`w-2 h-2 rounded-full ${(curSlide) === c ? 'bg-bullet' : 'bg-inactive'}`}></Button>
+            <Button key={c} aria-labelledby={"carousel-button-" + c} onClick={apiScrollTo(c)} className={`w-2 h-2 rounded-full ${(curSlide) === c ? 'bg-bullet' : 'bg-inactive'}`}></Button>
           )
         })}
       </div>

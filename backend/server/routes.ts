@@ -22,6 +22,7 @@ router.get("/transform-image", ImageController.transformImage);
 // User
 router.get("/get-user", UserController.getUser);
 router.post("/login", UserController.login);
+router.post("/logout", UserController.logout);
 router.post("/register", UserController.register);
 router.get("/is-authenticated", UserController.isAuthenticated);
 router.post("/personal-info", upload.single('user_image'), UserController.registerPersonalInfo);

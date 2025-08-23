@@ -2,15 +2,36 @@
 import Button from "@/components/Button";
 import Image from "@/components/Image/client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
+import {useMutation} from "@tanstack/react-query";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
+import {AxiosError, AxiosResponse} from "axios";
+import {toast} from "sonner";
+import {SheetClose} from "@/components/ui/sheet";
 
 export default function SidebarMenu(
   {user_data}:
   {user_data: z.infer<typeof UserSchema.User> | undefined}
 ) {
   const pathname = usePathname();
+  const router = useRouter();
+
+
+  const logoutMutation = useMutation({
+    mutationFn: () => ClientApiService.post("/logout", undefined),
+    onSuccess: (data: AxiosResponse) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(data);
+      toast.success("Successful!",  {description: message});
+      router.refresh();
+
+    },
+    onError: (error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
+    }
+  });
 
   const links = [
     {text: "トップページ", show: true, condition: pathname === "/", href: "/", src: "/icons/svg/white-house.svg", alt: "an icon for home button", type: "link"},
@@ -19,6 +40,7 @@ export default function SidebarMenu(
     {text: "レシピ図鑑", show: true, condition: pathname.includes("/recipe/list"), href: "/recipe/list/1", src: "/icons/svg/white-book.svg", alt: "an icon for recipe list", type: "link"},
     {text: "犬と食に関するコラム", show: true, condition: pathname.includes("/columns") , href: "/columns", src: "/icons/svg/white-paw-print.svg", alt: "an icon for columns/blog", type: "link"},
     {text: "愛犬登録", show: true, condition: pathname.includes("/user/settings/"), href: `/user/settings/${1}?=#register-pet`, src: "/icons/svg/white-paw-print.svg", alt: "an icon for pet registration", type: "link"},
+    {text: "ログアウト", function: () => logoutMutation.mutate(), show: user_data !== undefined, condition: false, href: `/`, src: "/icons/svg/white-paw-print.svg", alt: "an icon for pet registration", type: "button"},
   ]
 
   return (
@@ -32,26 +54,31 @@ export default function SidebarMenu(
           
           if(l.type === "link") {
             return (
-              <Link
-                key={idx}
-                className={`${l.condition ? 'bg-primary-text text-secondary-bg py-2' : 'hover:opacity-75 py-1'} 
+              <SheetClose key={idx} asChild={true}>
+                <Link
+
+                  className={`${l.condition ? 'bg-primary-text text-secondary-bg py-2' : 'hover:opacity-75 py-1'} 
                 px-4 rounded-full w-full text-sm flex justify-between items-center`}
-                href={l.href}
-              >
-                <Image noprocess src={l.condition ? l.src : l.src.replace("white","primary")} alt={l.alt}/>
-                {l.text}
-              </Link>
+                  href={l.href}
+                >
+                  <Image noprocess src={l.condition ? l.src : l.src.replace("white","primary")} alt={l.alt}/>
+                  {l.text}
+                </Link>
+              </SheetClose>
             )
           } else {
             return (
-              <Button 
-                key={idx} 
-                className={`${l.condition ? 'bg-primary-text text-secondary-bg py-2' : 'hover:opacity-75 py-1'} 
+              <SheetClose key={idx} asChild={true}>
+                <Button
+                  onClick={l.function ? l.function: undefined}
+                  key={idx}
+                  className={`${l.condition ? 'bg-primary-text text-secondary-bg py-2' : 'hover:opacity-75 py-1'} 
                 px-4 rounded-full w-full text-sm flex justify-between items-center`}
-              >
-                <Image noprocess src={l.condition ? l.src : l.src.replace("white","primary")} alt={l.alt}/>
-                {l.text}
-              </Button>
+                >
+                  <Image noprocess src={l.condition ? l.src : l.src.replace("white","primary")} alt={l.alt}/>
+                  {l.text}
+                </Button>
+              </SheetClose>
             )
           }
         })

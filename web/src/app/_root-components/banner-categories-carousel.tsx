@@ -195,7 +195,7 @@ export default function BannerCategoriesCarousel() {
       <section className="flex justify-center w-full gap-2 mt-2">
         {Array(cnt).fill(0).map( (c, idx) => {
           return (
-            <Button key={idx} onClick={apiScrollTo(idx)} className={`w-2 h-2 rounded-full ${(cur - 1) === idx ? 'bg-bullet' : 'bg-inactive'}`}></Button>
+            <Button role={"button"} key={idx} aria-label={"carousel-categories-button-" + idx} name={"carousel-categories-button-" + idx} aria-labelledby={"carousel-categories-button-" + idx} onClick={apiScrollTo(idx)} className={`w-2 h-2 rounded-full ${(cur - 1) === idx ? 'bg-bullet' : 'bg-inactive'}`}></Button>
           )
         })}
       </section>

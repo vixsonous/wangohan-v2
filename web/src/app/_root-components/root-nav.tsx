@@ -17,10 +17,12 @@ export default async function RootNavigationButtons() {
           <li><Link href="/signup">登録</Link></li>
           </>
         ) : (
-          <h1>Hello user!</h1>
+          <li>
+            <h1>Hello user!</h1>
+          </li>
         )
       }
-      <RootSidebar user_data={userData} />
+      <li><RootSidebar user_data={userData} /></li>
     </ul>
   )
 }

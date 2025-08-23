@@ -116,4 +116,20 @@ export class UserController {
 
     ApiResponse.success(res, "Successfully registered personal info!", userData);
   }
+
+  static async logout(req: Request, res: Response) {
+    if(req.user === undefined) {
+      ApiResponse.error(res, "Unauthorized log out!");
+      return;
+    }
+
+    req.logOut(err => {
+      if(err) {
+        ApiResponse.error(res, "Error logging out!");
+        return;
+      }
+
+      ApiResponse.success(res, "Successfully logged out!");
+    })
+  }
 }
