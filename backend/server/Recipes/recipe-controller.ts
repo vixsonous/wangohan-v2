@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import {ApiResponse} from "../utils/ApiUtils";
 import { RecipeService } from "./recipe-service";
 import { log } from "../utils/log";
-import { CacheUtil } from "../utils/redis";
+import {CacheUtil, RecipeCacheKey} from "../utils/redis";
 import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import z from "zod";
+import {getUserData} from "@/server/utils/server-utils";
 
 export class RecipeController {
 
@@ -192,5 +193,47 @@ export class RecipeController {
     }
 
     ApiResponse.success(res, "Successfully retrieved additional owned recipes!", ownedRecipes);
+  }
+
+  static async softDeleteRecipe(req: Request, res: Response) {
+    const {recipe_id, recipe_name, recipe_user_id} = req.query;
+
+    const user = getUserData(req);
+
+    if(user === undefined) {
+      ApiResponse.error(res, "You must log in to delete this recipe!");
+      return;
+    }
+
+    const submitData = {
+      recipe_id: Number(recipe_id),
+      recipe_name: recipe_name,
+      recipe_user_id: Number(recipe_user_id),
+      user_id: Number(user.user_id)
+    }
+
+    const softDeleteParseResult = RecipeSchema.DeleteRecipe.safeParse(submitData);
+
+    if(!softDeleteParseResult.success) {
+      ApiResponse.error(res, softDeleteParseResult.error.issues[0].message);
+      return;
+    }
+
+    const softDeleteResult = await RecipeService.softDeleteRecipe(
+      softDeleteParseResult.data.recipe_id,
+      softDeleteParseResult.data.recipe_name,
+      softDeleteParseResult.data.recipe_user_id
+    );
+
+    if(!softDeleteResult) {
+      ApiResponse.error(res, "Failed to delete recipe!");
+      return;
+    }
+
+    await CacheUtil.delete(RecipeCacheKey.GET_WEEKLY_RECIPES_KEY);
+    await CacheUtil.delete(RecipeCacheKey.GET_POPULAR_RECIPES_KEY);
+    await CacheUtil.delete(RecipeCacheKey.GET_RECIPE_KEY(String(softDeleteParseResult.data.recipe_id), softDeleteParseResult.data.recipe_name));
+
+    ApiResponse.success(res, "Successfully deleted recipe!");
   }
 }

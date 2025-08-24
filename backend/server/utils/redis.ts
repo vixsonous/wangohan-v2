@@ -10,6 +10,12 @@ export const redisClient = await createClient({
 .on("error", (err) => log(err))
 .connect();
 
+export class RecipeCacheKey {
+  public static GET_WEEKLY_RECIPES_KEY = 'GET:weekly-recipes';
+  public static GET_POPULAR_RECIPES_KEY = 'GET:popular-recipes';
+  public static GET_RECIPE_KEY = (recipe_id: string, recipe_name: string) => `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
+}
+
 export class CacheUtil {
   private static DEFAULT_EXPIRE = 60;
   public static async get<T, TFunc extends (...args: any[]) => any>(key: string, cb: TFunc, expire: number = this.DEFAULT_EXPIRE, ...args: Parameters<TFunc>): Promise<T> {

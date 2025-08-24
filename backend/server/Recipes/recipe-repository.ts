@@ -69,6 +69,7 @@ export class RecipeRepository {
           ).as("recipe_rating_data")
         ])
         .orderBy("total_views", "desc")
+        .where("is_deleted", "=", false)
         .limit(limit)
         .offset(OFFSET)
         .execute();
@@ -124,6 +125,7 @@ export class RecipeRepository {
           ).as("recipe_rating_data")
         ])
         .where("created_at", ">=", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+        .where("is_deleted", "=", false)
         .orderBy("created_at", "desc")
         .limit(this.FRONT_PAGE_RECIPE_QUERY_LIMIT)
         .execute();
@@ -573,6 +575,27 @@ export class RecipeRepository {
     } catch(e) {
       log(e);
       return undefined;
+    }
+  }
+
+  static async softDeleteRecipe(recipe_id: number, recipe_name: string, user_id: number): Promise<boolean> {
+    try {
+      await db.updateTable("recipes_table")
+        .set({
+          is_deleted: true
+        })
+        .where( eb => eb.and({
+          recipe_id: recipe_id,
+          recipe_name: recipe_name,
+          user_id: user_id
+        }))
+        .returning("recipe_id")
+        .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (error) {
+      log(error);
+      return false;
     }
   }
 }

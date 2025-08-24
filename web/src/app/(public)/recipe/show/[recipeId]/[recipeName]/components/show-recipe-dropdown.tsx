@@ -2,10 +2,13 @@ import Button from "@/components/Button";
 import Image from "@/components/Image/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import ShowRecipeDropdownDelete
+  from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/components/show-recipe-dropdown-delete";
 
 interface ShowRecipeDropdownProps {
   recipe_id: number;
   recipe_name: string;
+  user_id: number;
 }
 export default function ShowRecipeDropdown(recipe: ShowRecipeDropdownProps) {
   return (
@@ -26,10 +29,8 @@ export default function ShowRecipeDropdown(recipe: ShowRecipeDropdownProps) {
             Edit
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Button className="w-full text-left">
-            Delete
-          </Button>
+        <DropdownMenuItem asChild={true}>
+          <ShowRecipeDropdownDelete recipe_id={recipe.recipe_id} recipe_name={recipe.recipe_name} user_id={recipe.user_id}/>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

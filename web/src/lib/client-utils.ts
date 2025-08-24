@@ -12,6 +12,10 @@ export class ClientApiService {
   static async post<T>(url: string, data: T, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
     return await axios.post(this.BACKEND_SERVER_URL + url, data, {...getConfig, withCredentials: true});
   }
+
+  static async delete(url: string, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return await axios.delete(this.BACKEND_SERVER_URL + url, {...getConfig, withCredentials: true});
+  }
 }
 
 export class ClientApiResponseService {

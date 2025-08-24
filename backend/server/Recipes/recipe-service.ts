@@ -4,34 +4,31 @@ import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 
 export class RecipeService {
   static async getWeeklyRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
-    const recipes = await RecipeRepository.getWeeklyRecipes();
-    
-    return recipes;
+    return await RecipeRepository.getWeeklyRecipes();
   }
   
   static async getPopularRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
-    const recipes = await RecipeRepository.getPopularRecipes();
     
-    return recipes;
+    return await RecipeRepository.getPopularRecipes();
   }
 
   static async getRecipe(recipe_id: number, recipe_name: string, is_edit: boolean) {
-    const recipe = await RecipeRepository.getRecipe(recipe_id, recipe_name, is_edit);
 
-    return recipe;
+    return await RecipeRepository.getRecipe(recipe_id, recipe_name, is_edit);
   }
 
   static async postRecipe(recipe: z.infer<typeof RecipeSchema.PostRecipe>): Promise<boolean | undefined> {
 
-    const newRecipe = await RecipeRepository.insertRecipe(recipe);
-
-    return newRecipe;
+    return await RecipeRepository.insertRecipe(recipe);
   }
 
   static async updateRecipe(recipe: z.infer<typeof RecipeSchema.UpdateRecipe>): Promise<boolean | undefined> {
-    const updatedRecipe = await RecipeRepository.updateRecipe(recipe);
 
-    return updatedRecipe;
+    return await RecipeRepository.updateRecipe(recipe);
+  }
+
+  static async softDeleteRecipe(recipe_id: number, recipe_name: string, user_id:number): Promise<boolean> {
+    return await RecipeRepository.softDeleteRecipe(recipe_id, recipe_name, user_id);
   }
 
   static async getLikedRecipe(user_id: number, page: number): Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {

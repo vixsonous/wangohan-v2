@@ -123,5 +123,13 @@ export class RecipeSchema {
     user_id: z.number(),
   }));
 
-
+  static DeleteRecipe = z.object({
+    recipe_id: z.number("Please input valid recipe id!"),
+    recipe_name: z.string("Please input recipe name!"),
+    recipe_user_id: z.number("Please provide the recipe user id!"),
+    user_id: z.number("You must log in to modify recipe!"),
+  }).refine(data => data.recipe_user_id === data.user_id, {
+    message: "You are not authorized to delete this recipe!",
+    path: ["user_id"]
+  });
 }
