@@ -263,6 +263,7 @@ export class RecipeRepository {
         total_favourites: 0,
         total_likes: 0,
         total_views: 0,
+        is_deleted: false,
         updated_at: new Date(),
         created_at: new Date()
       } satisfies RecipeInsert;

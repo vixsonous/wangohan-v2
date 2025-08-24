@@ -39,6 +39,7 @@ export interface UserTable {
   email: string;
   password:string;
   user_lvl: number;
+  is_inactive: boolean;
   updated_at: Date;
   created_at: Date;
 }
@@ -102,6 +103,7 @@ export interface RecipesTable {
   total_favourites: number;
   total_views: number;
   user_id: number;
+  is_deleted: boolean;
   updated_at: Date;
   created_at: Date;
 }
@@ -209,6 +211,7 @@ export interface BlogColumnsTable {
   blog_image: string;
   blog_category: string;
   editor_state: JSON;
+  is_deleted: boolean;
   updated_at: Date;
   created_at: Date;
 }

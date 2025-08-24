@@ -253,6 +253,7 @@ export class UserRepository {
         google_id: user.google_id || "",
         password: password,
         user_lvl: UserLevel.user,
+        is_inactive: false,
         updated_at: new Date(),
         created_at: new Date(),
       } satisfies UserInsert;

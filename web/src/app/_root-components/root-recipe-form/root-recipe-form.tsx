@@ -97,8 +97,8 @@ export default function RecipeForm({recipe_data}: RecipeFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap justify-center gap-8 max-w-7xl h-full w-full">
       {recipe_data &&
         <>
-          <InputField {...register("recipe_id")} hidden={true} value={recipe_data.recipe_id} />
-          <InputField {...register("user_id")} hidden={true} value={recipe_data.user_id} />
+          <InputField {...register("recipe_id", {valueAsNumber: true})} hidden={true} value={recipe_data.recipe_id} />
+          <InputField {...register("user_id", {valueAsNumber: true})} hidden={true} value={recipe_data.user_id} />
         </>
       }
       <div className="first-section--container grid grid-cols-6 md:grid-cols-12 w-full gap-8">

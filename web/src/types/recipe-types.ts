@@ -92,7 +92,7 @@ export class RecipeSchema {
     recipe_age_tag: z.string(),
     recipe_size_tag: z.string(),
     recipe_event_tag: z.string(),
-    user_id: z.string().optional()
+    user_id: z.number().optional()
   });
 
   static PostRecipe = RecipeSchema.Recipe.and(z.object({

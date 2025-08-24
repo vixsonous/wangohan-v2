@@ -3,6 +3,10 @@ import EditRecipeFormWrapper from "@/app/(protected-user)/recipe/edit/[recipeId]
 import {getRecipe} from "@/server-actions/Recipe/recipe";
 import z from "zod";
 import {RecipeSchema} from "@/types/recipe-types";
+import {isAuthenticated} from "@/server-actions/User/user";
+import Unauthorized from "@/app/(error)/unauthorized";
+import RecipeNotFound from "@/app/(error)/recipe-not-found";
+import LoginRequired from "@/app/(error)/log-in-required";
 
 type Props = {
   params: Promise<{ recipeId: string, recipeName: string }>;
@@ -15,9 +19,21 @@ export default async function EditRecipe({params}: Props) {
   const recipe = await getRecipe(Number(recipeId), recipeName, true) as z.infer<typeof RecipeSchema.UpdateRecipe> | undefined;
   if(recipe === undefined) {
     return (
-      <h1>
-        Recipe not found
-      </h1>
+      <RecipeNotFound />
+    )
+  }
+
+  const userData = await isAuthenticated();
+
+  if(userData === undefined ) {
+    return (
+      <LoginRequired />
+    )
+  }
+
+  if(userData.user_id !== recipe.user_id) {
+    return (
+      <Unauthorized />
     )
   }
 
