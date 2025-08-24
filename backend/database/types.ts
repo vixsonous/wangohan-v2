@@ -131,7 +131,6 @@ export interface RecipeImagesTable {
   recipe_image_title: string;
   recipe_image_subtext: string;
   recipe_image: string;
-  recipe_image_order: number;
   recipe_id: number;
   updated_at: Date;
   created_at: Date;
@@ -143,7 +142,6 @@ export type RecipeImageUpdate = Updateable<RecipeImagesTable>;
 export interface RecipeInstructionsTable {
   recipe_instructions_id: Generated<number>;
   recipe_instructions_text: string;
-  recipe_instruction_order: number;
   recipe_id: number;
   updated_at: Date;
   created_at: Date;
@@ -156,7 +154,6 @@ export interface RecipeIngredientsTable {
   recipe_ingredient_id: Generated<number>;
   recipe_ingredients_name: string;
   recipe_ingredients_amount: string;
-  recipe_ingredient_order: number;
   recipe_id: number;
   updated_at: Date;
   created_at: Date;

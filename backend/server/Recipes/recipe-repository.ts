@@ -273,8 +273,7 @@ export class RecipeRepository {
         .returning("recipe_id")
         .executeTakeFirstOrThrow();
       
-      const newInstructions: RecipeInstructionInsert[] = recipe.recipe_instructions.map( (i, idx) => ({
-        recipe_instruction_order: idx,
+      const newInstructions: RecipeInstructionInsert[] = recipe.recipe_instructions.map( (i) => ({
         recipe_instructions_text: i.recipe_instructions_text,
         recipe_id: recipe_id,
         updated_at: new Date(),
@@ -285,8 +284,7 @@ export class RecipeRepository {
         .values(newInstructions)
         .execute();
 
-      const newIngredients: RecipeIngredientInsert[] = recipe.recipe_ingredients.map( (i , idx) => ({
-        recipe_ingredient_order: idx,
+      const newIngredients: RecipeIngredientInsert[] = recipe.recipe_ingredients.map( (i ) => ({
         recipe_ingredients_amount: i.recipe_ingredients_amount,
         recipe_ingredients_name: i.recipe_ingredients_name,
         recipe_id: recipe_id,
@@ -315,14 +313,12 @@ export class RecipeRepository {
 
         const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe_id).padStart(8, "0")}`;
         const uploadDone = await Image.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
-        console.log();
         return {key: uploadDone.Key, order: idx, filename: i.originalname};
       }));
 
       const insertImages: RecipeImageInsert[] = images.map( i => ({
           recipe_id,
           recipe_image: `r2://${i.key}`,
-          recipe_image_order: i.order,
           recipe_image_subtext: "",
           recipe_image_title: i.filename,
           updated_at: new Date(),
@@ -426,7 +422,6 @@ export class RecipeRepository {
             recipe_image_title: img.filename,
             recipe_image: `r2://${img.key}`,
             recipe_image_subtext: "",
-            recipe_image_order: 0,
             created_at: new Date(),
             updated_at: new Date()
           })
@@ -468,7 +463,6 @@ export class RecipeRepository {
           const newRecipeInstructions = {
             recipe_instructions_text: recipe.recipe_instructions[i].recipe_instructions_text,
             recipe_id: recipeId,
-            recipe_instruction_order: 0,
             updated_at: new Date(),
             created_at: new Date(),
           } satisfies RecipeInstructionInsert;
@@ -496,7 +490,6 @@ export class RecipeRepository {
             recipe_ingredients_name: recipe.recipe_ingredients[i].recipe_ingredients_name,
             recipe_ingredients_amount: recipe.recipe_ingredients[i].recipe_ingredients_amount,
             recipe_id: recipeId,
-            recipe_ingredient_order: 0,
             updated_at: new Date(),
             created_at: new Date(),
           } satisfies RecipeIngredientInsert;

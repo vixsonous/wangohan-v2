@@ -82,7 +82,7 @@ export class RecipeController {
       return;
     }
 
-    const user = req.user as {id: number, username: string};
+    const user = req.user as {user_id: number, username: string};
 
     const files: Express.Multer.File[] | undefined = req.files as Express.Multer.File[];
 
@@ -91,7 +91,7 @@ export class RecipeController {
     const submitData = {
       ...formData,
       recipe_images: [...files],
-      user_id: user.id
+      user_id: user.user_id
     }
 
     const submitParseResult = RecipeSchema.PostRecipe.safeParse(submitData);
@@ -118,9 +118,9 @@ export class RecipeController {
 
     const formData = req.body;
 
-    const user = req.user ? req.user as {id: number, username: string} : undefined;
+    const user = req.user ? req.user as {user_id: number, username: string} : undefined;
 
-    if(user === undefined || (user.id !== Number(formData.user_id))) {
+    if(user === undefined || (user.user_id !== Number(formData.user_id))) {
 
       ApiResponse.unauthorized(res, "You are not authorized to edit this recipe!");
       return;

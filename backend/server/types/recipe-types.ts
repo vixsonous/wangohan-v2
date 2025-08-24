@@ -103,7 +103,6 @@ export class RecipeSchema {
     recipe_age_tag: z.string(),
     recipe_size_tag: z.string(),
     recipe_event_tag: z.string(),
-    user_id: z.string().optional(),
   });
 
   static PostRecipe = RecipeSchema.Recipe.and(z.object({
@@ -121,6 +120,7 @@ export class RecipeSchema {
     delete_image_ids: z.array(RecipeSchema.ImageDeleteSchema).optional(),
     delete_recipe_instruction_ids: z.array(z.number()).optional(),
     delete_recipe_ingredient_ids: z.array(z.number()).optional(),
+    user_id: z.number(),
   }));
 
 

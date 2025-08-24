@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import { getRecipe } from "@/server-actions/Recipe/recipe";
 import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
+import {isAuthenticated} from "@/server-actions/User/user";
 
 type Props = {
   params: Promise<{ recipeId: string, recipeName: string }>;
@@ -53,6 +54,7 @@ export default async function ShowRecipe({params}: Props) {
   const {recipeId, recipeName} = await params;
 
   const recipe = await getRecipe(Number(recipeId), recipeName, false) as z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>;
+  const userData = await isAuthenticated();
 
   if(recipe === undefined) {
     return (
@@ -64,7 +66,7 @@ export default async function ShowRecipe({params}: Props) {
 
   return (
     <section className="flex max-w-3xl flex-col text-primary-text items-center w-full mt-10 gap-2">
-      <ShowRecipeCarousel recipe_images={recipe.recipe_images} recipe_id={recipe.recipe_id} recipe_name={recipe.recipe_name} />
+      <ShowRecipeCarousel is_owner={userData?.user_id === recipe.user?.user_id} recipe_images={recipe.recipe_images} recipe_id={recipe.recipe_id} recipe_name={recipe.recipe_name} />
       <ShowRecipeTags {...recipe}/>
       <section className="flex w-full flex-col p-5 gap-7">
         <header className="flex flex-col gap-7">
