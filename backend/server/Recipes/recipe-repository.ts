@@ -230,7 +230,8 @@ export class RecipeRepository {
         ])
         .where(eb => eb.and({
           recipe_id: recipe_id,
-          recipe_name: recipe_name
+          recipe_name: recipe_name,
+          is_deleted: false
         }))
         .executeTakeFirstOrThrow();
 
@@ -534,12 +535,16 @@ export class RecipeRepository {
           "recipes_table.created_at"
         ])
         .where("recipes_table.user_id", "=", user_id)
-        .where("likes_table.is_liked", "=", true)
+        .where(eb => eb.and({
+          is_liked: true,
+          is_deleted: false
+        }))
         .limit(RecipeRepository.BASIC_RECIPES_LIMIT)
         .offset(RecipeRepository.BASIC_RECIPES_LIMIT * page)
         .execute();
 
       log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
+      console.log(likedRecipes);
       return likedRecipes;
     } catch(e) {
       log(e);
@@ -565,7 +570,10 @@ export class RecipeRepository {
           "recipes_table.updated_at",
           "recipes_table.created_at"
         ])
-        .where("recipes_table.user_id", "=", user_id)
+        .where(eb => eb.and({
+          user_id: user_id,
+          is_deleted: false
+        }))
         .limit(RecipeRepository.BASIC_RECIPES_LIMIT)
         .offset(RecipeRepository.BASIC_RECIPES_LIMIT * page)
         .execute();
