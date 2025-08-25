@@ -552,7 +552,7 @@ export class RecipeRepository {
     }
   }
 
-  static async getOwnedRecipes(user_id: number, page: number) : Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {
+  static async getOwnedRecipes(user_id: number, page: number, get_archived: boolean = false) : Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {
     try {
       const likedRecipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = await db.selectFrom("recipes_table")
         .select(lteb => [
@@ -572,7 +572,7 @@ export class RecipeRepository {
         ])
         .where(eb => eb.and({
           user_id: user_id,
-          is_deleted: false
+          is_deleted: get_archived
         }))
         .limit(RecipeRepository.BASIC_RECIPES_LIMIT)
         .offset(RecipeRepository.BASIC_RECIPES_LIMIT * page)

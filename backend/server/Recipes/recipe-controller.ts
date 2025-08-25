@@ -195,6 +195,19 @@ export class RecipeController {
     ApiResponse.success(res, "Successfully retrieved additional owned recipes!", ownedRecipes);
   }
 
+  static async getArchivedRecipes(req: Request, res: Response) {
+    const {user_id, page} = req.query;
+
+    const archivedRecipes = await RecipeService.getArchivedRecipes(Number(user_id), Number(page));
+
+    if(archivedRecipes === undefined) {
+      ApiResponse.error(res, "There was an error retrieving owned recipes!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully retrieved additional owned recipes!", archivedRecipes);
+  }
+
   static async softDeleteRecipe(req: Request, res: Response) {
     const {recipe_id, recipe_name, recipe_user_id} = req.query;
 

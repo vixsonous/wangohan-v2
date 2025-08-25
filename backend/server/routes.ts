@@ -16,6 +16,7 @@ router.get("/get-weekly-recipes", RecipeController.getWeeklyRecipes);
 router.get("/get-popular-recipes", RecipeController.getPopularRecipes);
 router.get("/get-liked-recipes", RecipeController.getLikedRecipes);
 router.get("/get-owned-recipes", RecipeController.getOwnRecipes);
+router.get("/get-archived-recipes", RecipeController.getArchivedRecipes);
 
 // Images
 router.get("/transform-image", ImageController.transformImage);

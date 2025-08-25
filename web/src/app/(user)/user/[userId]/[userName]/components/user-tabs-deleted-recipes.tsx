@@ -24,8 +24,8 @@ export default function DeletedRecipes(
   const [recipes, setRecipes] = useState<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined>(deleted_recipes);
   const [page, setPage] = useState(1);
 
-  const getMoreLikedRecipesMutation = useMutation({
-    mutationFn: () => ClientApiService.get(`/get-liked-recipes?user_id=${user_id}&page=${page}`),
+  const getMoreArchivedRecipesMutation = useMutation({
+    mutationFn: () => ClientApiService.get(`/get-archived-recipes?user_id=${user_id}&page=${page}`),
     onSuccess: (data: AxiosResponse) => {
       const dt: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>>(data);
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);
@@ -97,7 +97,7 @@ export default function DeletedRecipes(
       </Card>
       {recipes && total_deleted && recipes.length < total_deleted && (
         <div className={"w-full flex justify-center mt-2"}>
-          <Button onClick={() => getMoreLikedRecipesMutation.mutate()} className={"flex items-center self-center gap-2 bg-primary-text"}>
+          <Button onClick={() => getMoreArchivedRecipesMutation.mutate()} className={"flex items-center self-center gap-2 bg-primary-text"}>
             Get more recipes
           </Button>
         </div>
