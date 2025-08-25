@@ -21,8 +21,10 @@ export class UserDetailSchema {
     pets: z.array(PetSchema.GetPet).optional(),
     liked_recipes: z.array(z.lazy(() => RecipeSchema.GetBasicRecipe)).optional(),
     my_recipes: z.array(z.lazy(() => RecipeSchema.GetBasicRecipe)).optional(),
+    deleted_recipes: z.array(z.lazy(() => RecipeSchema.GetBasicRecipe)).optional(),
     total_liked: z.number().optional(),
-    total_recipes: z.number().optional()
+    total_recipes: z.number().optional(),
+    total_deleted_recipes: z.number().optional()
   }))
 
   static PostUserDetails = UserDetailSchema.UserDetails.and(z.object({

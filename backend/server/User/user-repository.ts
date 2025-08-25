@@ -92,10 +92,37 @@ export class UserDetailsRepository {
               }))
               .limit(UserDetailsRepository.USER_DETAILS_DISPLAY_RECIPES_LIMIT)
           ).as("my_recipes"),
+          jsonArrayFrom(
+            eb.selectFrom("recipes_table")
+              .select(lteb => [
+                "recipes_table.recipe_id",
+                "recipes_table.recipe_name",
+                lteb.fn.coalesce(
+                  lteb.selectFrom("recipe_images_table")
+                    .select("recipe_image")
+                    .limit(1)
+                    .whereRef("recipes_table.recipe_id", "=", "recipe_images_table.recipe_id")
+                  ,
+                  lteb.val("")
+                ).as("recipe_image"),
+                "recipes_table.user_id",
+                "recipes_table.updated_at",
+                "recipes_table.created_at"
+              ])
+              .where(eb => eb.and({
+                user_id: user_id,
+                is_deleted: true
+              }))
+              .limit(UserDetailsRepository.USER_DETAILS_DISPLAY_RECIPES_LIMIT)
+          ).as("deleted_recipes"),
           eb.fn.coalesce(eb.selectFrom("recipes_table").select(({fn}) => [
             fn.count<number>("recipes_table.user_id").as("total_recipes")
           ]).where("recipes_table.user_id", "=", user_id)
             .where("recipes_table.is_deleted","=", false), eb.val(0)).as("total_recipes"),
+          eb.fn.coalesce(eb.selectFrom("recipes_table").select(({fn}) => [
+            fn.count<number>("recipes_table.user_id").as("total_recipes")
+          ]).where("recipes_table.user_id", "=", user_id)
+            .where("recipes_table.is_deleted","=", true), eb.val(0)).as("total_deleted_recipes"),
           eb.fn.coalesce(eb.selectFrom("likes_table").innerJoin("recipes_table", "recipes_table.recipe_id", "likes_table.recipe_id").select(({fn}) => [
             fn.count<number>("likes_table.user_id").as("total_liked")
           ]).where("likes_table.user_id", "=", user_id)
@@ -110,6 +137,7 @@ export class UserDetailsRepository {
         .executeTakeFirstOrThrow();
 
       log(UserDetailsRepository.USER_DETAILS_REPOSITORY_SUCCESS_LOG.GET_USER_SUCCESS);
+      console.log(user.deleted_recipes)
       return user
     } catch (error) {
       console.error("User not found!");

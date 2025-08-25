@@ -31,7 +31,7 @@ export default async function User({
   if(user === undefined) {
     return <h1>User not found!</h1>;
   }
-
+  console.log(user);
   const userData = await isAuthenticated();
   return (
     <div className="flex gap-2 flex-col md:flex-row justify-center w-full max-w-7xl text-primary-text mt-10 px-4">
@@ -50,7 +50,7 @@ export default async function User({
         <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
       </section>
       <section className="w-full">
-        <UserTabs total_recipes={user.total_recipes} total_liked={user.total_liked} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
+        <UserTabs deleted_recipes={user.deleted_recipes} total_recipes={user.total_recipes} total_deleted={user.total_deleted_recipes} total_liked={user.total_liked} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
       </section>
     </div>
   )

@@ -27,15 +27,12 @@ export class User {
   }
   
   static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
-    const user = await UserRepository.findUser({user_email: email, google_id: googleId});
 
-    return user;
+    return await UserRepository.findUser({user_email: email, google_id: googleId});
   }
 
   async createUser(): Promise<User | undefined> {
-    const createResult = await UserRepository.createUser({email: this.email, google_id: this.google_id, password: this.password});
-
-    return createResult;
+    return await UserRepository.createUser({email: this.email, google_id: this.google_id, password: this.password});
   }
 
   getId(): number {
@@ -84,8 +81,10 @@ export class GetUserDetails extends UserDetails {
   private pets?: Array<z.infer<typeof PetSchema.GetPet>> | undefined;
   private liked_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
   private my_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private deleted_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
   private total_liked?: number | undefined;
   private total_recipes?: number | undefined;
+  private total_deleted_recipes?: number | undefined;
 
   constructor(user_details: z.infer<typeof UserDetailSchema.GetUserDetails>) {
     super(user_details);
@@ -95,6 +94,8 @@ export class GetUserDetails extends UserDetails {
     this.my_recipes = user_details.my_recipes;
     this.total_liked = user_details.total_liked;
     this.total_recipes = user_details.total_recipes;
+    this.deleted_recipes = user_details.deleted_recipes;
+    this.total_deleted_recipes = user_details.total_deleted_recipes;
   }
 
   static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
