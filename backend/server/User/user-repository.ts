@@ -94,10 +94,12 @@ export class UserDetailsRepository {
           ).as("my_recipes"),
           eb.fn.coalesce(eb.selectFrom("recipes_table").select(({fn}) => [
             fn.count<number>("recipes_table.user_id").as("total_recipes")
-          ]).where("recipes_table.user_id", "=", user_id), eb.val(0)).as("total_recipes"),
-          eb.fn.coalesce(eb.selectFrom("likes_table").select(({fn}) => [
+          ]).where("recipes_table.user_id", "=", user_id)
+            .where("recipes_table.is_deleted","=", false), eb.val(0)).as("total_recipes"),
+          eb.fn.coalesce(eb.selectFrom("likes_table").innerJoin("recipes_table", "recipes_table.recipe_id", "likes_table.recipe_id").select(({fn}) => [
             fn.count<number>("likes_table.user_id").as("total_liked")
-          ]).where("likes_table.user_id", "=", user_id), eb.val(0)).as("total_liked"),
+          ]).where("likes_table.user_id", "=", user_id)
+            .where("recipes_table.is_deleted","=", false), eb.val(0)).as("total_liked"),
           "updated_at",
           "created_at"
         ])
