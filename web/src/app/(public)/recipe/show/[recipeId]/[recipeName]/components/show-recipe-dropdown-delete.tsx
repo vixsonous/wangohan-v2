@@ -24,7 +24,7 @@ function DeleteButton({recipe_id, recipe_name, user_id}: {recipe_id: number, rec
   const router = useRouter();
 
   const deleteMutation = useMutation({
-    mutationFn: (recipe_id: number) => ClientApiService.delete(`/delete-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}&recipe_user_id=${user_id}`),
+    mutationFn: (recipe_id: number) => ClientApiService.delete(`/archive-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}&recipe_user_id=${user_id}&is_archive=true`),
     onSuccess: (response: AxiosResponse) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(response);
       toast.success("Successful!", {description: message});

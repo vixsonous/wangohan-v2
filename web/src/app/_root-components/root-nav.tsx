@@ -7,7 +7,6 @@ import {UserSchema} from "@/types/user-types.user";
 export default async function RootNavigationButtons() {
 
   const userData: z.infer<typeof UserSchema.User> | undefined = await isAuthenticated();
-
   return (
     <ul className="text-xs ml-auto text-primary-text font-semibold flex gap-4 whitespace-nowrap items-center">
       {

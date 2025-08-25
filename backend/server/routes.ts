@@ -11,7 +11,7 @@ const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
 router.get("/get-recipe", RecipeController.getRecipe);
 router.post("/post-recipe", upload.array('recipe_images[]'), RecipeController.uploadRecipe);
 router.post("/update-recipe", upload.array("recipe_images[]"), RecipeController.updateRecipe);
-router.delete("/delete-recipe", RecipeController.softDeleteRecipe);
+router.delete("/archive-recipe", RecipeController.archiveRecipe);
 router.get("/get-weekly-recipes", RecipeController.getWeeklyRecipes);
 router.get("/get-popular-recipes", RecipeController.getPopularRecipes);
 router.get("/get-liked-recipes", RecipeController.getLikedRecipes);

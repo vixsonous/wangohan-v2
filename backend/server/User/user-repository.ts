@@ -137,7 +137,7 @@ export class UserDetailsRepository {
         .executeTakeFirstOrThrow();
 
       log(UserDetailsRepository.USER_DETAILS_REPOSITORY_SUCCESS_LOG.GET_USER_SUCCESS);
-      console.log(user.deleted_recipes)
+
       return user
     } catch (error) {
       console.error("User not found!");

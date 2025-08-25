@@ -208,13 +208,13 @@ export class RecipeController {
     ApiResponse.success(res, "Successfully retrieved additional owned recipes!", archivedRecipes);
   }
 
-  static async softDeleteRecipe(req: Request, res: Response) {
-    const {recipe_id, recipe_name, recipe_user_id} = req.query;
+  static async archiveRecipe(req: Request, res: Response) {
+    const {recipe_id, recipe_name, recipe_user_id, is_archive} = req.query;
 
     const user = getUserData(req);
 
     if(user === undefined) {
-      ApiResponse.error(res, "You must log in to delete this recipe!");
+      ApiResponse.error(res, "You must log in to archive this recipe!");
       return;
     }
 
@@ -222,31 +222,33 @@ export class RecipeController {
       recipe_id: Number(recipe_id),
       recipe_name: recipe_name,
       recipe_user_id: Number(recipe_user_id),
-      user_id: Number(user.user_id)
+      user_id: Number(user.user_id),
+      is_archive: String(is_archive) === 'true',
     }
 
-    const softDeleteParseResult = RecipeSchema.DeleteRecipe.safeParse(submitData);
+    const archiveRecipeParseResult = RecipeSchema.ArchiveRecipe.safeParse(submitData);
 
-    if(!softDeleteParseResult.success) {
-      ApiResponse.error(res, softDeleteParseResult.error.issues[0].message);
+    if(!archiveRecipeParseResult.success) {
+      ApiResponse.error(res, archiveRecipeParseResult.error.issues[0].message);
       return;
     }
 
-    const softDeleteResult = await RecipeService.softDeleteRecipe(
-      softDeleteParseResult.data.recipe_id,
-      softDeleteParseResult.data.recipe_name,
-      softDeleteParseResult.data.recipe_user_id
+    const softDeleteResult = await RecipeService.archiveRecipe(
+      archiveRecipeParseResult.data.recipe_id,
+      archiveRecipeParseResult.data.recipe_name,
+      archiveRecipeParseResult.data.recipe_user_id,
+      archiveRecipeParseResult.data.is_archive
     );
 
     if(!softDeleteResult) {
-      ApiResponse.error(res, "Failed to delete recipe!");
+      ApiResponse.error(res, `Failed to ${is_archive ? "archive" : "unarchive"} recipe!`);
       return;
     }
 
     await CacheUtil.delete(RecipeCacheKey.GET_WEEKLY_RECIPES_KEY);
     await CacheUtil.delete(RecipeCacheKey.GET_POPULAR_RECIPES_KEY);
-    await CacheUtil.delete(RecipeCacheKey.GET_RECIPE_KEY(String(softDeleteParseResult.data.recipe_id), softDeleteParseResult.data.recipe_name));
+    await CacheUtil.delete(RecipeCacheKey.GET_RECIPE_KEY(String(archiveRecipeParseResult.data.recipe_id), archiveRecipeParseResult.data.recipe_name));
 
-    ApiResponse.success(res, "Successfully deleted recipe!");
+    ApiResponse.success(res, `Successfully ${is_archive ? "archived" : "unarchived"} recipe!`);
   }
 }

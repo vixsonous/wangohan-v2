@@ -544,7 +544,7 @@ export class RecipeRepository {
         .execute();
 
       log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
-      console.log(likedRecipes);
+
       return likedRecipes;
     } catch(e) {
       log(e);
@@ -586,11 +586,12 @@ export class RecipeRepository {
     }
   }
 
-  static async softDeleteRecipe(recipe_id: number, recipe_name: string, user_id: number): Promise<boolean> {
+  static async archiveRecipe(recipe_id: number, recipe_name: string, user_id: number, is_archive: boolean): Promise<boolean> {
     try {
+      console.log("is archive " + is_archive);
       await db.updateTable("recipes_table")
         .set({
-          is_deleted: true
+          is_deleted: is_archive
         })
         .where( eb => eb.and({
           recipe_id: recipe_id,

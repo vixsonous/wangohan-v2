@@ -15,9 +15,43 @@ export async function generateMetadata({
   params
 }: UserProps): Promise<Metadata> {
   const {userId, userName} = (await params);
-  console.log(userId, userName);
+  const user = await getUser(Number(userId), String(userName));
+
+  if(user === undefined) {
+    return {
+      title: "Undefined"
+    }
+  }
+
+  const userImage = String(user.user_image).startsWith("r2://") ? process.env.BASE_PUBLIC_BUCKET_URL + "/" + String(user.user_image).split("r2://")[1] : user.user_image;
+
   return {
-    title: 'User'
+    title: user.user_codename,
+    keywords: user.my_recipes?.map(recipe => recipe.recipe_name).concat(user.pets?.map(pet => pet.pet_name) || []),
+    creator: user.user_codename,
+    description: `Discover the recipes and pets of ${user.user_codename}!`,
+    openGraph: {
+      title: user.user_codename,
+      description: `Discover the recipes and pets of ${user.user_codename}!`,
+      url: process.env.NEXT_PUBLIC_ORIGIN + "/user/" + user.user_id + "/" + user.user_codename, // Your website URL
+      type: 'profile',
+      siteName: "わんごはん",
+      images: [
+        { url: userImage, width: 500, height: 500, alt: user.user_codename }
+      ]
+    },
+    twitter: {
+      title: user.user_codename,
+      card: 'summary_large_image',
+      creator: `@${user.user_codename}`,
+      images: userImage,
+      description: `Discover the recipes and pets of ${user.user_codename}!`
+    },
+    robots: {
+      index:true,
+      follow: true,
+      nocache: false,
+    },
   }
 }
 
@@ -31,7 +65,7 @@ export default async function User({
   if(user === undefined) {
     return <h1>User not found!</h1>;
   }
-  console.log(user);
+
   const userData = await isAuthenticated();
   return (
     <div className="flex gap-2 flex-col md:flex-row justify-center w-full max-w-7xl text-primary-text mt-10 px-4">

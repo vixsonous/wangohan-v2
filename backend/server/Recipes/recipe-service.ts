@@ -27,8 +27,8 @@ export class RecipeService {
     return await RecipeRepository.updateRecipe(recipe);
   }
 
-  static async softDeleteRecipe(recipe_id: number, recipe_name: string, user_id:number): Promise<boolean> {
-    return await RecipeRepository.softDeleteRecipe(recipe_id, recipe_name, user_id);
+  static async archiveRecipe(recipe_id: number, recipe_name: string, user_id:number, is_archive: boolean): Promise<boolean> {
+    return await RecipeRepository.archiveRecipe(recipe_id, recipe_name, user_id, is_archive);
   }
 
   static async getLikedRecipe(user_id: number, page: number): Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {

@@ -10,12 +10,12 @@ import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
 
 export default function DeletedRecipes(
-  {deleted_recipes, user_id, user_codename, user_data, total_deleted}: {
+  {deleted_recipes, user_id, total_deleted}: {
     deleted_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
     user_id: number,
-    user_codename: string,
     user_data: z.infer<typeof UserSchema.User> | undefined,
     total_deleted: number | undefined,
   }
@@ -23,6 +23,7 @@ export default function DeletedRecipes(
 
   const [recipes, setRecipes] = useState<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined>(deleted_recipes);
   const [page, setPage] = useState(1);
+  const router = useRouter();
 
   const getMoreArchivedRecipesMutation = useMutation({
     mutationFn: () => ClientApiService.get(`/get-archived-recipes?user_id=${user_id}&page=${page}`),
@@ -44,17 +45,11 @@ export default function DeletedRecipes(
   });
 
   const restoreArchivedRecipe = useMutation({
-    mutationFn: () => ClientApiService.get(`/get-liked-recipes?user_id=${user_id}&page=${page}`),
+    mutationFn: (data: {recipe_id: number, recipe_name: string, user_id: number}) => ClientApiService.delete(`/archive-recipe?recipe_id=${data.recipe_id}&recipe_name=${data.recipe_name}&recipe_user_id=${data.user_id}&is_archive=false`),
     onSuccess: (data: AxiosResponse) => {
-      const dt: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>>(data);
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);
-
       toast.success('Successful!', {description: message});
-      setPage(prev => prev + 1);
-      setRecipes(prev => {
-        const newArray = prev === undefined ? ([] as Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>).concat(dt): prev.concat(dt);
-        return structuredClone(newArray);
-      })
+      router.refresh();
     },
     onError: (error: AxiosResponse) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(error);
@@ -76,7 +71,7 @@ export default function DeletedRecipes(
                     {a.recipe_name}
                   </h1>
                   <div className={"absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full bottom-4 flex justify-center gap-2"}>
-                    <Button>Restore</Button>
+                    <Button disabled={restoreArchivedRecipe.isPending} onClick={() => restoreArchivedRecipe.mutate({recipe_id: a.recipe_id, recipe_name: a.recipe_name, user_id: a.user_id})}>Restore</Button>
                     <Button variant={"destructive"}>Delete</Button>
                   </div>
                 </section>

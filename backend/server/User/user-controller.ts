@@ -22,6 +22,7 @@ export class UserController {
   }
 
   static async isAuthenticated(req: Request, res: Response) {
+    console.log("the cookies here " + req.cookies);
     ApiResponse.success(res, req.user ? "Authenticated": "Not authenticated", req.user, 200);
   }
 

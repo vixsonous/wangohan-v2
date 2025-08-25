@@ -122,7 +122,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
 
     const temp = structuredClone(files);
     const idx = temp.findIndex(f => f.preview_url === preview_url);
-    console.log(temp[idx].preview_url);
+
     if(idx < 0) return;
     const deleteId = temp[idx].recipe_image_id;
     const previewUrl = temp[idx].preview_url;

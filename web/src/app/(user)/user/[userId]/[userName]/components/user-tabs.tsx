@@ -47,7 +47,7 @@ export default function UserTabs(
         </TabsContent>
         {user_id === user_data?.user_id && (
           <TabsContent value="deleted-recipes">
-            <DeletedRecipes total_deleted={total_deleted} user_id={user_id} user_codename={user_codename} user_data={user_data} deleted_recipes={deleted_recipes} />
+            <DeletedRecipes total_deleted={total_deleted} user_id={user_id} user_data={user_data} deleted_recipes={deleted_recipes} />
           </TabsContent>
         )}
       </Tabs>
