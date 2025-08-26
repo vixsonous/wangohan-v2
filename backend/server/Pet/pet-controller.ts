@@ -1,4 +1,4 @@
-import {ApiResponse, ApiTest} from "@/server/utils/ApiUtils";
+import {ApiResponse} from "@/server/utils/ApiUtils";
 import { Request, Response } from "express";
 import {PetSchema} from "@/server/types/pet-types.pet";
 import {PetService} from "@/server/Pet/pet-service";
@@ -34,5 +34,20 @@ export class PetController {
     }
 
     ApiResponse.success(res, "Successfully posted pet!", pet);
+  }
+
+  static async getBirthdayMonthPets(req: Request, res: Response) {
+    const {current_month} = req.query;
+    const curMonth = Number(current_month);
+    console.log(current_month);
+    if(curMonth < 0 || curMonth > 12) {
+      log("Invalid current month!");
+      ApiResponse.error(res, "Invalid month!");
+      return;
+    }
+
+    const birthdayPets = await PetService.getBirthdayMonthPets(Number(current_month));
+
+    ApiResponse.success(res, "Successfully retrieved current month birthday pets", birthdayPets);
   }
 }

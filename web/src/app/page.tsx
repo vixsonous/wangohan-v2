@@ -6,6 +6,7 @@ import RecipeCarouselWrapper from "./_root-components/recipe-carousel-wrapper";
 import BirthdayWrapper from "./_root-components/birthday-wrapper";
 import ColumnBanner from "./_root-components/column-banner";
 import { getSliderRecipes } from "@/server-actions/Recipe/recipe";
+import {getBirthdayMonthPets} from "@/server-actions/Pet/pet";
 
 const gloria = Gloria_Hallelujah({
   weight: "400",
@@ -33,6 +34,9 @@ export default async function Home() {
     </section>
   }
 
+  const birthdayPets = await getBirthdayMonthPets();
+  console.log("birthday pets " + birthdayPets);
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Website",
@@ -54,7 +58,7 @@ export default async function Home() {
         <BannerSection recipes={sliderData.popularRecipes} />
         <RecipeCarouselWrapper title="今週のレシピ" recipes={sliderData.weeklyRecipes}/>
         <RecipeCarouselWrapper title="人気レシピ" recipes={sliderData.popularRecipes}/>
-        <BirthdayWrapper />
+        <BirthdayWrapper birthday_pets={birthdayPets} />
         <ColumnBanner />
       </section>
       <script

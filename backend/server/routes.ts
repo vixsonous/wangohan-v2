@@ -32,3 +32,4 @@ router.post("/personal-info", upload.single('user_image'), UserController.regist
 
 // Pets
 router.post("/post-pet", upload.single('pet_image'), PetController.postPet);
+router.get("/birthday-pets", PetController.getBirthdayMonthPets);

@@ -5,6 +5,7 @@ import {log} from "@/server/utils/log";
 import {db} from "@/database/database";
 import {ImageProcess} from "@/server/Images/image-service";
 import {Image} from "@/server/Images/image";
+import {sql} from "kysely";
 
 export class PetRepository {
 
@@ -71,6 +72,27 @@ export class PetRepository {
     } catch(e) {
       log(e);
       log(PetRepository.PET_REPOSITORY_ERROR_LOG.POST_PET_ERROR);
+      return undefined;
+    }
+  }
+
+  static async getBirthdayMonthPets(current_month: number): Promise<Array<z.infer<typeof PetSchema.GetPet>> | undefined> {
+    const BIRTHDAY_PET_RETRIEVAL_SUCCESS = "Successfully retrieved birthday pets";
+    try {
+      console.log("Went here");
+      const pets = await db.selectFrom("pets_table")
+        .selectAll()
+        .where(({ ref }) =>
+          sql`EXTRACT(MONTH FROM ${ref('pet_birthdate')}) = ${current_month}`
+        )
+        .execute();
+      console.log(pets);
+      log(BIRTHDAY_PET_RETRIEVAL_SUCCESS);
+
+      return pets;
+    } catch (e) {
+      log(e);
+      log("Failed to retrieve pets!");
       return undefined;
     }
   }
