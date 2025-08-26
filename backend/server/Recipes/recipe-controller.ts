@@ -241,7 +241,7 @@ export class RecipeController {
     );
 
     if(!softDeleteResult) {
-      ApiResponse.error(res, `Failed to ${is_archive ? "archive" : "unarchive"} recipe!`);
+      ApiResponse.error(res, `Failed to ${archiveRecipeParseResult.data.is_archive ? "archive" : "unarchive"} recipe!`);
       return;
     }
 
@@ -249,6 +249,6 @@ export class RecipeController {
     await CacheUtil.delete(RecipeCacheKey.GET_POPULAR_RECIPES_KEY);
     await CacheUtil.delete(RecipeCacheKey.GET_RECIPE_KEY(String(archiveRecipeParseResult.data.recipe_id), archiveRecipeParseResult.data.recipe_name));
 
-    ApiResponse.success(res, `Successfully ${is_archive ? "archived" : "unarchived"} recipe!`);
+    ApiResponse.success(res, `Successfully ${archiveRecipeParseResult.data.is_archive ? "archived" : "unarchived"} recipe!`);
   }
 }

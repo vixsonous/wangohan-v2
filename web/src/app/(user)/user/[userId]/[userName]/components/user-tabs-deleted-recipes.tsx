@@ -5,7 +5,7 @@ import z from "zod";
 import {RecipeSchema} from "@/types/recipe-types";
 import {UserSchema} from "@/types/user-types.user";
 import {useMutation} from "@tanstack/react-query";
-import {useState} from "react";
+import React, {useState} from "react";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosResponse} from "axios";
 import {toast} from "sonner";
@@ -71,7 +71,10 @@ export default function DeletedRecipes(
                     {a.recipe_name}
                   </h1>
                   <div className={"absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-full bottom-4 flex justify-center gap-2"}>
-                    <Button disabled={restoreArchivedRecipe.isPending} onClick={() => restoreArchivedRecipe.mutate({recipe_id: a.recipe_id, recipe_name: a.recipe_name, user_id: a.user_id})}>Restore</Button>
+                    <Button disabled={restoreArchivedRecipe.isPending} onClick={() => restoreArchivedRecipe.mutate({recipe_id: a.recipe_id, recipe_name: a.recipe_name, user_id: a.user_id})}>
+                      {restoreArchivedRecipe.isPending && (<Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>)}
+                      Restore
+                    </Button>
                     <Button variant={"destructive"}>Delete</Button>
                   </div>
                 </section>
@@ -93,6 +96,7 @@ export default function DeletedRecipes(
       {recipes && total_deleted && recipes.length < total_deleted && (
         <div className={"w-full flex justify-center mt-2"}>
           <Button onClick={() => getMoreArchivedRecipesMutation.mutate()} className={"flex items-center self-center gap-2 bg-primary-text"}>
+            {getMoreArchivedRecipesMutation.isPending && (<Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>)}
             Get more recipes
           </Button>
         </div>
