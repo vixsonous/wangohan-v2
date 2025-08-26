@@ -251,4 +251,48 @@ export class RecipeController {
 
     ApiResponse.success(res, `Successfully ${archiveRecipeParseResult.data.is_archive ? "archived" : "unarchived"} recipe!`);
   }
+
+  static async hardDeleteRecipe(req: Request, res: Response) {
+    const {recipe_id, recipe_name, recipe_user_id} = req.query;
+
+    const user = getUserData(req);
+
+    if(user === undefined) {
+      ApiResponse.error(res, "You must log in to delete this recipe!");
+      return;
+    }
+
+    if(user.user_id !== Number(recipe_user_id)) {
+      ApiResponse.unauthorized(res);
+      return;
+    }
+
+    const submitData = {
+      recipe_id: Number(recipe_id),
+      recipe_name: recipe_name,
+      recipe_user_id: Number(recipe_user_id),
+      user_id: Number(user.user_id),
+    }
+
+    const hardDeleteParseResult = RecipeSchema.HardDeleteRecipe.safeParse(submitData);
+    if(!hardDeleteParseResult.success) {
+      ApiResponse.error(res, hardDeleteParseResult.error.issues[0].message);
+      return;
+    }
+
+    const deleteResult = await RecipeService.hardDeleteRecipe(
+      hardDeleteParseResult.data.recipe_id,
+      hardDeleteParseResult.data.recipe_name,
+      hardDeleteParseResult.data.recipe_user_id
+    );
+
+    console.log(deleteResult);
+
+    if(!deleteResult) {
+      ApiResponse.error(res, "There was an error deleting recipe!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully deleted recipe!");
+  }
 }

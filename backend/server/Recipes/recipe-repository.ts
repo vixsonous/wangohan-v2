@@ -607,4 +607,42 @@ export class RecipeRepository {
       return false;
     }
   }
+
+  static async hardDeleteRecipe(recipe_id: number, recipe_name: string, user_id: number): Promise<boolean> {
+    const DELETE_RECIPE_FAILED = "Failed to delete recipe!";
+    const DELETE_RECIPE_SUCCESS = "Successfully deleted recipe!";
+
+    const trx = await db.startTransaction().execute();
+    try {
+
+      const images = await trx.selectFrom("recipe_images_table")
+        .select("recipe_image")
+        .where("recipe_id", "=", recipe_id)
+        .execute();
+
+      // Delete images in the bucket
+      await Promise.all(images.map(async image => {
+        const key = image.recipe_image.startsWith("r2://") ? image.recipe_image.split("r2://")[1] : image.recipe_image;
+        await Image.deleteR2Public(key);
+      }));
+
+      const res = await trx.deleteFrom("recipes_table")
+        .where(eb => eb.and({
+          recipe_id: recipe_id,
+          recipe_name: recipe_name,
+          user_id: user_id
+        }))
+        .returning("recipe_id")
+        .executeTakeFirstOrThrow();
+
+      await trx.commit().execute();
+      log(DELETE_RECIPE_SUCCESS + " Recipe: " + res.recipe_id);
+      return true;
+    } catch (e) {
+      log(DELETE_RECIPE_FAILED)
+      log(e);
+      await trx.rollback().execute();
+      return false;
+    }
+  }
 }

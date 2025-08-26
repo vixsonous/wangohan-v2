@@ -45,4 +45,8 @@ export class RecipeService {
     const GET_ARCHIVED = true;
     return await RecipeRepository.getOwnedRecipes(user_id, page, GET_ARCHIVED);
   }
+
+  static async hardDeleteRecipe(recipe_id: number, recipe_name: string, user_id:number): Promise<boolean> {
+    return await RecipeRepository.hardDeleteRecipe(recipe_id, recipe_name, user_id);
+  }
 }

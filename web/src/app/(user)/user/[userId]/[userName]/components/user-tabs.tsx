@@ -8,7 +8,9 @@ import {RecipeSchema} from "@/types/recipe-types";
 import {UserSchema} from "@/types/user-types.user";
 import {QueryClientProvider} from "@tanstack/react-query";
 import {queryClient} from "@/lib/tanstack-query";
-import DeletedRecipes from "@/app/(user)/user/[userId]/[userName]/components/user-tabs-deleted-recipes";
+import {
+  DeletedRecipes
+} from "@/app/(user)/user/[userId]/[userName]/components/user-tabs-deleted-recipes";
 
 export default function UserTabs(
   {liked_recipes, my_recipes, deleted_recipes, user_id, user_codename, user_data, total_recipes, total_liked, total_deleted}:

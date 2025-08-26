@@ -12,6 +12,7 @@ router.get("/get-recipe", RecipeController.getRecipe);
 router.post("/post-recipe", upload.array('recipe_images[]'), RecipeController.uploadRecipe);
 router.post("/update-recipe", upload.array("recipe_images[]"), RecipeController.updateRecipe);
 router.delete("/archive-recipe", RecipeController.archiveRecipe);
+router.delete("/hard-delete-recipe", RecipeController.hardDeleteRecipe);
 router.get("/get-weekly-recipes", RecipeController.getWeeklyRecipes);
 router.get("/get-popular-recipes", RecipeController.getPopularRecipes);
 router.get("/get-liked-recipes", RecipeController.getLikedRecipes);
