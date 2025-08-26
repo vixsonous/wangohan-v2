@@ -286,8 +286,6 @@ export class RecipeController {
       hardDeleteParseResult.data.recipe_user_id
     );
 
-    console.log(deleteResult);
-
     if(!deleteResult) {
       ApiResponse.error(res, "There was an error deleting recipe!");
       return;

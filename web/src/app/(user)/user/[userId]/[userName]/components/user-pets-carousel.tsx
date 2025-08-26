@@ -49,9 +49,9 @@ export default function UserPetsCarousel(
                   <Image src={a.pet_image} className={`${curSlide === idx ? 'opacity-100 pointer-events-auto' : 'opacity-50 pointer-events-none'} transition-all border-4 border-primary-text duration-500 w-full h-full aspect-square object-cover`} style={{clipPath: curSlide === idx ? 'circle(70% at 50% 50%)': 'circle(50% at 50% 50%)'}} alt={a.pet_name} />
                 </HoverCardTrigger>
                 <HoverCardContent>
-                  <p>{a.pet_name}</p>
-                  <p>{format(new Date(a.pet_birthdate).toDateString(), "MMMM do yyyy")}</p>
-                  <p>{a.pet_breed}</p>
+                  <p>愛犬の名前: {a.pet_name}</p>
+                  <p>誕生日: {format(new Date(a.pet_birthdate).toDateString(), "MMMM do yyyy")}</p>
+                  <p>姓: {a.pet_breed}</p>
                 </HoverCardContent>
               </HoverCard>
             </CarouselItem>
