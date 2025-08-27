@@ -91,7 +91,9 @@ export class UserController {
       user_id: Number(req.body.user_id),
       user_agreement: Number(req.body.user_agreement),
       user_birthdate: new Date(req.body.user_birthdate),
-      user_image: req.file
+      user_image: req.file,
+      updated_at: new Date(req.body.updated_at),
+      created_at: new Date(req.body.created_at),
     };
 
     const personalInfoData = UserDetailSchema.PostUserDetails.safeParse(submitData);

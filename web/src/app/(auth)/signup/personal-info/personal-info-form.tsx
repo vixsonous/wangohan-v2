@@ -21,6 +21,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import TermsAndConditions from "@/app/(auth)/signup/personal-info/terms-and-conditions";
+import {formatInTimeZone} from "date-fns-tz";
 
 export default function PersonalInfoForm({user_id}: {user_id: number}) {
   const { signupInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm();
@@ -144,7 +145,13 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
                   <Calendar
                     mode="single"
                     selected={field.value}
-                    onSelect={field.onChange}
+                    onSelect={(date) => {
+                      if(date) {
+                        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        const formatted = formatInTimeZone(date, timeZone, 'yyyy-MM-dd');
+                        field.onChange(formatted);
+                      }
+                    }}
                     disabled={(date) =>
                       date > new Date() || date < new Date("1900-01-01")
                     }

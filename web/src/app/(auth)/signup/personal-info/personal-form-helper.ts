@@ -14,7 +14,11 @@ export const usePersonalForm = () => {
 
   const router = useRouter();
   const signupInfoMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.post("/personal-info", data, {
+    mutationFn: (data: FieldValues) => ClientApiService.post("/personal-info", {
+      ...data,
+      updated_at: new Date().toLocaleString(),
+      created_at: new Date().toLocaleString(),
+    }, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
