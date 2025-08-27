@@ -8,12 +8,13 @@ export class PetController {
 
   static async postPet(req: Request, res: Response) {
     const data = req.body;
-
     const submitData = {
       ...data,
       user_id: Number(data.user_id),
       pet_birthdate: new Date(data.pet_birthdate),
-      pet_image: req.file
+      pet_image: req.file,
+      updated_at: new Date(data.updated_at),
+      created_at: new Date(data.created_at),
     };
 
     const postPetResult = PetSchema.PostPet.safeParse(submitData);

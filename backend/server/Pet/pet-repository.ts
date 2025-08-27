@@ -57,8 +57,8 @@ export class PetRepository {
         pet_birthdate: pet.pet_birthdate,
         pet_breed: pet.pet_breed,
         user_id: pet.user_id,
-        updated_at: new Date(),
-        created_at: new Date(),
+        updated_at: pet.updated_at || new Date(),
+        created_at: pet.created_at || new Date(),
       } satisfies PetInsert;
 
       const getPet: z.infer<typeof PetSchema.GetPet> = await db.insertInto("pets_table")

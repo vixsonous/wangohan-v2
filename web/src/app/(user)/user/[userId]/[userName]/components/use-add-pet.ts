@@ -10,7 +10,11 @@ import {AxiosError} from "axios";
 export const useAddPet = () => {
 
   const postPetMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.post("/post-pet", data, {
+    mutationFn: (data: FieldValues) => ClientApiService.post("/post-pet", {
+      ...data,
+      updated_at: new Date().toLocaleString(),
+      created_at: new Date().toLocaleString(),
+    }, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

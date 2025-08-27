@@ -9,6 +9,7 @@ import {format} from "date-fns";
 import {ja} from "date-fns/locale";
 import {Calendar} from "@/components/ui/calendar";
 import {useAddPet} from "@/app/(user)/user/[userId]/[userName]/components/use-add-pet";
+import {formatInTimeZone} from "date-fns-tz";
 
 export default function AddPetsForm({user_id}: {user_id: number}) {
 
@@ -99,8 +100,14 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
+                      selected={new Date(field.value)}
+                      onSelect={(date) => {
+                        if(date) {
+                          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                          const formatted = formatInTimeZone(date, timeZone, 'yyyy-MM-dd');
+                          field.onChange(formatted);
+                        }
+                      }}
                       disabled={(date) =>
                         date > new Date() || date < new Date("1900-01-01")
                       }

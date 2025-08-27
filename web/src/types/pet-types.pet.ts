@@ -1,10 +1,16 @@
 import z from "zod";
+import {format, isValid, parse} from "date-fns";
 
 export class PetSchema {
   public static Pet = z.object({
     user_id: z.number(),
     pet_name: z.string().min(1, "Please enter your pet's name!"),
-    pet_birthdate: z.date("Please enter your pet's birthdate!"),
+    pet_birthdate: z.string("Please enter your pet's birthdate!").refine(val => {
+      const parsed = parse(val, 'yyyy-MM-dd', new Date());
+      return isValid(parsed) && val === format(parsed, 'yyyy-MM-dd');
+    }, {
+      message: "Invalid birthdate, yyyy-MM-dd is expected!"
+    }),
     pet_breed: z.string().min(1, "Please enter your pet's breed!"),
     updated_at: z.date().optional(),
     created_at: z.date().optional()
