@@ -29,5 +29,9 @@ export class UserDetailSchema {
 
   static PostUserDetails = UserDetailSchema.UserDetails.and(z.object({
     user_image: z.custom<Express.Multer.File>()
+  }));
+
+  static UpdateUserDetails = UserDetailSchema.UserDetails.and(z.object({
+    user_image: z.custom<Express.Multer.File>().optional()
   }))
 }

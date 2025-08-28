@@ -9,8 +9,9 @@ import {UserDetailSchema} from "@/types/user-types.user-detail";
 import {UserSchema} from "@/types/user-types.user";
 import {useRouter} from "next/navigation";
 import {AxiosError} from "axios";
+import React from "react";
 
-export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof UserSchema.User>) => {
+export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof UserSchema.User>, setOpen?: React.Dispatch<React.SetStateAction<boolean>> | undefined) => {
 
   const router = useRouter();
   const signupInfoMutation = useMutation({
@@ -29,6 +30,7 @@ export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof
       toast.success("Successful!", {
         description: ClientApiResponseService.getAxiosResponseMessage(data)
       });
+      if(setOpen) setOpen(false);
       router.push("/user/" + dt?.user_id + "/" + dt?.user_codename);
     },
     onError: (error: AxiosError) => {
@@ -49,9 +51,13 @@ export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof
     }),
     onSuccess: (data) => {
       const dt = ClientApiResponseService.getAxiosResponseData<z.infer<typeof UserSchema.UserDisplay>>(data);
+
       toast.success("Successful!", {
         description: ClientApiResponseService.getAxiosResponseMessage(data)
       });
+      if(setOpen) setOpen(false);
+      router.replace("/user/" + dt?.user_id + "/" + dt?.user_codename);
+      router.refresh();
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosErrorMessage(error);

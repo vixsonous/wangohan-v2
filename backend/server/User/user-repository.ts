@@ -2,7 +2,7 @@ import z from "zod";
 import { db } from "@/database/database";
 import { log } from "../utils/log";
 import { UserLevel} from "../types/user-types";
-import {UserDetailInsert, UserInsert} from "@/database/types";
+import {UserDetailInsert, UserDetailUpdate, UserInsert} from "@/database/types";
 // @ts-ignore
 import bcrypt from 'bcrypt';
 import {User} from "./user";
@@ -164,7 +164,7 @@ export class UserDetailsRepository {
 
       const uploadImage = await image.result();
       const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
-      const uploadDone = await Image.uploadToR2Public(folder, uploadImage, user_detail.user_image.originalname.split(".")[0], "webp", "images/webp");
+      const uploadDone = await Image.uploadToR2Public(folder, uploadImage, "profile_picture_" + user_detail.user_id, "webp", "images/webp");
 
       if(uploadDone.Key === undefined) {
         return undefined;
@@ -196,6 +196,75 @@ export class UserDetailsRepository {
 
       return userDetails;
 
+    } catch (e) {
+      log(e);
+      return undefined;
+    }
+  }
+
+  static async updateUserDetails(user_detail: z.infer<typeof UserDetailSchema.UpdateUserDetails>): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
+    try {
+
+      let new_user_image_key = '';
+      if(user_detail.user_image) {
+        const buffer: Buffer<ArrayBuffer> = Buffer.from(user_detail.user_image.buffer);
+
+        let image = new ImageProcess(buffer.buffer);
+
+        image = image.resize(1024, undefined, {
+          withoutEnlargement: true,
+          fit: "inside"
+        });
+
+        image = image.webp({
+          quality: 80
+        });
+
+        const uploadImage = await image.result();
+        const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
+        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, "profile_picture_" + user_detail.user_id, "webp", "images/webp");
+
+        if(uploadDone.Key === undefined) {
+          return undefined;
+        }
+
+        new_user_image_key = uploadDone.Key;
+      }
+
+      const updateUserDetails: UserDetailUpdate = {
+        user_codename: user_detail.user_codename,
+        user_first_name: user_detail.user_first_name,
+        user_last_name: user_detail.user_last_name,
+        user_gender: user_detail.user_gender,
+        user_occupation: user_detail.user_occupation,
+        user_agreement: user_detail.user_agreement,
+        user_birthdate: user_detail.user_birthdate,
+        updated_at: user_detail.updated_at
+      }
+
+      if(user_detail.user_image) {
+        updateUserDetails.user_image = `r2://${new_user_image_key}`
+      }
+
+      const userDetails: z.infer<typeof UserDetailSchema.GetUserDetails> = await db.updateTable("user_details_table")
+        .set(updateUserDetails)
+        .returning([
+          "user_id",
+          "user_first_name",
+          "user_last_name",
+          "user_gender",
+          "user_occupation",
+          "user_image",
+          "user_codename",
+          "user_agreement",
+          "user_birthdate",
+        ])
+        .where("user_id", "=", user_detail.user_id)
+        .executeTakeFirstOrThrow();
+
+      log("Successfully posted user details data!");
+      console.log(userDetails);
+      return userDetails;
     } catch (e) {
       log(e);
       return undefined;

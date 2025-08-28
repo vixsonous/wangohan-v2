@@ -120,6 +120,35 @@ export class UserController {
     ApiResponse.success(res, "Successfully registered personal info!", userData);
   }
 
+  static async updatePersonalInfo(req: Request, res: Response) {
+
+    const submitData = {
+      ...req.body,
+      user_id: Number(req.body.user_id),
+      user_agreement: Number(req.body.user_agreement),
+      user_birthdate: new Date(req.body.user_birthdate),
+      updated_at: new Date(req.body.updated_at),
+      user_image: req.file
+    }
+
+    const updatePersonalInfoParseResult = UserDetailSchema.UpdateUserDetails.safeParse(submitData);
+
+    if(!updatePersonalInfoParseResult.success) {
+      ApiResponse.error(res, "Error in saving personal information!");
+      log(updatePersonalInfoParseResult.error.issues);
+      return;
+    }
+
+    const updatedPersonalInfo = await UserService.updatePersonalInfo(updatePersonalInfoParseResult.data);
+
+    if(updatedPersonalInfo === undefined) {
+      ApiResponse.error(res, "Error in updating personal information!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully updated personal info!", updatedPersonalInfo);
+  }
+
   static async logout(req: Request, res: Response) {
     if(req.user === undefined) {
       ApiResponse.error(res, "Unauthorized log out!");

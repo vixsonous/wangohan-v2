@@ -28,12 +28,13 @@ import {UserSchema} from "@/types/user-types.user";
 interface PersonalInfoFormProps {
   user_id: number,
   is_edit?: boolean,
-  user_details?: z.infer<typeof UserSchema.User>
+  user_details?: z.infer<typeof UserSchema.User>,
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function PersonalInfoForm({user_id, is_edit, user_details}: PersonalInfoFormProps) {
-  const { signupInfoMutation, updateInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm(is_edit, user_details);
-  console.log(user_details?.user_id);
+export default function PersonalInfoForm({user_id, is_edit, user_details, setOpen}: PersonalInfoFormProps) {
+  const { signupInfoMutation, updateInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm(is_edit, user_details, setOpen);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-full sm:max-w-2xl flex flex-col gap-4 items-start pt-10">
       {Object.keys(errors).map(err => err)}

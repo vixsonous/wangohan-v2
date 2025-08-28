@@ -13,22 +13,27 @@ import {
 } from "@/app/(user)/user/[userId]/[userName]/components/user-tabs-deleted-recipes";
 import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import dynamic from "next/dynamic";
+import {useState} from "react";
 
 const PersonalInfoForm = dynamic(() => import("@/app/(auth)/signup/personal-info/personal-info-form"), {ssr: false, loading: () => <span>Loading</span>});
 
+interface UserTabsProps {
+  liked_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
+  my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
+  deleted_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
+  user_id: number,
+  user_codename: string,
+  user_data: z.infer<typeof UserSchema.User> | undefined,
+  total_recipes: number | undefined,
+  total_liked: number | undefined,
+  total_deleted: number | undefined,
+}
 export default function UserTabs(
-  {liked_recipes, my_recipes, deleted_recipes, user_id, user_codename, user_data, total_recipes, total_liked, total_deleted}:
-  {liked_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
-    my_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
-    deleted_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,
-    user_id: number,
-    user_codename: string,
-    user_data: z.infer<typeof UserSchema.User> | undefined,
-    total_recipes: number | undefined,
-    total_liked: number | undefined,
-    total_deleted: number | undefined,
-  }
+  {liked_recipes, my_recipes, deleted_recipes, user_id, user_codename, user_data, total_recipes, total_liked, total_deleted}: UserTabsProps
+
 ) {
+
+  const [open, setOpen] = useState(false);
   return (
     <QueryClientProvider client={queryClient}>
       <Tabs defaultValue="my-recipes">
@@ -52,7 +57,7 @@ export default function UserTabs(
           {user_id === user_data?.user_id && (
             <TabsList>
               <TabsTrigger value={"edit"} asChild={true} onClick={() => alert(5)}>
-                <Dialog>
+                <Dialog open={open} onOpenChange={setOpen}>
                   <DialogTrigger>
                     Edit Profile
                   </DialogTrigger>
@@ -60,7 +65,7 @@ export default function UserTabs(
                     <DialogTitle>
                       Edit your profile
                     </DialogTitle>
-                    <PersonalInfoForm user_id={user_data?.user_id || -1} is_edit={true} user_details={user_data} />
+                    <PersonalInfoForm setOpen={setOpen} user_id={user_data?.user_id || -1} is_edit={true} user_details={user_data} />
                   </DialogContent>
                 </Dialog>
               </TabsTrigger>

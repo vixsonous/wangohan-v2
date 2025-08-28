@@ -29,6 +29,7 @@ router.post("/logout", UserController.logout);
 router.post("/register", UserController.register);
 router.get("/is-authenticated", UserController.isAuthenticated);
 router.post("/personal-info", upload.single('user_image'), UserController.registerPersonalInfo);
+router.put("/update-personal-info", upload.single('user_image'), UserController.updatePersonalInfo);
 
 // Pets
 router.post("/post-pet", upload.single('pet_image'), PetController.postPet);
