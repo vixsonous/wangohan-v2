@@ -10,7 +10,7 @@ import {UserSchema} from "@/types/user-types.user";
 import {useRouter} from "next/navigation";
 import {AxiosError} from "axios";
 
-export const usePersonalForm = () => {
+export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof UserSchema.User>) => {
 
   const router = useRouter();
   const signupInfoMutation = useMutation({
@@ -30,6 +30,28 @@ export const usePersonalForm = () => {
         description: ClientApiResponseService.getAxiosResponseMessage(data)
       });
       router.push("/user/" + dt?.user_id + "/" + dt?.user_codename);
+    },
+    onError: (error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
+    }
+  });
+
+  const updateInfoMutation = useMutation({
+    mutationFn: (data: FieldValues) => ClientApiService.put("/update-personal-info", {
+      ...data,
+      updated_at: new Date().toLocaleString(),
+    }, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      withCredentials: true
+    }),
+    onSuccess: (data) => {
+      const dt = ClientApiResponseService.getAxiosResponseData<z.infer<typeof UserSchema.UserDisplay>>(data);
+      toast.success("Successful!", {
+        description: ClientApiResponseService.getAxiosResponseMessage(data)
+      });
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosErrorMessage(error);
@@ -58,19 +80,27 @@ export const usePersonalForm = () => {
     })
   })
 
-  const onSubmit = (data: FieldValues) => {
-    signupInfoMutation.mutate({...data});
-  }
+  const onSubmit = (data: FieldValues) => is_edit ? updateInfoMutation.mutate({...data}) : signupInfoMutation.mutate({...data});
 
-
-
-  const {register, handleSubmit, control, formState: {errors}} = useForm<z.infer<typeof UserDetailSchema.PostUserDetails>>({
+  const {register, handleSubmit, control, formState: {errors}} = useForm<z.infer<typeof UserDetailSchema.PostUserDetails | typeof  UserDetailSchema.UpdateUserDetails>>({
     mode: "onBlur",
-    resolver: zodResolver(UserDetailSchema.PostUserDetails)
+    resolver: zodResolver(is_edit ? UserDetailSchema.UpdateUserDetails : UserDetailSchema.PostUserDetails),
+    defaultValues: user_details ? {
+      user_id: user_details.user_id,
+      user_codename: user_details.user_details?.user_codename,
+      user_image: undefined,
+      user_gender: user_details.user_details?.user_gender,
+      user_birthdate: user_details.user_details?.user_birthdate,
+      user_agreement: user_details.user_details?.user_agreement,
+      user_occupation: user_details.user_details?.user_occupation,
+      user_last_name: user_details.user_details?.user_last_name,
+      user_first_name: user_details.user_details?.user_first_name,
+    } : undefined,
   });
 
   return {
     signupInfoMutation,
+    updateInfoMutation,
     register,
     errors,
     control,

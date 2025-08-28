@@ -22,13 +22,22 @@ import {
 } from "@/components/ui/select";
 import TermsAndConditions from "@/app/(auth)/signup/personal-info/terms-and-conditions";
 import {formatInTimeZone} from "date-fns-tz";
+import z from "zod";
+import {UserSchema} from "@/types/user-types.user";
 
-export default function PersonalInfoForm({user_id}: {user_id: number}) {
-  const { signupInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm();
+interface PersonalInfoFormProps {
+  user_id: number,
+  is_edit?: boolean,
+  user_details?: z.infer<typeof UserSchema.User>
+}
 
+export default function PersonalInfoForm({user_id, is_edit, user_details}: PersonalInfoFormProps) {
+  const { signupInfoMutation, updateInfoMutation, register, errors, control, onSubmit, handleSubmit, uploadFileMutation} = usePersonalForm(is_edit, user_details);
+  console.log(user_details?.user_id);
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-full sm:max-w-2xl flex flex-col gap-4 items-start pt-10">
-      <InputField hidden={true} {...register("user_id", {valueAsNumber: true})} value={Number(user_id)}/>
+      {Object.keys(errors).map(err => err)}
+      <InputField hidden={true} {...register("user_id", {valueAsNumber: true})} value={is_edit ? Number(user_id) : Number(user_details?.user_id)}/>
       <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-5">
         <div className="col-span-2">
           <Controller
@@ -45,14 +54,24 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
                   )
                 }
                 <div className="relative w-full">
-                  <Image
-                    key={field.value ? field.value.name : "image"}
-                    noprocess={true}
-                    src={field.value ? URL.createObjectURL(field.value) : "/image.webp"}
-                    className="h-full w-full top-0 aspect-square right-0 object-cover rounded-full"
-                    width={100} height={100}
-                    alt={field.value ? field.value.name : "default image"}
-                  />
+                  {field.value !== undefined ? (
+                    <Image
+                      key={field.value ? field.value.name : "image"}
+                      noprocess={true}
+                      src={field.value ? URL.createObjectURL(field.value) : "/image.webp"}
+                      className="h-full w-full top-0 aspect-square right-0 object-cover rounded-full"
+                      width={100} height={100}
+                      alt={field.value ? field.value.name : "default image"}
+                    />
+                  ) : (
+                    <Image
+                      key={user_details?.user_details?.user_image ? user_details?.user_details?.user_image : "image"}
+                      src={user_details?.user_details?.user_image ? user_details?.user_details?.user_image : "/image.webp"}
+                      className="h-full w-full top-0 aspect-square right-0 object-cover rounded-full"
+                      width={100} height={100}
+                      alt={user_details?.user_details?.user_codename ? user_details?.user_details?.user_codename : "default image"}
+                    />
+                  )}
                 </div>
                 <span className={"hidden"}>
                   <InputField onChange={
@@ -144,7 +163,7 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value}
+                    selected={new Date(field.value)}
                     onSelect={(date) => {
                       if(date) {
                         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -171,7 +190,7 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
           </label>
 
           <Controller render={({field}) => (
-            <Select onValueChange={field.onChange}>
+            <Select value={field.value} onValueChange={field.onChange}>
               <SelectTrigger id={"user_gender"} className="w-full bg-secondary-bg border border-primary-text">
                 <SelectValue placeholder="性別を選択" />
               </SelectTrigger>
@@ -208,9 +227,10 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
 
       <Controller
         render={({field}) => (
-          <p className="w-full flex flex-col justify-center items-center gap-2">
+          <p className={`w-full ${is_edit ? "hidden" : ""} flex flex-col justify-center items-center gap-2`}>
             <label className="text-sm font-semibold flex items-baseline gap-2" htmlFor="user_agreement">
               <input
+                checked={field.value !== 0}
                 aria-invalid={errors.user_agreement?.message !== undefined}
                 className="sm:text-base"
                 onChange={(e:React.ChangeEvent<HTMLInputElement>) => field.onChange(e.currentTarget.checked ? 1 : 0)}
@@ -226,8 +246,8 @@ export default function PersonalInfoForm({user_id}: {user_id: number}) {
         control={control}
       />
       <div className="w-full flex justify-center flex-col items-center gap-[10px]">
-        <Button disabled={signupInfoMutation.isPending || signupInfoMutation.isSuccess} type="submit" className="w-full flex items-center gap-2 bg-primary-text">
-          {signupInfoMutation.isPending ? (
+        <Button disabled={is_edit ? (updateInfoMutation.isPending || updateInfoMutation.isSuccess) : (signupInfoMutation.isPending || signupInfoMutation.isSuccess)} type="submit" className="w-full flex items-center gap-2 bg-primary-text">
+          {signupInfoMutation.isPending || updateInfoMutation.isPending ? (
             <><Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} /> 新規登録</>
           ): (
             "新規登録"
