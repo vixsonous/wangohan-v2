@@ -9,7 +9,7 @@ const PersonalInfoForm = dynamic(() => import("@/app/(auth)/signup/personal-info
 export default function PersonalInfoFormWrapper({user_id}: {user_id: number}) {
   return (
     <QueryClientProvider client={queryClient}>
-      <PersonalInfoForm user_id={user_id}/>
+      <PersonalInfoForm user_id={user_id} is_edit={false}/>
     </QueryClientProvider>
   )
 }

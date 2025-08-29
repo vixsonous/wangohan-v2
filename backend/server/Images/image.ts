@@ -29,7 +29,11 @@ export class Image {
         Key: `${folder}/${filename}.${file_extension}`,
         ContentType: content_type,
       },
-      leavePartsOnError: false
+      leavePartsOnError: false,
+    });
+
+    upload.on("httpUploadProgress", progress =>  {
+      console.log(`Upload progress ${progress.loaded} of ${progress.total}`);
     });
 
     return await upload.done();

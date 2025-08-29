@@ -37,8 +37,7 @@ export default function PersonalInfoForm({user_id, is_edit, user_details, setOpe
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-full sm:max-w-2xl flex flex-col gap-4 items-start pt-10">
-      {Object.keys(errors).map(err => err)}
-      <InputField hidden={true} {...register("user_id", {valueAsNumber: true})} value={is_edit ? Number(user_id) : Number(user_details?.user_id)}/>
+      <InputField hidden={true} {...register("user_id", {valueAsNumber: true})} value={is_edit ? Number(user_details?.user_id) : Number(user_id) }/>
       <div className="w-full gap-4 grid grid-cols-1 md:grid-cols-5">
         <div className="col-span-2">
           <Controller

@@ -222,7 +222,7 @@ export class UserDetailsRepository {
 
         const uploadImage = await image.result();
         const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
-        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, "profile_picture_" + user_detail.user_id, "webp", "images/webp");
+        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, user_detail.user_image.originalname.split(".")[0], "webp", "images/webp");
 
         if(uploadDone.Key === undefined) {
           return undefined;

@@ -105,8 +105,8 @@ export class ImageService {
 
       if(widthCheck) {
         image = heightCheck ?
-          image.resize(Number(w), Number(h), {fit: fit as keyof FitEnum, kernel: upscale ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined}) :
-          image.resize(Number(w), undefined, {fit: fit as keyof FitEnum, kernel: upscale ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined});
+          image.resize(Number(w), Number(h), {fit: fit as keyof FitEnum, kernel: upscale || upscale === "true" ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined}) :
+          image.resize(Number(w), undefined, {fit: fit as keyof FitEnum, kernel: upscale || upscale === "true" ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined});
       }
 
       if(quality !== undefined) {

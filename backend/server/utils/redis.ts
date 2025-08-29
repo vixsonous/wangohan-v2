@@ -41,6 +41,7 @@ export class CacheUtil {
   }
 
   public static async delete(key: string) {
+    log("Successfully deleted cache data: " + key);
     await redisClient.del(key);
   }
 }
