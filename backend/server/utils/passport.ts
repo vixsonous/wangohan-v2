@@ -74,8 +74,22 @@ passport.use(new GoogleStrategy({
 
   const googleCredentials = await UserService.googleStrategyLogin(profile.id);
 
+  const isVerified = profile._json.email_verified;
+  const email = profile._json.email;
+  if(googleCredentials === undefined && isVerified !== undefined && isVerified && email !== undefined) {
+    const createResult = await UserService.googleStrategyRegister(email, profile.id);
+
+    if(createResult === undefined) {
+      done("There was an error registering with OAuth!", false);
+      return;
+    }
+
+    done(null, {id: profile.id, strategy: 'google'} satisfies PassportUser);
+    return;
+  }
+
   if(googleCredentials === undefined) {
-    done("Google user not found! Please sign up with your google account.", false);
+    done("User with google credentials does not exist!", false);
     return;
   }
 

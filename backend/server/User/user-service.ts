@@ -12,6 +12,7 @@ export class UserService {
     POST_USER_DETAILS_SUCCESS: "Successfully posted personal information!",
     UPDATE_USER_DETAILS_SUCCESS: "Successfully updated personal information!",
     GOOGLE_STRATEGY_LOGIN_SUCCESS: "Successfully found user!",
+    GOOGLE_STRATEGY_REGISTER_SUCCESS: "Successfully created a new user!",
   }
   static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
     const user = await GetUserDetails.getUser(user_id, user_codename);
@@ -37,6 +38,12 @@ export class UserService {
   static async localStrategyRegister(email: string, password: string): Promise<User | undefined> {
     const createResult = await new User({email, password}).createUser();
     log(UserService.USER_SERVICE_SUCCESS_LOGS.LOCAL_STRATEGY_REGISTER_SUCCESS);
+    return createResult;
+  }
+
+  static async googleStrategyRegister(email: string, google_id: string): Promise<User | undefined> {
+    const createResult = await new User({email, google_id}).createUser();
+    log(UserService.USER_SERVICE_SUCCESS_LOGS.GOOGLE_STRATEGY_REGISTER_SUCCESS);
     return createResult;
   }
 

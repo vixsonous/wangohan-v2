@@ -27,7 +27,7 @@ router.get("/transform-image", ImageController.transformImage);
 router.get("/get-user", UserController.getUser);
 router.post("/login", UserController.login);
 router.get("/google", passport.authenticate("google", {
-  scope: ["profile"]
+  scope: ["profile", "email"]
 }));
 router.get("/google/redirect", UserController.googleLogin);
 router.post("/logout", UserController.logout);

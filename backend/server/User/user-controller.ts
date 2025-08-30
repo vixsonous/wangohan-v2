@@ -174,7 +174,7 @@ export class UserController {
 
       req.logIn(user, (err) => {
         if(err) {
-          ApiResponse.error(res, "Error in saving to session!");
+          ApiResponse.redirect(res, "/login?error=" + "Google account access was denied!");
           return;
         }
 

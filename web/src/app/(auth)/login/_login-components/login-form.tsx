@@ -16,6 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosError} from "axios";
+import {useRouter} from "next/navigation";
 
 const UserLoginSchema = z.object({
   email: z.string().min(1, "Email is required!").email("Invalid email format!"),
@@ -26,6 +27,7 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
 
   const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserLoginSchema)});
   const [passwordState, setPasswordState] = useState('password');
+  const router = useRouter();
 
   const ShowPasswordBtn = memo(function ShowPassword() {
     return <ButtonX onClick={() => setPasswordState(prev => prev === 'password' ? 'text' : 'password')}>
@@ -41,7 +43,8 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
     mutationFn: (data: FieldValues) => ClientApiService.post("/login", data),
     onSuccess: (data) => {
       toast.success("Successful!", {description: data.data.message});
-      window.location.href = "/";
+      router.replace("/");
+      router.refresh();
     },
     onError:(error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosErrorMessage(error);
