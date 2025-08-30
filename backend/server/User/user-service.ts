@@ -11,6 +11,7 @@ export class UserService {
     LOCAL_STRATEGY_REGISTER_SUCCESS: "Successfully created a new user!",
     POST_USER_DETAILS_SUCCESS: "Successfully posted personal information!",
     UPDATE_USER_DETAILS_SUCCESS: "Successfully updated personal information!",
+    GOOGLE_STRATEGY_LOGIN_SUCCESS: "Successfully found user!",
   }
   static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
     const user = await GetUserDetails.getUser(user_id, user_codename);
@@ -23,6 +24,14 @@ export class UserService {
 
     if(user !== undefined) log(UserService.USER_SERVICE_SUCCESS_LOGS.LOCAL_STRATEGY_LOGIN_SUCCESS);
 
+    return user;
+  }
+
+  static async googleStrategyLogin(google_id: string): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
+    const user = await User.findUser({googleId: google_id});
+
+    if(user !== undefined) log(UserService.USER_SERVICE_SUCCESS_LOGS.GOOGLE_STRATEGY_LOGIN_SUCCESS);
+    console.log(user);
     return user;
   }
 

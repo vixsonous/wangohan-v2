@@ -321,6 +321,42 @@ export class UserRepository {
     }
   }
 
+  static async getUserByGoogleId(google_id: string): Promise<z.infer<typeof UserSchema.User> | undefined> {
+    try {
+      const user: z.infer<typeof UserSchema.User> = await db.selectFrom("users_table")
+        .select(eb => [
+          "user_id",
+          "email",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_first_name",
+                "user_last_name",
+                "user_codename",
+                "user_image",
+                "user_agreement",
+                "user_gender",
+                "user_birthdate",
+                "user_id",
+                "user_occupation",
+                "updated_at",
+                "created_at"
+              ]).whereRef("user_details_table.user_id", "=", "users_table.user_id")
+          ).as("user_details")
+        ])
+        .where("google_id", "=", google_id)
+        .executeTakeFirstOrThrow();
+
+      log(UserRepository.USER_REPOSITORY_SUCCESS_MESSAGE.GET_USER_BY_ID_SUCCESS);
+
+      return user
+    } catch (error) {
+      console.error("User not found!");
+      log(error);
+      return undefined;
+    }
+  }
+
   static async findUser({user_email, google_id, user_id}:{user_email?: string | undefined, google_id?: string | undefined, user_id?: string | undefined}): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
     try {
       const user: z.infer<typeof UserAuthenticationSchema.UserCredentials> = await db.selectFrom("users_table")

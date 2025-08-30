@@ -4,12 +4,16 @@ import passport from './utils/passport';
 import session from 'express-session';
 import { redisClient } from './utils/redis';
 import {RedisStore} from 'connect-redis';
+import cors from 'cors';
 
 const SESSION_MINUTES = 30;
 
 const app = express();
 app.use(express.json());
 app.use(urlencoded({extended: false}));
+app.use(cors({
+  origin: "*",
+}))
 
 app.use(session({
   store: new RedisStore({client: redisClient}),

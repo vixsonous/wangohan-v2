@@ -7,6 +7,7 @@ import {queryClient} from "@/lib/tanstack-query";
 import SidebarMenu from "@/app/_root-components/root-sidebar-menu";
 
 export default function RootSidebarMenuWrapper({user_data}: {user_data: z.infer<typeof UserSchema.User> | undefined}) {
+
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarMenu user_data={user_data} />

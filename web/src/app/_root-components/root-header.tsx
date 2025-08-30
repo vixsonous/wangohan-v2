@@ -2,6 +2,7 @@ import Link from "next/link";
 import RootNavigationButtons from "./root-nav";
 import Image from "@/components/Image/server";
 import HomeSearchBar from "./home-search-bar";
+import GoogleLoginSuccess from "@/app/_root-components/google-login-success";
 
 export default async function RootHeader() {
   return (
@@ -12,6 +13,7 @@ export default async function RootHeader() {
         </Link>
         <HomeSearchBar />
         <RootNavigationButtons />
+        <GoogleLoginSuccess />
       </div>
       <div className="absolute top-0 left-0 w-full h-full bg-secondary-bg opacity-[0.9] z-[-1]"></div>
     </header>

@@ -79,7 +79,6 @@ export class PetRepository {
   static async getBirthdayMonthPets(current_month: number): Promise<Array<z.infer<typeof PetSchema.GetPet>> | undefined> {
     const BIRTHDAY_PET_RETRIEVAL_SUCCESS = "Successfully retrieved birthday pets";
     try {
-      console.log("Went here");
       const pets = await db.selectFrom("pets_table")
         .selectAll()
         .where(({ ref }) =>

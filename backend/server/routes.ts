@@ -4,6 +4,7 @@ import { ImageController } from "./Images/image-controller";
 import { UserController } from "./User/user-controller";
 import multer from 'multer';
 import {PetController} from "@/server/Pet/pet-controller";
+import passport from "@/server/utils/passport";
 
 export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
@@ -25,6 +26,10 @@ router.get("/transform-image", ImageController.transformImage);
 // User
 router.get("/get-user", UserController.getUser);
 router.post("/login", UserController.login);
+router.get("/google", passport.authenticate("google", {
+  scope: ["profile"]
+}));
+router.get("/google/redirect", UserController.googleLogin);
 router.post("/logout", UserController.logout);
 router.post("/register", UserController.register);
 router.get("/is-authenticated", UserController.isAuthenticated);

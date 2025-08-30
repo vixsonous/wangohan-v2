@@ -6,8 +6,14 @@ export class ServerApiResponseService {
     return responseData.data as T;
   }
 
-  static async getResponseJson<T>(res: Response): Promise<{message: string, data: T}> {
-    return await res.json();
+  static async getResponseJson<T>(res: Response): Promise<{message: string, data: T} | undefined> {
+    try {
+      return await res.json();
+    } catch(e) {
+      console.error(e);
+      return undefined
+    }
+
   }
 }
 export class ServerApiService {

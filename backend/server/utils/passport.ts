@@ -1,17 +1,36 @@
 import passport from 'passport';
 import Local from 'passport-local';
+import Google from 'passport-google-oauth20';
 import { UserService } from '../User/user-service';
 import bcrypt from 'bcrypt';
 import { UserRepository} from "@/server/User/user-repository";
 
+interface PassportUser {
+  id: string;
+  strategy: "local" | "google"
+}
+
 passport.serializeUser((user, done) => {
+  console.log("serialized", user);
   done(null, user);
 });
 
-passport.deserializeUser(async (id: number, done) => {
-  const user = await UserRepository.getUserById(id);
+passport.deserializeUser(async (userParams: PassportUser, done) => {
+  let user;
 
-  if(user === undefined) done("User not found!", false);
+  if(userParams.strategy === "google") {
+    user = await UserRepository.getUserByGoogleId(userParams.id);
+  }
+
+  if(userParams.strategy === "local") {
+    user = await UserRepository.getUserById(Number(userParams.id));
+  }
+
+  if(user === undefined) {
+    console.log("went here and no user!");
+    done(new Error("User not found!"), null);
+    return;
+  }
 
   done(null, user);
 });
@@ -39,8 +58,33 @@ passport.use(new LocalStrategy(
       return;
     }
 
-    done(null, credentials.user_id);
+    done(null, {id: String(credentials.user_id), strategy: "local"} as PassportUser);
   }
 ));
+
+const GoogleStrategy = Google.Strategy;
+
+passport.use(new GoogleStrategy({
+  callbackURL: process.env.GOOGLE_AUTH_CALLBACK_URL,
+  clientID: process.env.GOOGLE_CLIENT_ID!,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+},async (accessToken, refreshToken, profile, done) => {
+
+  const googleCredentials = await UserService.googleStrategyLogin(profile.id);
+
+  if(googleCredentials === undefined) {
+    done("Google user not found! Please sign up with your google account.", false);
+    return;
+  }
+
+  const googleId = googleCredentials.google_id;
+
+  if(googleId === undefined) {
+    done("Please login through email and password!", false);
+    return;
+  }
+
+  done(null, {id: googleId, strategy: 'google'} satisfies PassportUser);
+}))
 
 export default passport;

@@ -23,6 +23,8 @@ export class UserController {
 
   static async isAuthenticated(req: Request, res: Response) {
     console.log("the cookies here " + req.cookies);
+    console.log("the user is ");
+    console.log(req.user)
     ApiResponse.success(res, req.user ? "Authenticated": "Not authenticated", req.user, 200);
   }
 
@@ -37,7 +39,7 @@ export class UserController {
 
       req.logIn(user, (loginError) => {
         if(loginError){
-          ApiResponse.error(res, loginError);
+          ApiResponse.redirect(res, "/login");
           return;
         }
 
@@ -163,5 +165,26 @@ export class UserController {
 
       ApiResponse.success(res, "Successfully logged out!");
     })
+  }
+
+  static async googleLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate("google", (err: any, user: any, _: any) => {
+      if(err) {
+        log(err);
+        ApiResponse.redirect(res, "/login?error=" + err);
+        return;
+      }
+
+      req.logIn(user, (err) => {
+        if(err) {
+          ApiResponse.error(res, "Error in saving to session!");
+          return;
+        }
+
+        ApiResponse.redirect(res, "/?google-login-success=true");
+      });
+
+    })(req, res, next);
+
   }
 }
