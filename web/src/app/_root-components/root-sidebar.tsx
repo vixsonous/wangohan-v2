@@ -16,7 +16,7 @@ export default async function RootSidebar(
       </SheetTrigger>
       <SheetContent side="right" className="px-8 w-[300px]">
         <SheetTitle className="mt-8">
-          <CreateRecipe />
+          <CreateRecipe user_data={user_data} />
         </SheetTitle>
         <SheetDescription>
           description
