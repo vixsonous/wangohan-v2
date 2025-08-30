@@ -588,7 +588,6 @@ export class RecipeRepository {
 
   static async archiveRecipe(recipe_id: number, recipe_name: string, user_id: number, is_archive: boolean): Promise<boolean> {
     try {
-      console.log("is archive " + is_archive);
       await db.updateTable("recipes_table")
         .set({
           is_deleted: is_archive

@@ -40,7 +40,7 @@ export class PetController {
   static async getBirthdayMonthPets(req: Request, res: Response) {
     const {current_month} = req.query;
     const curMonth = Number(current_month);
-    console.log(current_month);
+
     if(curMonth < 0 || curMonth > 12) {
       log("Invalid current month!");
       ApiResponse.error(res, "Invalid month!");

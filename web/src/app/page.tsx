@@ -35,7 +35,6 @@ export default async function Home() {
   }
 
   const birthdayPets = await getBirthdayMonthPets();
-  console.log("birthday pets " + birthdayPets);
 
   const structuredData = {
     "@context": "https://schema.org",

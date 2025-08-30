@@ -31,7 +31,6 @@ export class UserService {
     const user = await User.findUser({googleId: google_id});
 
     if(user !== undefined) log(UserService.USER_SERVICE_SUCCESS_LOGS.GOOGLE_STRATEGY_LOGIN_SUCCESS);
-    console.log(user);
     return user;
   }
 

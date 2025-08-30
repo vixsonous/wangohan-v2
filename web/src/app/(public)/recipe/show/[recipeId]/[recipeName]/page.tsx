@@ -19,9 +19,10 @@ export async function generateMetadata({
 }: Props): Promise<Metadata> {
   const id = (await params).recipeId;
   const name = (await params).recipeName;
-  console.log(id, name);
+
+  const recipe = await getRecipe(Number(id), name, false) as z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>;
   return {
-    title: "クリスマス3色あんかけ",
+    title: recipe.recipe_name,
     keywords: ["愛犬のための手作りごはんレシピサイト",
       "わんごはん",
       "犬用手作りごはん",
@@ -29,16 +30,18 @@ export async function generateMetadata({
       "homemade dog food",
       "healthy pet food",
       "dog recipe ideas",
-      "ペットレシピサイト"],
-    creator: "Victor Chiong",
-    description: "わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？",
+      "ペットレシピサイト"].concat(recipe.recipe_ingredients.map( i => i.recipe_ingredients_name)),
+    creator: recipe.user?.user_codename,
+    description: recipe.recipe_description,
     openGraph: {
-      title: 'わんごはん - 愛犬のための手作りごはんレシピサイト',
-      description: 'わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？',
+      title: recipe.recipe_name,
+      description: recipe.recipe_description,
       url: 'https://wangohanjp.com', // Your website URL
-      type: 'website',
+      type: "article",
       images: [
-          { url: 'https://wangohanjp.com/logo-final.webp', width: 500, height: 500, alt: 'わんごはん' }
+          { url: recipe.recipe_images[0].recipe_image.startsWith("r2://") ?
+              process.env.BASE_PUBLIC_BUCKET_URL + recipe.recipe_images[0].recipe_image.split("r2://")[1] :
+              recipe.recipe_images[0].recipe_image, width: 500, height: 500, alt: recipe.recipe_images[0].recipe_image_title }
       ]
     },
     robots: {

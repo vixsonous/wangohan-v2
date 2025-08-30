@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export default async function middleware(req: NextRequest) {
-  console.log(req);
+export default async function middleware(_: NextRequest) {
   return NextResponse.next({
     request: {
       headers: undefined

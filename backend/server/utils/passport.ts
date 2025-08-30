@@ -4,6 +4,7 @@ import Google from 'passport-google-oauth20';
 import { UserService } from '../User/user-service';
 import bcrypt from 'bcrypt';
 import { UserRepository} from "@/server/User/user-repository";
+import {log} from "@/server/utils/log";
 
 interface PassportUser {
   id: string;
@@ -11,7 +12,6 @@ interface PassportUser {
 }
 
 passport.serializeUser((user, done) => {
-  console.log("serialized", user);
   done(null, user);
 });
 
@@ -19,15 +19,17 @@ passport.deserializeUser(async (userParams: PassportUser, done) => {
   let user;
 
   if(userParams.strategy === "google") {
+    log("Logging in with google strategy");
     user = await UserRepository.getUserByGoogleId(userParams.id);
   }
 
   if(userParams.strategy === "local") {
+    log("Logging in with local strategy");
     user = await UserRepository.getUserById(Number(userParams.id));
   }
 
   if(user === undefined) {
-    console.log("went here and no user!");
+    log("User not found!");
     done(new Error("User not found!"), null);
     return;
   }

@@ -9,7 +9,7 @@ export const getUser = async (user_id: number, user_codename: string): Promise<z
     const response = await ServerApiService.get(`/get-user?user_id=${user_id}&user_codename=${user_codename}`);
     return await ServerApiResponseService.getResponseData<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined>(response);
   } catch(e) {
-    console.log(e);
+    log(e);
     return undefined;
   }
 }
@@ -18,6 +18,12 @@ export const isAuthenticated = async (): Promise<z.infer<typeof UserSchema.User>
   try {
     const isAuthenticated = await ServerApiService.get("/is-authenticated");
     const responseJson = await ServerApiResponseService.getResponseJson<z.infer<typeof UserSchema.User> | undefined>(isAuthenticated);
+
+    if(responseJson === undefined) {
+      log("The response data is undefined!");
+      return undefined;
+    }
+
     log(responseJson.message);
     return responseJson.data;
   } catch (e) {

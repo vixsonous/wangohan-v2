@@ -263,7 +263,6 @@ export class UserDetailsRepository {
         .executeTakeFirstOrThrow();
 
       log("Successfully posted user details data!");
-      console.log(userDetails);
       return userDetails;
     } catch (e) {
       log(e);

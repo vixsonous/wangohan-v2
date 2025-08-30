@@ -85,7 +85,7 @@ export class PetRepository {
           sql`EXTRACT(MONTH FROM ${ref('pet_birthdate')}) = ${current_month}`
         )
         .execute();
-      console.log(pets);
+
       log(BIRTHDAY_PET_RETRIEVAL_SUCCESS);
 
       return pets;
