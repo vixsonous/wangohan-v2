@@ -41,8 +41,24 @@ export class CacheUtil {
     });
   }
 
-  public static async delete(key: string) {
+  public static async delete(key: string | string[]) {
     log("Successfully deleted cache data: " + key);
-    await redisClient.del(key);
+    const deleted = await redisClient.del(key);
+    console.log(deleted);
+  }
+}
+
+export class RecipeCacheUtil {
+  static async clearFrontPageRecipesCache() {
+    await CacheUtil.delete([RecipeCacheKey.GET_WEEKLY_RECIPES_KEY, RecipeCacheKey.GET_POPULAR_RECIPES_KEY]);
+  }
+
+  static async clearAllRecipesCache() {
+    const keys = await redisClient.scan("0", {
+      MATCH: "GET:recipe-list-page*",
+      COUNT: 100
+    });
+
+    await CacheUtil.delete([RecipeCacheKey.GET_WEEKLY_RECIPES_KEY, RecipeCacheKey.GET_POPULAR_RECIPES_KEY].concat(keys.keys));
   }
 }

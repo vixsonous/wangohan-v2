@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import {ApiResponse} from "../utils/ApiUtils";
 import { RecipeService } from "./recipe-service";
 import { log } from "../utils/log";
-import {CacheUtil, RecipeCacheKey} from "../utils/redis";
+import {CacheUtil, RecipeCacheKey, RecipeCacheUtil} from "../utils/redis";
 import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import z from "zod";
 import {getUserData} from "@/server/utils/server-utils";
@@ -63,7 +63,7 @@ export class RecipeController {
     
     const recipe = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>, typeof RecipeService.getRecipe>(
       GET_RECIPE_KEY,
-      RecipeService.getRecipe, 60, Number(recipe_id), String(recipe_name), Boolean(is_edit)
+      RecipeService.getRecipe, 120, Number(recipe_id), String(recipe_name), Boolean(is_edit)
     ).catch( (err: undefined) => err);
 
     if(recipe === undefined) {
@@ -112,6 +112,7 @@ export class RecipeController {
       return;
     }
 
+    await RecipeCacheUtil.clearAllRecipesCache();
     ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_POST_RECIPE);
   }
 
@@ -164,6 +165,7 @@ export class RecipeController {
 
     await RecipeService.updateRecipe(submitParseResult.data);
     const GET_RECIPE_KEY = `GET:recipe_id=${submitParseResult.data.recipe_id}&recipe_name=${submitParseResult.data.recipe_name}`;
+    await RecipeCacheUtil.clearAllRecipesCache();
     await CacheUtil.delete(GET_RECIPE_KEY);
 
     ApiResponse.success(res, "Successfully updated the recipe!");
@@ -245,8 +247,7 @@ export class RecipeController {
       return;
     }
 
-    await CacheUtil.delete(RecipeCacheKey.GET_WEEKLY_RECIPES_KEY);
-    await CacheUtil.delete(RecipeCacheKey.GET_POPULAR_RECIPES_KEY);
+    await RecipeCacheUtil.clearAllRecipesCache();
     await CacheUtil.delete(RecipeCacheKey.GET_RECIPE_KEY(String(archiveRecipeParseResult.data.recipe_id), archiveRecipeParseResult.data.recipe_name));
 
     ApiResponse.success(res, `Successfully ${archiveRecipeParseResult.data.is_archive ? "archived" : "unarchived"} recipe!`);
@@ -290,6 +291,8 @@ export class RecipeController {
       ApiResponse.error(res, "There was an error deleting recipe!");
       return;
     }
+
+    await RecipeCacheUtil.clearAllRecipesCache();
 
     ApiResponse.success(res, "Successfully deleted recipe!");
   }
