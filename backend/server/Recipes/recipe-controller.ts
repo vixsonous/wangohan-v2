@@ -304,7 +304,10 @@ export class RecipeController {
       return;
     }
 
-    const recipeList = await RecipeService.getRecipeList(pageParse.data);
+    const recipeList = await CacheUtil.get<
+      z.infer<typeof RecipeSchema.RecipeList>,
+      typeof RecipeService.getRecipeList
+    >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
 
     if(recipeList === undefined) {
       ApiResponse.error(res, "There was an error retrieving the recipe list!");
