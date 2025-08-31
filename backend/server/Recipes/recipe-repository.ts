@@ -606,7 +606,7 @@ export class RecipeRepository {
           "recipes_table.updated_at",
           "recipes_table.created_at"
         ])
-        .orderBy("recipes_table.created_at desc")
+        .orderBy("recipes_table.created_at", "desc")
         .limit(RecipeRepository.LIST_RECIPES_LIMIT)
         .offset(RecipeRepository.LIST_RECIPES_LIMIT * page)
         .execute();
