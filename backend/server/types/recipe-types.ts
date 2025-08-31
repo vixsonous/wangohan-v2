@@ -76,6 +76,7 @@ export class RecipeSchema {
     recipe_name: z.string(),
     recipe_image: z.string(),
     user_id: z.number(),
+    total_recipes: z.number().optional(),
     updated_at: z.date(),
     created_at: z.date()
   });
@@ -143,4 +144,9 @@ export class RecipeSchema {
     message: "You are not authorized to delete this recipe!",
     path: ["user_id"]
   });
+
+  static RecipeList = z.object({
+    recipes: z.array(RecipeSchema.GetBasicRecipe),
+    total_recipes: z.number(),
+  })
 }

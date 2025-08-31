@@ -117,4 +117,9 @@ export class RecipeSchema {
     updated_at: z.date(),
     created_at: z.date()
   });
+
+  static RecipeList = z.object({
+    recipes: z.array(RecipeSchema.GetBasicRecipe),
+    total_recipes: z.number()
+  })
 }

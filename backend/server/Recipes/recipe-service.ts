@@ -41,6 +41,10 @@ export class RecipeService {
     return await RecipeRepository.getOwnedRecipes(user_id, page);
   }
 
+  static async getRecipeList(page_no: number): Promise<z.infer<typeof RecipeSchema.RecipeList> | undefined> {
+    return await RecipeRepository.getRecipeList(page_no);
+  }
+
   static async getArchivedRecipes(user_id: number, page: number): Promise<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined> {
     const GET_ARCHIVED = true;
     return await RecipeRepository.getOwnedRecipes(user_id, page, GET_ARCHIVED);

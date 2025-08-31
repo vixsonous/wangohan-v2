@@ -293,4 +293,25 @@ export class RecipeController {
 
     ApiResponse.success(res, "Successfully deleted recipe!");
   }
+
+  static async getRecipeList(req: Request, res: Response) {
+    const {page_no} = req.query;
+
+    const pageParse = z.number().safeParse(Number(page_no));
+
+    if(!pageParse.success) {
+      ApiResponse.error(res, "Invalid page number!");
+      return;
+    }
+
+    const recipeList = await RecipeService.getRecipeList(pageParse.data);
+
+    if(recipeList === undefined) {
+      ApiResponse.error(res, "There was an error retrieving the recipe list!");
+      return;
+    }
+
+    log("Successfully retrieved recipe list!");
+    ApiResponse.success(res, "Successfully retrieved recipes!", recipeList);
+  }
 }

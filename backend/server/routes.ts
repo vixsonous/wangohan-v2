@@ -10,6 +10,7 @@ export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
 
 router.get("/get-recipe", RecipeController.getRecipe);
+router.get("/get-recipe-list", RecipeController.getRecipeList);
 router.post("/post-recipe", upload.array('recipe_images[]'), RecipeController.uploadRecipe);
 router.post("/update-recipe", upload.array("recipe_images[]"), RecipeController.updateRecipe);
 router.delete("/archive-recipe", RecipeController.archiveRecipe);

@@ -586,6 +586,50 @@ export class RecipeRepository {
     }
   }
 
+  private static LIST_RECIPES_LIMIT = 20;
+
+  static async getRecipeList(page: number) : Promise<z.infer<typeof RecipeSchema.RecipeList> | undefined> {
+    try {
+      const recipeList: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = await db.selectFrom("recipes_table")
+        .select(lteb => [
+          "recipes_table.recipe_id",
+          "recipes_table.recipe_name",
+          lteb.fn.coalesce(
+            lteb.selectFrom("recipe_images_table")
+              .select("recipe_image")
+              .limit(1)
+              .whereRef("recipes_table.recipe_id", "=", "recipe_images_table.recipe_id")
+            ,
+            lteb.val("")
+          ).as("recipe_image"),
+          "recipes_table.user_id",
+          "recipes_table.updated_at",
+          "recipes_table.created_at"
+        ])
+        .orderBy("recipes_table.created_at desc")
+        .limit(RecipeRepository.LIST_RECIPES_LIMIT)
+        .offset(RecipeRepository.LIST_RECIPES_LIMIT * page)
+        .execute();
+
+      log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
+
+      const totalRecipes = await db.selectFrom("recipes_table")
+        .select(lteb => [
+          lteb.fn.coalesce(lteb.selectFrom("recipes_table").select(({fn}) => [
+            fn.count<number>("recipes_table.user_id").as("total_recipes")
+          ]), lteb.val(0)).as("total_recipes")
+        ]).executeTakeFirstOrThrow();
+
+      return {
+        recipes: recipeList,
+        total_recipes: Number(totalRecipes.total_recipes)
+      };
+    } catch(e) {
+      log(e);
+      return undefined;
+    }
+  }
+
   static async archiveRecipe(recipe_id: number, recipe_name: string, user_id: number, is_archive: boolean): Promise<boolean> {
     try {
       await db.updateTable("recipes_table")
