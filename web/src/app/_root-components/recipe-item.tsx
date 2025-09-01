@@ -3,7 +3,8 @@
 import Image from "@/components/Image/client";
 import Link from "next/link";
 import StarReviews from "@/components/StarReviews";
-import { RecipeDisplayDetails } from "@/server-actions/Recipe/recipe-types";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
 
 const getTags = (recipe_tag: string) => {
   return recipe_tag.split(",").map( (tag, idx) => (
@@ -11,7 +12,7 @@ const getTags = (recipe_tag: string) => {
   ));
 }
 
-export default function RecipeItem(recipe: RecipeDisplayDetails) {
+export default function RecipeItem({recipe}: {recipe: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>}) {
   return (
     <Link className="w-full" href={`/recipe/show/${recipe.recipe_id}/${recipe.recipe_name}`}>
       <section className="relative flex flex-col gap-[8px]">

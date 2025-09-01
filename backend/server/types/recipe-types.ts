@@ -148,5 +148,10 @@ export class RecipeSchema {
   static RecipeList = z.object({
     recipes: z.array(RecipeSchema.GetBasicRecipe),
     total_recipes: z.number(),
+  });
+
+  static SearchRecipeList = z.object({
+    recipes: z.array(RecipeDisplaySchema.RecipeCardDisplay),
+    total_recipes: z.number(),
   })
 }

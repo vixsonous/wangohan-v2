@@ -16,6 +16,7 @@ export class RecipeCacheKey {
   public static GET_RECIPE_KEY = (recipe_id: string, recipe_name: string) => `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
   public static TRANSFORM_IMAGE = (src: string, h: string, w: string, fit: string, quality: string,format: string, upscale: string, upscaleMethod: string) => `${src}?h=${h}&w=${w}&fit=${fit}&quality=${quality}&format=${format}&upscale=${upscale}&upscaleMethod=${upscaleMethod}`;
   public static GET_RECIPE_LIST = (page_no: number) => `GET:recipe-list-page=${page_no}`;
+  public static GET_SEARCH_RECIPE_LIST = (page_no: number, search_text: string) => `GET:recipe-list-page=${page_no}-search-${search_text}`;
 }
 
 export class CacheUtil {

@@ -3,10 +3,11 @@
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import RecipeItem from "./recipe-item";
 import Autoplay from "embla-carousel-autoplay";
-import { RecipeDisplayDetails } from "@/server-actions/Recipe/recipe-types";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
 
 interface RecipeCarouselProps {
-  recipes: Array<RecipeDisplayDetails>
+  recipes: Array<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>
 }
 
 export default function RecipeCarousel({recipes}: RecipeCarouselProps) {
@@ -27,7 +28,7 @@ export default function RecipeCarousel({recipes}: RecipeCarouselProps) {
           recipes.map( (recipe, idx) => {
             return (
               <CarouselItem className="lg:basis-1/4" key={idx}>
-                <RecipeItem {...recipe}/>
+                <RecipeItem recipe={recipe}/>
               </CarouselItem>
             )
           })

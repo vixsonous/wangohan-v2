@@ -6,6 +6,7 @@ import {CacheUtil, RecipeCacheKey, RecipeCacheUtil} from "../utils/redis";
 import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import z from "zod";
 import {getUserData} from "@/server/utils/server-utils";
+import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
 
 export class RecipeController {
 
@@ -319,5 +320,35 @@ export class RecipeController {
 
     log("Successfully retrieved recipe list!");
     ApiResponse.success(res, "Successfully retrieved recipes!", recipeList);
+  }
+
+  static async getSearchRecipeList(req: Request, res: Response) {
+    const {page_no, search_text} = req.query;
+
+    const searchRecipeParse = RecipeControllerValidationSchema.SearchRecipeList.safeParse({
+      page_no: Number(page_no),
+      search_text: search_text
+    });
+
+    if(!searchRecipeParse.success) {
+      ApiResponse.error(res, "Invalid page number!");
+      return;
+    }
+
+    const searchRecipeList = await CacheUtil.get<
+      z.infer<typeof RecipeSchema.RecipeList>,
+      typeof RecipeService.getSearchRecipeList
+    >(RecipeCacheKey.GET_SEARCH_RECIPE_LIST(
+      searchRecipeParse.data.page_no,
+      searchRecipeParse.data.search_text
+    ), RecipeService.getSearchRecipeList, 60, searchRecipeParse.data.page_no, searchRecipeParse.data.search_text);
+
+    if(searchRecipeList === undefined) {
+      ApiResponse.error(res, "There was an error retrieving the recipe list!");
+      return;
+    }
+
+    log("Successfully retrieved search recipe list!");
+    ApiResponse.success(res, "Successfully retrieved search recipes!", searchRecipeList);
   }
 }

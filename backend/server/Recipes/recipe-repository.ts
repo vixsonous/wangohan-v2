@@ -630,6 +630,179 @@ export class RecipeRepository {
     }
   }
 
+  private static SEARCH_RECIPES_LIMIT = 9;
+
+  static async getSearchRecipeList(page: number, search_text: string) : Promise<z.infer<typeof RecipeSchema.SearchRecipeList> | undefined> {
+    try {
+      const recipeList: Array<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>> = await db.selectFrom("recipes_table")
+        .select(lteb => [
+          "recipe_name",
+          "recipe_id",
+          "recipe_category",
+          "recipe_age_tag",
+          "recipe_event_tag",
+          "recipe_size_tag",
+          "recipe_description",
+          "user_id",
+          "created_at",
+          "total_likes",
+          "total_views",
+          jsonArrayFrom(
+            lteb.selectFrom("recipe_images_table")
+              .select([
+                "recipe_image_id",
+                "recipe_image_title",
+                "recipe_image_subtext",
+                "recipe_image",
+                "recipe_id",
+              ])
+              .whereRef("recipe_images_table.recipe_id","=","recipes_table.recipe_id")
+          ).as("recipe_images"),
+          jsonObjectFrom(
+            lteb.selectFrom("recipe_comments_table")
+              .select(({ fn }) => [
+                fn
+                  .count<number>("recipe_comment_id")
+                  .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                  .as("total_rating"),
+                fn
+                  .avg<number>("recipe_comment_rating")
+                  .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                  .as("avg_rating"),
+              ])
+          ).as("recipe_rating_data"),
+          lteb.fn.coalesce(
+            lteb.selectFrom("recipe_images_table")
+              .select("recipe_image")
+              .limit(1)
+              .whereRef("recipes_table.recipe_id", "=", "recipe_images_table.recipe_id")
+            ,
+            lteb.val("")
+          ).as("recipe_image"),
+        ])
+        .orderBy("recipes_table.created_at", "desc")
+        .where(({ eb, exists }) =>
+          eb.or([
+            eb("recipe_name", "ilike", `%${search_text}%`),
+            eb("recipe_description", "ilike", `%${search_text}%`),
+            eb("recipe_age_tag", "ilike", `%${search_text}%`),
+            eb("recipe_size_tag", "ilike", `%${search_text}%`),
+            eb("recipe_event_tag", "ilike", `%${search_text}%`),
+            exists(
+              eb
+                .selectFrom("recipe_ingredients_table")
+                .where(
+                  "recipe_ingredients_table.recipe_id",
+                  "=",
+                  eb.ref("recipes_table.recipe_id")
+                )
+                .where((eb) =>
+                  eb.or([
+                    eb(
+                      "recipe_ingredients_table.recipe_ingredients_name",
+                      "ilike",
+                      `%${search_text}%`
+                    ),
+                    eb(
+                      "recipe_ingredients_table.recipe_ingredients_amount",
+                      "ilike",
+                      `%${search_text}%`
+                    ),
+                  ])
+                )
+            ),
+            exists(
+              eb
+                .selectFrom("recipe_instructions_table")
+                .where(
+                  "recipe_instructions_table.recipe_id",
+                  "=",
+                  eb.ref("recipes_table.recipe_id")
+                )
+                .where((eb) =>
+                  eb.or([
+                    eb(
+                      "recipe_instructions_table.recipe_instructions_text",
+                      "ilike",
+                      `%${search_text}%`
+                    ),
+                  ])
+                )
+            ),
+          ])
+        )
+        .limit(RecipeRepository.SEARCH_RECIPES_LIMIT)
+        .offset(RecipeRepository.SEARCH_RECIPES_LIMIT * page)
+        .execute();
+
+      log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
+
+      const totalRecipes = await db.selectFrom("recipes_table")
+        .select(lteb => [
+          lteb.fn.coalesce(lteb.selectFrom("recipes_table").select(({fn}) => [
+            fn.count<number>("recipes_table.user_id").as("total_recipes")
+          ]).where(({ eb, exists }) =>
+            eb.or([
+              eb("recipe_name", "ilike", `%${search_text}%`),
+              eb("recipe_description", "ilike", `%${search_text}%`),
+              eb("recipe_age_tag", "ilike", `%${search_text}%`),
+              eb("recipe_size_tag", "ilike", `%${search_text}%`),
+              eb("recipe_event_tag", "ilike", `%${search_text}%`),
+              exists(
+                eb
+                  .selectFrom("recipe_ingredients_table")
+                  .where(
+                    "recipe_ingredients_table.recipe_id",
+                    "=",
+                    eb.ref("recipes_table.recipe_id")
+                  )
+                  .where((eb) =>
+                    eb.or([
+                      eb(
+                        "recipe_ingredients_table.recipe_ingredients_name",
+                        "ilike",
+                        `%${search_text}%`
+                      ),
+                      eb(
+                        "recipe_ingredients_table.recipe_ingredients_amount",
+                        "ilike",
+                        `%${search_text}%`
+                      ),
+                    ])
+                  )
+              ),
+              exists(
+                eb
+                  .selectFrom("recipe_instructions_table")
+                  .where(
+                    "recipe_instructions_table.recipe_id",
+                    "=",
+                    eb.ref("recipes_table.recipe_id")
+                  )
+                  .where((eb) =>
+                    eb.or([
+                      eb(
+                        "recipe_instructions_table.recipe_instructions_text",
+                        "ilike",
+                        `%${search_text}%`
+                      ),
+                    ])
+                  )
+              ),
+            ])
+          ), lteb.val(0)).as("total_recipes")
+        ]).executeTakeFirstOrThrow();
+
+      return {
+        recipes: recipeList,
+        total_recipes: Number(totalRecipes.total_recipes)
+      };
+    } catch(e) {
+      log(e);
+      return undefined;
+    }
+  }
+
   static async archiveRecipe(recipe_id: number, recipe_name: string, user_id: number, is_archive: boolean): Promise<boolean> {
     try {
       await db.updateTable("recipes_table")
