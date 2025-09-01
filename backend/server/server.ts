@@ -9,6 +9,7 @@ import cors from 'cors';
 const SESSION_MINUTES = 30;
 
 const app = express();
+
 app.use(express.json());
 app.use(urlencoded({extended: false}));
 app.use(cors({

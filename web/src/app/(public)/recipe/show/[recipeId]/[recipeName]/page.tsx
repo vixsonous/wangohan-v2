@@ -9,6 +9,7 @@ import { getRecipe } from "@/server-actions/Recipe/recipe";
 import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
 import {isAuthenticated} from "@/server-actions/User/user";
+import ViewCounter from "@/components/ViewCounter";
 
 type Props = {
   params: Promise<{ recipeId: string, recipeName: string }>;
@@ -69,6 +70,7 @@ export default async function ShowRecipe({params}: Props) {
 
   return (
     <section className="flex max-w-3xl flex-col text-primary-text items-center w-full mt-10 gap-2">
+      <ViewCounter recipe_id={recipe.recipe_id} />
       <ShowRecipeCarousel user_id={recipe.user?.user_id || -1} is_owner={userData?.user_id === recipe.user?.user_id} recipe_images={recipe.recipe_images} recipe_id={recipe.recipe_id} recipe_name={recipe.recipe_name} />
       <ShowRecipeTags {...recipe}/>
       <section className="flex w-full flex-col p-5 gap-7">

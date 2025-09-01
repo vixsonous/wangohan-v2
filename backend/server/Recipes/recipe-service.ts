@@ -57,4 +57,8 @@ export class RecipeService {
   static async hardDeleteRecipe(recipe_id: number, recipe_name: string, user_id:number): Promise<boolean> {
     return await RecipeRepository.hardDeleteRecipe(recipe_id, recipe_name, user_id);
   }
+
+  static async viewedRecipe(recipe_id: number) {
+    return await RecipeRepository.viewedRecipe(recipe_id);
+  }
 }

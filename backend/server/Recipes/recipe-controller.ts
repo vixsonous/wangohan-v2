@@ -351,4 +351,23 @@ export class RecipeController {
     log("Successfully retrieved search recipe list!");
     ApiResponse.success(res, "Successfully retrieved search recipes!", searchRecipeList);
   }
+
+  static async viewedRecipe(req: Request, res: Response) {
+    const {recipe_id} = req.query;
+
+    const recipeIdParse = z.number().safeParse(Number(recipe_id));
+    if(!recipeIdParse.success) {
+      ApiResponse.error(res, "Invalid recipe id!");
+      return;
+    }
+
+    const result = await RecipeService.viewedRecipe(recipeIdParse.data);
+
+    if(!result) {
+      ApiResponse.error(res, "There was an error updating the recipe view number!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully viewed recipe!");
+  }
 }

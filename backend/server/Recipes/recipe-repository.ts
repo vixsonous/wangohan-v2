@@ -12,6 +12,7 @@ import { RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import {ImageProcess} from "../Images/image-service";
 import {Image} from "../Images/image";
+import {RecipeCacheUtil} from "@/server/utils/redis";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -859,6 +860,25 @@ export class RecipeRepository {
       log(e);
       await trx.rollback().execute();
       return false;
+    }
+  }
+
+  static async viewedRecipe(recipe_id: number): Promise<boolean | undefined> {
+    try {
+
+      await db
+        .updateTable("recipes_table")
+        .set((eb) => ({
+          total_views: eb("total_views", "+", 1),
+        }))
+        .where("recipe_id", "=", recipe_id)
+        .execute();
+
+      await RecipeCacheUtil.clearAllRecipesCache();
+      return true;
+    } catch (e) {
+      log(e);
+      return undefined;
     }
   }
 }
