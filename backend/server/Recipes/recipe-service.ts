@@ -61,4 +61,12 @@ export class RecipeService {
   static async viewedRecipe(recipe_id: number) {
     return await RecipeRepository.viewedRecipe(recipe_id);
   }
+
+  static async likeRecipe(recipe_id: number, user_id: number, is_liked: boolean) {
+    return await RecipeRepository.likeRecipe(recipe_id, user_id, is_liked);
+  }
+
+  static async isLikedRecipe(recipe_id: number, user_id: number) {
+    return await RecipeRepository.isLikedRecipe(recipe_id, user_id);
+  }
 }

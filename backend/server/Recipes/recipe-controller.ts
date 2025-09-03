@@ -7,6 +7,7 @@ import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import z from "zod";
 import {getUserData} from "@/server/utils/server-utils";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
+import {RecipeRepository} from "@/server/Recipes/recipe-repository";
 
 export class RecipeController {
 
@@ -369,5 +370,80 @@ export class RecipeController {
     }
 
     ApiResponse.success(res, "Successfully viewed recipe!");
+  }
+
+  static async isLikedRecipe(req: Request, res: Response) {
+    const {recipe_id} = req.query;
+
+    const user = getUserData(req);
+
+    if(user === undefined) {
+      console.error("Error!");
+      log("You must log in to like a recipe!");
+      ApiResponse.error(res, "You must log in to like a recipe!");
+      return;
+    }
+
+    const submitData = {
+      recipe_id: Number(recipe_id),
+      user_id: user.user_id
+    }
+
+    const isLikedRecipeParseResult = RecipeControllerValidationSchema.IsLikedRecipe.safeParse(submitData);
+
+    if(!isLikedRecipeParseResult.success) {
+      console.error("Error!");
+      log(isLikedRecipeParseResult.error.issues[0].message);
+      ApiResponse.error(res, isLikedRecipeParseResult.error.issues[0].message);
+      return;
+    }
+
+    const isLiked = await RecipeRepository.isLikedRecipe(
+      isLikedRecipeParseResult.data.recipe_id,
+      isLikedRecipeParseResult.data.user_id
+    );
+
+    ApiResponse.success(res, "Successfully retrieved is liked!", {is_liked: isLiked});
+  }
+
+  static async likeRecipe(req: Request, res: Response) {
+    const {recipe_id, is_liked, recipe_name} = req.query;
+
+    const user = getUserData(req);
+
+    if(user === undefined) {
+      ApiResponse.error(res, "You must be logged in to like a recipe!");
+      return;
+    }
+
+    const submitData = {
+      recipe_id: Number(recipe_id),
+      is_liked: is_liked === 'true',
+      user_id: user.user_id,
+      recipe_name: recipe_name,
+    }
+
+    const likeRecipeParseResult = RecipeControllerValidationSchema.LikeRecipe.safeParse(submitData);
+
+    if(!likeRecipeParseResult.success) {
+      ApiResponse.error(res, likeRecipeParseResult.error.issues[0].message);
+      return;
+    }
+
+    const isLiked = await RecipeService.likeRecipe(
+      likeRecipeParseResult.data.recipe_id,
+      likeRecipeParseResult.data.user_id,
+      likeRecipeParseResult.data.is_liked
+    );
+
+    if(isLiked === undefined) {
+      ApiResponse.error(res, "There was an error liking the recipe!");
+      return;
+    }
+
+    await RecipeCacheUtil.clearAllRecipesCache();
+    await RecipeCacheUtil.clearRecipeCache(likeRecipeParseResult.data.recipe_id, likeRecipeParseResult.data.recipe_name);
+
+    ApiResponse.success(res, `Successfully ${likeRecipeParseResult.data.is_liked ? 'liked' : 'unlinked'} the recipe!`);
   }
 }

@@ -881,4 +881,58 @@ export class RecipeRepository {
       return undefined;
     }
   }
+
+  static async likeRecipe(recipe_id: number, user_id: number, is_liked: boolean): Promise<boolean | undefined> {
+
+    const trx = await db.startTransaction().execute();
+    try {
+      await trx.insertInto("likes_table")
+        .values({
+          recipe_id: recipe_id,
+          user_id: user_id,
+          is_liked: is_liked,
+          updated_at: new Date(),
+          created_at: new Date(),
+        })
+        .onConflict(oc =>
+          oc.columns(['user_id', 'recipe_id'])
+            .doUpdateSet({is_liked: is_liked, updated_at: new Date()}))
+        .execute();
+
+      await trx.updateTable("recipes_table")
+        .set((eb) => ({
+          total_likes: eb("total_likes", is_liked ? "+" : "-", 1),
+          updated_at: new Date(),
+        }))
+        .returning("total_likes")
+        .where(eb => eb.and({
+          recipe_id: recipe_id,
+        }))
+        .executeTakeFirstOrThrow();
+
+      await trx.commit().execute();
+      return true;
+    } catch(e) {
+      log(e);
+      await trx.rollback().execute();
+      return undefined;
+    }
+  }
+
+  static async isLikedRecipe(recipe_id: number, user_id: number): Promise<boolean> {
+    try {
+      const isLiked = await db.selectFrom("likes_table")
+        .select("is_liked")
+        .where(eb => eb.and({
+          recipe_id: recipe_id,
+          user_id: user_id
+        }))
+        .executeTakeFirstOrThrow();
+
+      return isLiked.is_liked;
+    } catch(e) {
+      log(e);
+      return false;
+    }
+  }
 }

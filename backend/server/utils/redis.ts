@@ -62,4 +62,9 @@ export class RecipeCacheUtil {
 
     await CacheUtil.delete([RecipeCacheKey.GET_WEEKLY_RECIPES_KEY, RecipeCacheKey.GET_POPULAR_RECIPES_KEY].concat(keys.keys));
   }
+
+  static async clearRecipeCache(recipe_id: number, recipe_name: string) {
+    const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
+    await CacheUtil.delete(GET_RECIPE_KEY);
+  }
 }
