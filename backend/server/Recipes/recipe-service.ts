@@ -1,6 +1,7 @@
 import z from "zod";
 import { RecipeRepository } from "./recipe-repository";
 import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
+import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
 
 export class RecipeService {
   static async getWeeklyRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
@@ -68,5 +69,9 @@ export class RecipeService {
 
   static async isLikedRecipe(recipe_id: number, user_id: number) {
     return await RecipeRepository.isLikedRecipe(recipe_id, user_id);
+  }
+
+  static async postComment(comment: z.infer<typeof RecipeControllerValidationSchema.PostComment>) {
+    return await RecipeRepository.postComment(comment);
   }
 }

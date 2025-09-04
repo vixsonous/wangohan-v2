@@ -15,6 +15,7 @@ router.get("/get-search-recipe-list", RecipeController.getSearchRecipeList);
 router.get("/viewed-recipe", RecipeController.viewedRecipe);
 router.get("/like-recipe", RecipeController.likeRecipe);
 router.get("/is-liked", RecipeController.isLikedRecipe);
+router.post("/post-comment", RecipeController.postComment);
 router.post("/post-recipe", upload.array('recipe_images[]'), RecipeController.uploadRecipe);
 router.post("/update-recipe", upload.array("recipe_images[]"), RecipeController.updateRecipe);
 router.delete("/archive-recipe", RecipeController.archiveRecipe);

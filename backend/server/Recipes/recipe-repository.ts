@@ -13,6 +13,7 @@ import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import {ImageProcess} from "../Images/image-service";
 import {Image} from "../Images/image";
 import {RecipeCacheUtil} from "@/server/utils/redis";
+import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -141,6 +142,8 @@ export class RecipeRepository {
     }
   }
 
+  static RECIPE_COMMENT_COUNT_LIMIT: number = 5;
+
   static async getRecipe(recipe_id: number, recipe_name: string, is_edit: boolean):
     Promise<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | z.infer<typeof RecipeSchema.UpdateRecipe> | undefined> {
     try {
@@ -226,8 +229,13 @@ export class RecipeRepository {
                     .whereRef("recipe_comments_table.user_id", "=", "user_details_table.user_id")
                 ).as("user")
               ])
+              .orderBy("recipe_comments_table.created_at","desc")
+              .limit(RecipeRepository.RECIPE_COMMENT_COUNT_LIMIT)
               .whereRef("recipe_comments_table.recipe_id","=","recipes_table.recipe_id")
-          ).as("recipe_comments")
+          ).as("recipe_comments"),
+          eb.fn.coalesce(eb.selectFrom("recipe_comments_table").select(({fn}) => [
+            fn.count<number>("recipe_comments_table.recipe_id").as("total_comments")
+          ]).where("recipe_comments_table.recipe_id", "=", recipe_id), eb.val(0)).as("total_comments")
         ])
         .where(eb => eb.and({
           recipe_id: recipe_id,
@@ -237,7 +245,7 @@ export class RecipeRepository {
         .executeTakeFirstOrThrow();
 
       log("Successfully retrieved recipe details!");
-
+      console.log(recipe);
       return is_edit ?
         recipe as z.infer<typeof RecipeSchema.UpdateRecipe> :
         recipe as z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>;
@@ -934,5 +942,39 @@ export class RecipeRepository {
       log(e);
       return false;
     }
+  }
+  
+  static async postComment(comment: z.infer<typeof RecipeControllerValidationSchema.PostComment>): Promise<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments> | undefined> {
+    try {
+      
+      const newComment = await db.insertInto("recipe_comments_table")
+        .values({
+          recipe_comment_rating: comment.rating,
+          recipe_comment_title: "",
+          recipe_comment_subtext: comment.comment,
+          recipe_id: comment.recipe_id,
+          user_id: comment.user_id,
+          updated_at: comment.created_at,
+          created_at: comment.created_at
+        })
+        .returning(se => [
+          "recipe_comment_rating",
+          "recipe_comment_subtext",
+          "created_at",
+          jsonObjectFrom(
+            se.selectFrom("user_details_table")
+              .select(["user_image", "user_id", "user_codename"])
+              .whereRef("user_details_table.user_id","=", "recipe_comments_table.user_id")
+          ).as("user")
+        ])
+        .executeTakeFirstOrThrow();
+      
+      log("Successfully inserted the comment!");
+      return newComment;
+    } catch (e) {
+      log(e);
+      return undefined;
+    }
+    
   }
 }

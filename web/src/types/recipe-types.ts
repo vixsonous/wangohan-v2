@@ -63,6 +63,7 @@ export class RecipeDisplaySchema {
     recipe_instructions: z.array(RecipeDisplaySchema.RecipeInstruction),
     recipe_ingredients: z.array(RecipeDisplaySchema.RecipeIngredient),
     recipe_comments: z.array(RecipeDisplaySchema.RecipeDetailsDisplayComments),
+    total_comments: z.number(),
     user: UserSchema.UserDisplay,
     created_at: z.date(),
   });
@@ -126,5 +127,11 @@ export class RecipeSchema {
   static SearchRecipeList = z.object({
     recipes: z.array(RecipeDisplaySchema.RecipeCardDisplay),
     total_recipes: z.number(),
-  })
+  });
+
+  static ClientPostComment = z.object({
+    rating: z.number("Please provide your rating for the recipe!"),
+    recipe_id: z.number("Please provide the recipe id!"),
+    comment: z.string().min(1, "Please provide your comment for the recipe!"),
+  });
 }

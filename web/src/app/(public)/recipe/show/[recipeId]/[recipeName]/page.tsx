@@ -3,13 +3,14 @@ import ShowRecipeTags from "./show-recipe-tags";
 import ShowRecipeIngredients from "./show-recipe-ingredients";
 import ShowRecipeInstructions from "./show-recipe-instructions";
 import ShowRecipeCommentsHeader from "./show-recipe-comments-header";
-import ShowRecipeComments from "./show-recipe-comments";
 import { Metadata } from "next";
 import { getRecipe } from "@/server-actions/Recipe/recipe";
 import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
 import {isAuthenticated} from "@/server-actions/User/user";
 import ViewCounter from "@/components/ViewCounter";
+import ShowRecipeCommentFormWrapper
+  from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/components/show-recipe-comments-form";
 
 type Props = {
   params: Promise<{ recipeId: string, recipeName: string }>;
@@ -91,7 +92,7 @@ export default async function ShowRecipe({params}: Props) {
         <ShowRecipeIngredients recipe_ingredients={recipe.recipe_ingredients}/>
         <ShowRecipeInstructions recipe_instructions={recipe.recipe_instructions}/>
         <ShowRecipeCommentsHeader avgRating={4.5} totalRating={10} recipe_id={recipe.recipe_id} user={recipe.user}/>
-        <ShowRecipeComments comments={recipe.recipe_comments} total_comments={15}/>
+        <ShowRecipeCommentFormWrapper total_comments={Number(recipe.total_comments)} recipe_comments={recipe.recipe_comments} recipe_id={recipe.recipe_id} is_logged_in={userData !== undefined} />
       </section>
     </section>
   )

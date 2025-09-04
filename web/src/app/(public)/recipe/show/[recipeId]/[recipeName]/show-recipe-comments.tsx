@@ -1,15 +1,37 @@
+"use client"
 import Button from "@/components/Button";
-import Image from "@/components/Image/server";
+import Image from "@/components/Image/client";
 import StarReviews from "@/components/StarReviews";
-import { RecipeDetailsDisplayComments } from "@/server-actions/Recipe/recipe-types";
 import Link from "next/link";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
+import {useState} from "react";
+import {useMutation} from "@tanstack/react-query";
+import {ClientApiService} from "@/lib/client-utils";
+import {AxiosError, AxiosResponse} from "axios";
 
 interface ShowRecipeCommentsProps {
-  comments: Array<RecipeDetailsDisplayComments>;
+  comments: Array<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>>;
   total_comments: number;
+  recipe_id: number;
 }
 
-export default async function ShowRecipeComments({comments, total_comments}: ShowRecipeCommentsProps) {
+const COMMENT_FIRST_PAGE = 1;
+
+export default function ShowRecipeComments({comments, total_comments, recipe_id}: ShowRecipeCommentsProps) {
+
+  const [page, setPage] = useState(COMMENT_FIRST_PAGE);
+
+  const getMoreCommentsMutation = useMutation({
+    mutationFn: ({recipe_id, page}: {recipe_id: number, page: number}) => ClientApiService.get("/get-comments?recipe_id=" + recipe_id + "&page=" + page),
+    onSuccess: (response: AxiosResponse) => {
+      setPage(prev => prev + 1);
+    },
+    onError: (error: AxiosError) => {
+
+    }
+  })
+
   return (
     <div className="reviews flex flex-col gap-[20px]">
       {
@@ -28,7 +50,7 @@ export default async function ShowRecipeComments({comments, total_comments}: Sho
                     <StarReviews value={com.recipe_comment_rating} interactive={false}/>
                   </div>
                   <div className="date">
-                    {new Date(com.created_at).toLocaleString()}
+                    {new Date(com.created_at.toString().replace("Z","")).toLocaleString()}
                   </div>
                 </div>
                 <div className="lower-content whitespace-pre-wrap rounded-md text-[10px] bg-[#fef1dd] p-[10px]">
@@ -41,7 +63,7 @@ export default async function ShowRecipeComments({comments, total_comments}: Sho
       }
       {
         total_comments > 10 && (
-          <Button className="text-[10px] ml-[50px] flex gap-[10px] items-center">
+          <Button onClick={() => getMoreCommentsMutation.mutate({recipe_id: recipe_id, page: page})} className="text-[10px] ml-[50px] flex gap-[10px] items-center">
             全てのレビューを見る
           </Button>
         )

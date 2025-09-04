@@ -446,4 +446,45 @@ export class RecipeController {
 
     ApiResponse.success(res, `Successfully ${likeRecipeParseResult.data.is_liked ? 'liked' : 'unlinked'} the recipe!`);
   }
+
+  static async postComment(req: Request, res: Response) {
+    const data = req.body;
+
+    const user = getUserData(req);
+
+    if(user === undefined) {
+      log("You must log in to comment to a recipe!");
+      ApiResponse.error(res, "You must be logged in to comment to a recipe!");
+      return;
+    }
+
+    const submitData = {
+      ...data,
+      user_id: user.user_id,
+      recipe_id: Number(data.recipe_id),
+      rating: Number(data.rating),
+      created_at: new Date(data.created_at)
+    }
+
+    const postCommentParseResult = RecipeControllerValidationSchema.PostComment.safeParse(submitData);
+
+    if(!postCommentParseResult.success) {
+      console.error("Error!");
+      log(postCommentParseResult.error.issues[0].message);
+      ApiResponse.error(res, postCommentParseResult.error.issues[0].message);
+      return;
+    }
+
+    const submittedComment = await RecipeService.postComment(postCommentParseResult.data);
+
+    if(submittedComment === undefined) {
+      log("There was an error posting the comment!");
+      ApiResponse.error(res, "There was an error posting the comment!");
+      return;
+    }
+
+    console.log(submittedComment);
+
+    ApiResponse.success(res, "Successfully posted the comment!", submittedComment);
+  }
 }

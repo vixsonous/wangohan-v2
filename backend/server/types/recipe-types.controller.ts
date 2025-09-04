@@ -16,5 +16,13 @@ export class RecipeControllerValidationSchema {
   static IsLikedRecipe = z.object({
     recipe_id: z.number("Please provide a recipe id!"),
     user_id: z.number("You must be logged in to like a recipe!"),
+  });
+
+  static PostComment = z.object({
+    rating: z.number("Must be a valid rating!"),
+    comment: z.string().min(1, "Please provide a comment!"),
+    created_at: z.date("Please provide the date!"),
+    user_id: z.number("You must be logged in to comment to a recipe!"),
+    recipe_id: z.number("Please provide a recipe id!"),
   })
 }
