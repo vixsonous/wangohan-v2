@@ -91,7 +91,7 @@ export default async function ShowRecipe({params}: Props) {
         </header>
         <ShowRecipeIngredients recipe_ingredients={recipe.recipe_ingredients}/>
         <ShowRecipeInstructions recipe_instructions={recipe.recipe_instructions}/>
-        <ShowRecipeCommentsHeader avgRating={4.5} totalRating={10} recipe_id={recipe.recipe_id} user={recipe.user}/>
+        <ShowRecipeCommentsHeader avgRating={recipe.recipe_rating_data?.avg_rating || 0} totalRating={recipe.recipe_rating_data?.total_rating || 0} recipe_id={recipe.recipe_id} user={recipe.user}/>
         <ShowRecipeCommentFormWrapper recipe_name={recipe.recipe_name} total_comments={Number(recipe.total_comments)} recipe_comments={recipe.recipe_comments} recipe_id={recipe.recipe_id} is_logged_in={userData !== undefined} />
       </section>
     </section>
