@@ -14,6 +14,7 @@ import {ImageProcess} from "../Images/image-service";
 import {Image} from "../Images/image";
 import {RecipeCacheUtil} from "@/server/utils/redis";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
+import {UserSchema} from "@/server/types/user-types.user";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -252,6 +253,28 @@ export class RecipeRepository {
     } catch (error) {
       log("There was an error retrieving recipe details.");
       console.error(error);
+      return undefined;
+    }
+  }
+
+  static async getRecipeOwner(recipe_id: number): Promise<z.infer<typeof UserSchema.UserDisplay> | undefined> {
+    try {
+      const user = await db.selectFrom("recipes_table")
+        .select(eb => jsonObjectFrom(
+          eb.selectFrom("user_details_table")
+            .select([
+              "user_codename",
+              "user_id",
+              "user_image"
+            ]).whereRef("user_id", "=", "recipes_table.user_id")
+        ).as("user"))
+        .where("recipes_table.recipe_id","=", recipe_id)
+        .executeTakeFirstOrThrow();
+
+      log("Successfully retrieved recipe owner");
+      return user.user;
+    } catch(e) {
+      log(e);
       return undefined;
     }
   }

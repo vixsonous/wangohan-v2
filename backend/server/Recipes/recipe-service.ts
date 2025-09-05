@@ -2,6 +2,7 @@ import z from "zod";
 import { RecipeRepository } from "./recipe-repository";
 import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
+import {UserSchema} from "@/server/types/user-types.user";
 
 export class RecipeService {
   static async getWeeklyRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
@@ -16,6 +17,10 @@ export class RecipeService {
   static async getRecipe(recipe_id: number, recipe_name: string, is_edit: boolean) {
 
     return await RecipeRepository.getRecipe(recipe_id, recipe_name, is_edit);
+  }
+
+  static async getRecipeOwner(recipe_id: number): Promise<z.infer<typeof UserSchema.UserDisplay> | undefined> {
+    return await RecipeRepository.getRecipeOwner(recipe_id);
   }
 
   static async postRecipe(recipe: z.infer<typeof RecipeSchema.PostRecipe>): Promise<boolean | undefined> {

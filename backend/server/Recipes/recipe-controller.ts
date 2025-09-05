@@ -8,6 +8,7 @@ import z from "zod";
 import {getUserData} from "@/server/utils/server-utils";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
 import {RecipeRepository} from "@/server/Recipes/recipe-repository";
+import {recipeEvents} from "@/server/server";
 
 export class RecipeController {
 
@@ -444,7 +445,20 @@ export class RecipeController {
     await RecipeCacheUtil.clearAllRecipesCache();
     await RecipeCacheUtil.clearRecipeCache(likeRecipeParseResult.data.recipe_id, likeRecipeParseResult.data.recipe_name);
 
-    ApiResponse.success(res, `Successfully ${likeRecipeParseResult.data.is_liked ? 'liked' : 'unlinked'} the recipe!`);
+    const owner = await RecipeService.getRecipeOwner(likeRecipeParseResult.data.recipe_id);
+
+    recipeEvents.sendMessageToClient(
+      JSON.stringify({
+        type: "like",
+        recipe_id: likeRecipeParseResult.data.recipe_id,
+        recipe_name: likeRecipeParseResult.data.recipe_name,
+        user_codename: user.user_details?.user_codename,
+        user_image: user.user_details?.user_image
+      }),
+      `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
+    );
+
+    ApiResponse.success(res, `Successfully ${likeRecipeParseResult.data.is_liked ? 'liked' : 'unliked'} the recipe!`);
   }
 
   static async postComment(req: Request, res: Response) {
@@ -516,5 +530,45 @@ export class RecipeController {
     }
 
     ApiResponse.success(res, "Successfully retrieved comments!", comments);
+  }
+
+  static async recipeEvents(req: Request, res: Response) {
+    const {user_id, user_codename} = req.query;
+
+    const user = getUserData(req);
+
+    if(user === undefined) {
+      log("You must login to get notifications!");
+      ApiResponse.unauthorized(res, "Unauthorized");
+      return;
+    }
+
+    if(Number(user_id) !== user.user_id || user.user_details?.user_codename !== user_codename) {
+      console.error("Error!");
+      log("Unauthorized user given!");
+      ApiResponse.unauthorized(res, "Unauthorized");
+      return;
+    }
+
+    const origin = req.headers.origin;
+
+    if(origin === process.env.BASE_URL) {
+      res.setHeader("Access-Control-Allow-Origin", process.env.BASE_URL || "");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    res.flushHeaders();
+
+    const id = `user_id=${user_id}&user_codename=${user_codename}&room_id=${Date.now()}`;
+    recipeEvents.addClient({id: id, res: res});
+
+    req.on("close", () => {
+      recipeEvents.removeClient(id);
+      console.log("User disconnected");
+    });
   }
 }

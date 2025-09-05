@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 
-export default async function middleware(_: NextRequest) {
+export default async function middleware() {
   return NextResponse.next({
     request: {
       headers: undefined

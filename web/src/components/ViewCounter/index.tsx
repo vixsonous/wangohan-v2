@@ -12,6 +12,6 @@ export default function ViewCounter({recipe_id}: {recipe_id: number}) {
     }, VIEW_TIMEOUT * SECOND);
 
     return () => clearTimeout(countDown);
-  }, []);
+  }, [recipe_id]);
   return null;
 }

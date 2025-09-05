@@ -17,7 +17,7 @@ export default function LoginWrapper() {
       toast.error("Error!", {description: error});
       router.replace("/login");
     }
-  }, [error]);
+  }, [error, router]);
   return (
     <QueryClientProvider client={queryClient}>
       <LoginForm />

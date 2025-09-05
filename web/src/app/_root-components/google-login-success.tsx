@@ -14,6 +14,6 @@ export default function GoogleLoginSuccess() {
       toast.success("Successful!", {description: "Successfully logged in!"});
       router.replace("/");
     }
-  }, [googleLoginSuccess]);
+  }, [googleLoginSuccess, router]);
   return <Toaster richColors position="top-center"/>;
 }

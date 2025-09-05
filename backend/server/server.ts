@@ -5,10 +5,13 @@ import session from 'express-session';
 import { redisClient } from './utils/redis';
 import {RedisStore} from 'connect-redis';
 import cors from 'cors';
+import {RecipeEvents} from "@/server/utils/recipe-events";
 
 const SESSION_MINUTES = 30;
 
 const app = express();
+
+export const recipeEvents = new RecipeEvents();
 
 app.use(express.json());
 app.use(urlencoded({extended: false}));

@@ -30,7 +30,7 @@ export default function ShowRecipeComments({comments, total_comments, recipe_id}
 
   useEffect(() => {
     dispatch(setComments(comments));
-  }, [comments]);
+  }, [comments, dispatch]);
 
   const getMoreCommentsMutation = useMutation({
     mutationFn: ({recipe_id, page}: {recipe_id: number, page: number}) => ClientApiService.get("/get-comments?recipe_id=" + recipe_id + "&page=" + page),

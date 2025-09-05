@@ -78,7 +78,7 @@ export function PaginationWithLinks({
 
       return `${listPathName}/${newPage}`;
     },
-    [pageSearchParam, searchParams, pathname]
+    [pathname]
   );
 
   const navigateToPage = useCallback(
@@ -109,7 +109,7 @@ export function PaginationWithLinks({
         router.push(url);
       }
     },
-    [pageSearchParam, searchParams, pathname, navigationMode, router]
+    [pageSearchParam, searchParams, pathname, navigationMode, router, pageSizeSelectOptions?.pageSizeSearchParam]
   );
 
   const renderPageNumbers = () => {

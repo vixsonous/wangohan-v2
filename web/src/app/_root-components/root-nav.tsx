@@ -3,6 +3,7 @@ import RootSidebar from "./root-sidebar";
 import {isAuthenticated} from "@/server-actions/User/user";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
+import RootNavigationUser from "@/app/_root-components/root-nav-user";
 
 export default async function RootNavigationButtons() {
 
@@ -18,7 +19,7 @@ export default async function RootNavigationButtons() {
           </>
         ) : (
           <li>
-            <h1>Hello user!</h1>
+            <RootNavigationUser user_data={userData} />
           </li>
         )
       }
