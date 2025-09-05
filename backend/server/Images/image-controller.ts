@@ -32,7 +32,7 @@ export class ImageController {
       String(upscaleMethod)
     );
 
-    const resultImage = await CacheUtil.get<z.infer<typeof ImageSchema.TransformImage>, typeof ImageService.imageTransformService>(key, ImageService.imageTransformService, 60, req);
+    const resultImage = await CacheUtil.get<z.infer<typeof ImageSchema.TransformImage>, typeof ImageService.imageTransformService>(key, ImageService.imageTransformService, 3600, req);
 
     if(resultImage === undefined) {
       ApiResponse.error(res, this.IMAGE_ERROR_MESSAGE.IMAGE_TRANSFORM_FAILED);

@@ -65,9 +65,8 @@ passport.use(new LocalStrategy(
 ));
 
 const GoogleStrategy = Google.Strategy;
-
 passport.use(new GoogleStrategy({
-  callbackURL: process.env.GOOGLE_AUTH_CALLBACK_URL,
+  callbackURL: process.env.BASE_URL! + process.env.GOOGLE_AUTH_CALLBACK_URL!,
   clientID: process.env.GOOGLE_CLIENT_ID!,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
 },async (accessToken, refreshToken, profile, done) => {

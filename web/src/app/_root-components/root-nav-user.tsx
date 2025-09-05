@@ -16,7 +16,7 @@ export default function RootNavigationUser({user_data}: RootNavigationUserProps)
   useEffect(() => {
     if(!user_data.user_details) return;
 
-    const event = new EventSource("http://app.wang:3001/api/recipe-events?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
+    const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + ":3001/api/recipe-events?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
     event.onmessage = (event) => {
       const data: z.infer<typeof EventSchema.Event> = JSON.parse(event.data);
       toast.message(`${data.user_codename} liked your recipe!`, {
