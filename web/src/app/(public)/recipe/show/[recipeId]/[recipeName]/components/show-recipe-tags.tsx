@@ -7,11 +7,10 @@ import {UserSchema} from "@/types/user-types.user";
 type LikeRecipeButtonProps = {
   total_likes: number;
   recipe_id: number;
-  user_data: z.infer<typeof UserSchema.User>;
   recipe_name: string;
 }
 
-async function LikeRecipeButton({total_likes, recipe_id, user_data, recipe_name}: LikeRecipeButtonProps) {
+async function LikeRecipeButton({total_likes, recipe_id, recipe_name}: LikeRecipeButtonProps) {
   const isLikedResponse = await ServerApiService.get("/is-liked?recipe_id=" + recipe_id);
   const isLiked = await ServerApiResponseService.getResponseData<{is_liked: boolean}>(isLikedResponse);
   return (
@@ -72,7 +71,7 @@ export default async function ShowRecipeTags({recipe_age_tag,recipe_size_tag,rec
         ) : null}
       </div>
 
-      {user_data !== undefined && <LikeRecipeButton recipe_id={recipe_id} total_likes={total_likes} user_data={user_data} recipe_name={recipe_name} />}
+      {user_data !== undefined && <LikeRecipeButton recipe_id={recipe_id} total_likes={total_likes} recipe_name={recipe_name} />}
     </section>
   )
 }

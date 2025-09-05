@@ -11,19 +11,20 @@ import Image from "@/components/Image/client";
 import Button from "@/components/Button";
 import StarReviews from "@/components/StarReviews";
 import InputField from "@/components/Input";
-import ShowRecipeComments from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/show-recipe-comments";
+import ShowRecipeComments from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/components/show-recipe-comments";
 import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Provider} from "react-redux";
+import {store} from "@/store/store";
 
 type ShowRecipeCommentFormProps = {
   is_logged_in: boolean;
   recipe_id: number;
-  setComments: Dispatch<SetStateAction<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>[]>>
+  recipe_name: string;
 }
 
-function ShowRecipeCommentForm({is_logged_in, recipe_id, setComments}: ShowRecipeCommentFormProps) {
-  const {register, errors, handleSubmit, onSubmit, commentSubmitMutation, control} = useShowRecipeCommentsForm(setComments);
+function ShowRecipeCommentForm({is_logged_in, recipe_id, recipe_name}: ShowRecipeCommentFormProps) {
+  const {register, errors, handleSubmit, onSubmit, commentSubmitMutation, control} = useShowRecipeCommentsForm();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="relative flex justify-center flex-col gap-[10px]" action="">
@@ -36,6 +37,7 @@ function ShowRecipeCommentForm({is_logged_in, recipe_id, setComments}: ShowRecip
           <div className="w-[100%] flex items-center">
             <span className={"hidden"}>
               <InputField hidden={true} {...register("recipe_id", {valueAsNumber: true, value: recipe_id})}/>
+              <InputField hidden={true} {...register("recipe_name", { value: recipe_name})}/>
             </span>
             <TextareaField {...register("comment")} placeholder="このレシピのレビューを投稿する" className="text-sm px-4 py-2 w-full" name="comment"></TextareaField>
             <Button role={"submit"} className="absolute text-white right-2 top-10" type="submit">
@@ -49,7 +51,7 @@ function ShowRecipeCommentForm({is_logged_in, recipe_id, setComments}: ShowRecip
             </Button>
           </div>
           <div className="w-full">
-            {Object.keys(errors).map((err, idx) => idx < 1 && <Error>{errors[err as keyof typeof errors]?.message}</Error>)}
+            {Object.keys(errors).map((err, idx) => idx < 1 && <Error key={idx}>{errors[err as keyof typeof errors]?.message}</Error>)}
           </div>
         </>
       ) : (
@@ -67,17 +69,17 @@ type ShowRecipeCommentFormWrapperProps = {
   recipe_id: number;
   recipe_comments: Array<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>>;
   total_comments: number;
+  recipe_name: string;
 }
 
 export default function ShowRecipeCommentFormWrapper(props: ShowRecipeCommentFormWrapperProps) {
 
-
-  const [comments, setComments] = useState<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>[]>(props.recipe_comments);
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <ShowRecipeComments recipe_id={props.recipe_id} comments={comments} total_comments={props.total_comments}/>
-      <ShowRecipeCommentForm setComments={setComments} is_logged_in={props.is_logged_in} recipe_id={props.recipe_id}/>
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <ShowRecipeComments recipe_id={props.recipe_id} comments={props.recipe_comments} total_comments={props.total_comments}/>
+        <ShowRecipeCommentForm is_logged_in={props.is_logged_in} recipe_id={props.recipe_id} recipe_name={props.recipe_name}/>
+      </QueryClientProvider>
+    </Provider>
   )
 }

@@ -11,10 +11,12 @@ interface StarReviewsProps {
     rating: number
     comment: string,
     recipe_id: number,
+    recipe_name: string,
   }, unknown, {
     rating: number
     comment: string
-    recipe_id: number
+    recipe_id: number,
+    recipe_name: string,
   }>
 }
 

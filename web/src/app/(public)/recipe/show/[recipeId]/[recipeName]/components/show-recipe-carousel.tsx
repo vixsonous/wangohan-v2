@@ -5,7 +5,7 @@ import Image from "@/components/Image/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import React, { useEffect, useState } from "react";
-import ShowRecipeDropdown from "./components/show-recipe-dropdown";
+import ShowRecipeDropdown from "./show-recipe-dropdown";
 import { RecipeImageDisplay } from "@/server-actions/Recipe/recipe-types";
 
 interface ShowRecipeCarouselProps {

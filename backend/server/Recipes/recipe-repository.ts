@@ -977,4 +977,36 @@ export class RecipeRepository {
     }
     
   }
+
+  static async getComments(recipe_id: number, page: number): Promise<Array<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>> | undefined> {
+    try {
+      const comments = await db.selectFrom("recipe_comments_table")
+        .select(rc => [
+          "recipe_comment_subtext",
+          "recipe_comment_rating",
+          "recipe_comments_table.created_at",
+          jsonObjectFrom(
+            rc.selectFrom("user_details_table")
+              .select([
+                "user_id",
+                "user_image",
+                "user_codename"
+              ])
+              .whereRef("recipe_comments_table.user_id", "=", "user_details_table.user_id")
+          ).as("user")
+        ])
+        .orderBy("recipe_comments_table.created_at","desc")
+        .offset(RecipeRepository.RECIPE_COMMENT_COUNT_LIMIT * page)
+        .limit(RecipeRepository.RECIPE_COMMENT_COUNT_LIMIT)
+        .where("recipe_comments_table.recipe_id","=",recipe_id)
+        .execute();
+
+      log("Successfully retrieved comments!");
+
+      return comments;
+    } catch (e) {
+      log(e);
+      return undefined;
+    }
+  }
 }
