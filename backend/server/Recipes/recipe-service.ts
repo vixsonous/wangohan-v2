@@ -74,4 +74,8 @@ export class RecipeService {
   static async postComment(comment: z.infer<typeof RecipeControllerValidationSchema.PostComment>) {
     return await RecipeRepository.postComment(comment);
   }
+
+  static async getComments(recipe_id: number, page: number) {
+    return await RecipeRepository.getComments(recipe_id, page);
+  }
 }

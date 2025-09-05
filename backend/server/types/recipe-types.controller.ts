@@ -24,5 +24,11 @@ export class RecipeControllerValidationSchema {
     created_at: z.date("Please provide the date!"),
     user_id: z.number("You must be logged in to comment to a recipe!"),
     recipe_id: z.number("Please provide a recipe id!"),
+    recipe_name: z.string("Please provide a recipe name!"),
+  });
+
+  static GetComments = z.object({
+    recipe_id: z.number("Please provide a valid recipe id!"),
+    page: z.number("Please provide a valid page number!")
   })
 }

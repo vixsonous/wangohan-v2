@@ -6,13 +6,16 @@ import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosError, AxiosResponse} from "axios";
 import {toast} from "sonner";
 import z from "zod";
-import {Dispatch, SetStateAction} from "react";
+import {useDispatch} from "react-redux";
+import {addComments} from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/components/comments-slice";
 
-export const useShowRecipeCommentsForm = (setComments: Dispatch<SetStateAction<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>[]>>) => {
+export const useShowRecipeCommentsForm = () => {
   const { register, handleSubmit, formState: {errors}, control, reset } = useForm({
     mode: 'onBlur',
     resolver: zodResolver(RecipeSchema.ClientPostComment)
   });
+
+  const dispatch = useDispatch();
 
   const commentSubmitMutation = useMutation({
     mutationFn: (data: FieldValues) => ClientApiService.post("/post-comment", {
@@ -23,7 +26,7 @@ export const useShowRecipeCommentsForm = (setComments: Dispatch<SetStateAction<z
       const message = ClientApiResponseService.getAxiosResponseMessage(response);
       toast.success("Successful!", {description: message});
       const data = ClientApiResponseService.getAxiosResponseData<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>>(response);
-      setComments(prev => ([data, ...prev]));
+      dispatch(addComments(data));
       reset();
     },
     onError: (error: AxiosError) => {

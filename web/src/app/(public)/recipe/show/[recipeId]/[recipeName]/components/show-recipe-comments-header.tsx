@@ -20,7 +20,7 @@ export default function ShowRecipeCommentsHeader(recipe_data: ShowRecipeComments
         <p>No. {recipe_data.recipe_id}</p>
         <h1 className="flex items-center gap-[10px]">
           Recipe by
-          <Link href={user !== null ? "/user/" + user.user_id + "/" + user.user_codename : "/"}>
+          <Link href={user !== null ? "/user/" + user.user_id + "/" + user.user_codename : "/web/public"}>
             <Image
               src={user !== null ? user.user_image : "/image.webp"}
               className="h-[30px] w-[30px] rounded-[100px] object-cover"

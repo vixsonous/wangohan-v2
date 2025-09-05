@@ -1,8 +1,8 @@
-import ShowRecipeCarousel from "./show-recipe-carousel";
-import ShowRecipeTags from "./show-recipe-tags";
-import ShowRecipeIngredients from "./show-recipe-ingredients";
-import ShowRecipeInstructions from "./show-recipe-instructions";
-import ShowRecipeCommentsHeader from "./show-recipe-comments-header";
+import ShowRecipeCarousel from "./components/show-recipe-carousel";
+import ShowRecipeTags from "./components/show-recipe-tags";
+import ShowRecipeIngredients from "./components/show-recipe-ingredients";
+import ShowRecipeInstructions from "./components/show-recipe-instructions";
+import ShowRecipeCommentsHeader from "./components/show-recipe-comments-header";
 import { Metadata } from "next";
 import { getRecipe } from "@/server-actions/Recipe/recipe";
 import z from "zod";
@@ -92,7 +92,7 @@ export default async function ShowRecipe({params}: Props) {
         <ShowRecipeIngredients recipe_ingredients={recipe.recipe_ingredients}/>
         <ShowRecipeInstructions recipe_instructions={recipe.recipe_instructions}/>
         <ShowRecipeCommentsHeader avgRating={4.5} totalRating={10} recipe_id={recipe.recipe_id} user={recipe.user}/>
-        <ShowRecipeCommentFormWrapper total_comments={Number(recipe.total_comments)} recipe_comments={recipe.recipe_comments} recipe_id={recipe.recipe_id} is_logged_in={userData !== undefined} />
+        <ShowRecipeCommentFormWrapper recipe_name={recipe.recipe_name} total_comments={Number(recipe.total_comments)} recipe_comments={recipe.recipe_comments} recipe_id={recipe.recipe_id} is_logged_in={userData !== undefined} />
       </section>
     </section>
   )

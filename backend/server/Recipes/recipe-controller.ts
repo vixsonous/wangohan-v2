@@ -460,6 +460,7 @@ export class RecipeController {
 
     const submitData = {
       ...data,
+      recipe_name: data.recipe_name,
       user_id: user.user_id,
       recipe_id: Number(data.recipe_id),
       rating: Number(data.rating),
@@ -483,8 +484,37 @@ export class RecipeController {
       return;
     }
 
-    console.log(submittedComment);
+    await RecipeCacheUtil.clearRecipeCache(postCommentParseResult.data.recipe_id, postCommentParseResult.data.recipe_name);
 
     ApiResponse.success(res, "Successfully posted the comment!", submittedComment);
+  }
+
+  static async getComments(req: Request, res: Response) {
+    const {recipe_id, page} = req.query;
+
+    const submitData = {
+      recipe_id: Number(recipe_id),
+      page: Number(page),
+    }
+
+    const getCommentsParseResult = RecipeControllerValidationSchema.GetComments.safeParse(submitData);
+
+    if(!getCommentsParseResult.success) {
+      console.error("Error!");
+      log(getCommentsParseResult.error.issues[0].message);
+      ApiResponse.error(res, getCommentsParseResult.error.issues[0].message);
+      return;
+    }
+
+    const comments = await RecipeService.getComments(getCommentsParseResult.data.recipe_id, getCommentsParseResult.data.page);
+
+    if(comments === undefined) {
+      console.error("Error!");
+      log("There was an error getting comments!");
+      ApiResponse.error(res, "There was an error getting comments!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully retrieved comments!", comments);
   }
 }

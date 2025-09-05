@@ -133,5 +133,6 @@ export class RecipeSchema {
     rating: z.number("Please provide your rating for the recipe!"),
     recipe_id: z.number("Please provide the recipe id!"),
     comment: z.string().min(1, "Please provide your comment for the recipe!"),
+    recipe_name: z.string().min(1, "Please provide the recipe name!"),
   });
 }
