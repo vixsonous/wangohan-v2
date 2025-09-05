@@ -500,6 +500,19 @@ export class RecipeController {
 
     await RecipeCacheUtil.clearRecipeCache(postCommentParseResult.data.recipe_id, postCommentParseResult.data.recipe_name);
 
+    const owner = await RecipeService.getRecipeOwner(postCommentParseResult.data.recipe_id);
+
+    recipeEvents.sendMessageToClient(
+      JSON.stringify({
+        type: "comment",
+        recipe_id: postCommentParseResult.data.recipe_id,
+        recipe_name: postCommentParseResult.data.recipe_name,
+        user_codename: user.user_details?.user_codename,
+        user_image: user.user_details?.user_image
+      }),
+      `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
+    );
+
     ApiResponse.success(res, "Successfully posted the comment!", submittedComment);
   }
 

@@ -19,7 +19,21 @@ export default function RootNavigationUser({user_data}: RootNavigationUserProps)
     const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + ":3001/api/recipe-events?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
     event.onmessage = (event) => {
       const data: z.infer<typeof EventSchema.Event> = JSON.parse(event.data);
-      toast.message(`${data.user_codename} liked your recipe!`, {
+      let headerMsg = '';
+      let descriptionMsg = '';
+
+      switch (data.type) {
+        case "like" :
+          headerMsg = `${data.user_codename} liked your recipe!`;
+          descriptionMsg = `has liked your recipe!`;
+          break;
+        case "comment":
+          headerMsg = `${data.user_codename} commented on your recipe!`;
+          descriptionMsg = `has commented on your recipe!`;
+          break;
+      }
+
+      toast.message(headerMsg, {
         position: "bottom-right",
         description:
           <Link href={"/recipe/show/" + data.recipe_id + "/" + data.recipe_name} className={"flex gap-2 items-center"}>
@@ -30,7 +44,7 @@ export default function RootNavigationUser({user_data}: RootNavigationUserProps)
               width={30}
               height={30}
             />
-            has liked your recipe!
+            {descriptionMsg}
           </Link>
       });
     }
