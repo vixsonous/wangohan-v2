@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import RootHeader from "./_root-components/root-header";
+import RootHeader from "./_root-components/(root-header)/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ServerUtils } from "@/lib/server-utils";
 import RootFooter from "./_root-components/root-footer";

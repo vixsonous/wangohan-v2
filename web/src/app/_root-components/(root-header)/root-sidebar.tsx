@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import Image from "@/components/Image/server";
-import { CreateRecipe } from "./root-create-recipe";
+import { CreateRecipe } from "../root-create-recipe";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import RootSidebarMenuWrapper from "@/app/_root-components/root-recipe-form/root-sidebar-menu-wrapper";

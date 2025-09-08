@@ -9,6 +9,7 @@ import {getUserData} from "@/server/utils/server-utils";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
 import {RecipeRepository} from "@/server/Recipes/recipe-repository";
 import {recipeEvents} from "@/server/server";
+import {EventSchema} from "@/server/types/event-types";
 
 export class RecipeController {
 
@@ -447,14 +448,25 @@ export class RecipeController {
 
     const owner = await RecipeService.getRecipeOwner(likeRecipeParseResult.data.recipe_id);
 
+    const sendData = {
+      type: likeRecipeParseResult.data.is_liked ? "like" : "unlike",
+      recipe_id: likeRecipeParseResult.data.recipe_id,
+      recipe_name: likeRecipeParseResult.data.recipe_name,
+      user_codename: user.user_details?.user_codename,
+      user_image: user.user_details?.user_image,
+      is_read: false,
+    };
+
+    const notificationSendDataParseResult = EventSchema.Event.safeParse(sendData);
+
+    if(!notificationSendDataParseResult.success) {
+      log("Invalid notification data to send: " + notificationSendDataParseResult.error.issues[0].message);
+      ApiResponse.error(res, notificationSendDataParseResult.error.issues[0].message);
+      return;
+    }
+
     recipeEvents.sendMessageToClient(
-      JSON.stringify({
-        type: "like",
-        recipe_id: likeRecipeParseResult.data.recipe_id,
-        recipe_name: likeRecipeParseResult.data.recipe_name,
-        user_codename: user.user_details?.user_codename,
-        user_image: user.user_details?.user_image
-      }),
+      JSON.stringify(notificationSendDataParseResult.data),
       `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
     );
 

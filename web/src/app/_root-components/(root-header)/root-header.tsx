@@ -1,7 +1,7 @@
 import Link from "next/link";
 import RootNavigationButtons from "./root-nav";
 import Image from "@/components/Image/server";
-import HomeSearchBar from "./home-search-bar";
+import HomeSearchBar from "../home-search-bar";
 import GoogleLoginSuccess from "@/app/_root-components/google-login-success";
 
 export default async function RootHeader() {

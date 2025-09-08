@@ -3,7 +3,7 @@ import RootSidebar from "./root-sidebar";
 import {isAuthenticated} from "@/server-actions/User/user";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
-import RootNavigationUser from "@/app/_root-components/root-nav-user";
+import RootNavigationUser from "@/app/_root-components/(root-header)/root-nav-user";
 
 export default async function RootNavigationButtons() {
 
