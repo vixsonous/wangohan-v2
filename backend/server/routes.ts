@@ -5,6 +5,7 @@ import { UserController } from "./User/user-controller";
 import multer from 'multer';
 import {PetController} from "@/server/Pet/pet-controller";
 import passport from "@/server/utils/passport";
+import {EventController} from "@/server/Event/event-controller";
 
 export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
@@ -49,3 +50,4 @@ router.get("/birthday-pets", PetController.getBirthdayMonthPets);
 
 // Events
 router.get("/recipe-events", RecipeController.recipeEvents);
+router.get("/set-user-notifications-read", EventController.setUserNotificationsRead);

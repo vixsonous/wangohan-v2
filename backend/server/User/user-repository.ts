@@ -286,7 +286,7 @@ export class UserRepository {
 
   static async getUserById(user_id: number): Promise<z.infer<typeof UserSchema.User> | undefined> {
     try {
-      const user: z.infer<typeof UserSchema.User> = await db.selectFrom("users_table")
+      const user = await db.selectFrom("users_table")
         .select(eb => [
           "user_id",
           "email",
@@ -305,10 +305,29 @@ export class UserRepository {
                 "updated_at",
                 "created_at"
               ]).whereRef("user_details_table.user_id", "=", "users_table.user_id")
-          ).as("user_details")
+          ).as("user_details"),
+          jsonArrayFrom(
+            eb.selectFrom("notifications_table")
+              .innerJoin("user_details_table", "notifications_table.user_id", "user_details_table.user_id")
+              .innerJoin("recipes_table", "recipes_table.recipe_id","notifications_table.recipe_id")
+              .select([
+                "notifications_table.recipe_id",
+                "notifications_table.recipe_name",
+                "is_read",
+                "type",
+                "notifications_table.user_codename",
+                "notifications_table.user_image",
+                "liked",
+                "notifications_table.notification_date"
+              ])
+              .where("notification_date", ">=", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+              .orderBy("notification_date", "desc")
+              .limit(10)
+              .whereRef("users_table.user_id", "=", "notifications_table.user_id")
+          ).as("notifications")
         ])
         .where("user_id", "=", user_id)
-        .executeTakeFirstOrThrow();
+        .executeTakeFirstOrThrow() as z.infer<typeof UserSchema.User>;
 
       log(UserRepository.USER_REPOSITORY_SUCCESS_MESSAGE.GET_USER_BY_ID_SUCCESS);
 
@@ -322,7 +341,7 @@ export class UserRepository {
 
   static async getUserByGoogleId(google_id: string): Promise<z.infer<typeof UserSchema.User> | undefined> {
     try {
-      const user: z.infer<typeof UserSchema.User> = await db.selectFrom("users_table")
+      const user = await db.selectFrom("users_table")
         .select(eb => [
           "user_id",
           "email",
@@ -341,10 +360,29 @@ export class UserRepository {
                 "updated_at",
                 "created_at"
               ]).whereRef("user_details_table.user_id", "=", "users_table.user_id")
-          ).as("user_details")
+          ).as("user_details"),
+          jsonArrayFrom(
+            eb.selectFrom("notifications_table")
+              .innerJoin("user_details_table", "notifications_table.user_id", "user_details_table.user_id")
+              .innerJoin("recipes_table", "recipes_table.recipe_id","notifications_table.recipe_id")
+              .select([
+                "notifications_table.recipe_id",
+                "notifications_table.recipe_name",
+                "is_read",
+                "type",
+                "notifications_table.user_codename",
+                "notifications_table.user_image",
+                "liked",
+                "notifications_table.updated_at as notification_date"
+              ])
+              .where("notification_date", ">=", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+              .orderBy("notification_date", "desc")
+              .limit(10)
+              .whereRef("users_table.user_id", "=", "notifications_table.user_id")
+          ).as("notifications")
         ])
         .where("google_id", "=", google_id)
-        .executeTakeFirstOrThrow();
+        .executeTakeFirstOrThrow() as z.infer<typeof UserSchema.User>;
 
       log(UserRepository.USER_REPOSITORY_SUCCESS_MESSAGE.GET_USER_BY_ID_SUCCESS);
 

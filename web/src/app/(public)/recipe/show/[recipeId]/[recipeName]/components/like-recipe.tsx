@@ -17,7 +17,7 @@ function LikeButton({total_likes, recipe_id, is_liked, recipe_name}: LikeButtonP
   const [liked, setLiked] = useState(is_liked);
   const [likes, setLikes] = useState(total_likes);
   const likeMutation = useMutation({
-    mutationFn: () => ClientApiService.get("/like-recipe?recipe_id=" +recipe_id + "&is_liked=" + !liked + "&recipe_name=" + recipe_name),
+    mutationFn: () => ClientApiService.get("/like-recipe?recipe_id=" +recipe_id + "&is_liked=" + !liked + "&recipe_name=" + recipe_name + "&notification_date=" + new Date().toLocaleString()),
     onSuccess: () => {
       setLiked(prev => !prev);
       setLikes(prev => liked ? prev - 1 : prev + 1);

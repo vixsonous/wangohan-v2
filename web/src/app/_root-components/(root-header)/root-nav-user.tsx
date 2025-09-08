@@ -1,24 +1,26 @@
 "use client";
 
-import {useEffect} from "react";
+import React from "react";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import {toast} from "sonner";
 import {EventSchema} from "@/types/event-types";
 import Image from "@/components/Image/client";
 import Link from "next/link";
-import {Provider, useDispatch, useSelector} from "react-redux";
-import {RootState, store} from "@/store/store";
-import {addNotification, readAllNotifications} from "@/app/_root-components/(root-header)/notifications-slice";
+import {Provider} from "react-redux";
+import { store} from "@/store/store";
 import Button from "@/components/Button";
 import {Button as ButtonX} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {QueryClientProvider} from "@tanstack/react-query";
+import {queryClient} from "@/lib/tanstack-query";
+import {useHeader} from "@/app/_root-components/(root-header)/helper";
 
 type RootNavigationUserProps = {
   user_data: z.infer<typeof UserSchema.User>;
 }
 
-function displayNotification(header_msg: string, description_msg: string, data: z.infer<typeof EventSchema.Event>) {
+export function displayNotification(header_msg: string, description_msg: string, data: z.infer<typeof EventSchema.Event>) {
   toast.message(header_msg, {
     position: "bottom-right",
     description:
@@ -37,71 +39,22 @@ function displayNotification(header_msg: string, description_msg: string, data: 
 
 function NavigationUser({user_data}: RootNavigationUserProps) {
 
-  const notifications = useSelector((state: RootState) => state.notifications);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if(!user_data.user_details) return;
-
-    const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + "/api/recipe-events?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
-    event.onmessage = (event) => {
-      const data: z.infer<typeof EventSchema.Event> = JSON.parse(event.data);
-      let headerMsg = '';
-      let descriptionMsg = '';
-
-      switch (data.type) {
-        case "like" :
-          headerMsg = `${data.user_codename} liked your recipe!`;
-          descriptionMsg = `has liked your recipe!`;
-          displayNotification(
-            headerMsg,
-            descriptionMsg,
-            data
-          );
-          dispatch(addNotification(data));
-          break;
-        case "comment":
-          headerMsg = `${data.user_codename} commented on your recipe!`;
-          descriptionMsg = `has commented on your recipe!`;
-          displayNotification(
-            headerMsg,
-            descriptionMsg,
-            data
-          );
-          dispatch(addNotification(data));
-          break;
-      }
-    }
-
-    return () => {
-      event.onmessage = null;
-    }
-  }, [user_data]);
-
-  const unread_notifications = notifications.filter(notification => !notification.is_read).length;
-  const combinedNotifications = notifications.reduce((acc: Array<z.infer<typeof EventSchema.Event>>, curNotification) => {
-    const existingNotification = acc.find(
-      notification =>
-        notification.recipe_id === curNotification.recipe_id &&
-        notification.type === curNotification.type
-    );
-
-    if(existingNotification) {
-      existingNotification.duplicate_count = (existingNotification.duplicate_count || 0) + 1;
-    } else {
-      acc.push({...curNotification, duplicate_count: curNotification.duplicate_count || 1});
-    }
-
-    return acc;
-  }, [])
+  const {
+    notifications,
+    readAllNotificationsMutation,
+    combinedNotifications,
+    unread_notifications
+  } = useHeader(user_data);
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button className={"relative"}>
           <Image src={"/icons/svg/primary-notification.svg"} width={35} height={35} alt={"notification icon"}/>
-          <span className='absolute z-10 top-4 left-6 bg-red-600 text-white text-xs rounded-full flex justify-center items-center h-5 w-5 aspect-square'>
-            {unread_notifications}
-          </span>
+          {unread_notifications > 0 && (
+            <span className='absolute z-10 top-4 left-6 bg-red-600 text-white text-xs rounded-full flex justify-center items-center h-5 w-5 aspect-square'>
+              {unread_notifications}
+            </span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent align={"start"} className="w-72 p-0 bg-secondary-bg max-h-[400px] overflow-auto">
@@ -139,14 +92,14 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
                           />
                           {descriptionMsg}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">5 min ago</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{5} min ago</p>
                       </div>
                     </Link>
                   )
                 )
               })}
-              <ButtonX onClick={() => dispatch(readAllNotifications())} variant="outline" className="mt-4">
-                Mark All as Read
+              <ButtonX onClick={() => {readAllNotificationsMutation.mutate()}} disabled={readAllNotificationsMutation.isPending} variant="outline" className="mt-4">
+                {readAllNotificationsMutation.isPending && <Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} />} Mark All as Read
               </ButtonX>
             </>
           ) : (
@@ -161,8 +114,10 @@ export default function RootNavigationUser({user_data}: RootNavigationUserProps)
 
 
   return (
-    <Provider store={store}>
-      <NavigationUser user_data={user_data} />
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <NavigationUser user_data={user_data} />
+      </Provider>
+    </QueryClientProvider>
   )
 }

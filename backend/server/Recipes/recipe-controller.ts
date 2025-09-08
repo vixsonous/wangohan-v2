@@ -10,6 +10,7 @@ import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.cont
 import {RecipeRepository} from "@/server/Recipes/recipe-repository";
 import {recipeEvents} from "@/server/server";
 import {EventSchema} from "@/server/types/event-types";
+import {EventService} from "@/server/Event/event-service";
 
 export class RecipeController {
 
@@ -409,7 +410,7 @@ export class RecipeController {
   }
 
   static async likeRecipe(req: Request, res: Response) {
-    const {recipe_id, is_liked, recipe_name} = req.query;
+    const {recipe_id, is_liked, recipe_name, notification_date} = req.query;
 
     const user = getUserData(req);
 
@@ -455,6 +456,7 @@ export class RecipeController {
       user_codename: user.user_details?.user_codename,
       user_image: user.user_details?.user_image,
       is_read: false,
+      notification_date: new Date(String(notification_date))
     };
 
     const notificationSendDataParseResult = EventSchema.Event.safeParse(sendData);
@@ -469,6 +471,21 @@ export class RecipeController {
       JSON.stringify(notificationSendDataParseResult.data),
       `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
     );
+
+    const notificationData = notificationSendDataParseResult.data;
+    const notification = await EventService.postNotification(
+      user.user_id,
+      notificationData.user_codename,
+      notificationData.user_image,
+      false,
+      "like",
+      likeRecipeParseResult.data.is_liked,
+      notificationData.recipe_id,
+      notificationData.recipe_name,
+      notificationData.notification_date
+    );
+
+    console.log(notification);
 
     ApiResponse.success(res, `Successfully ${likeRecipeParseResult.data.is_liked ? 'liked' : 'unliked'} the recipe!`);
   }
@@ -520,7 +537,8 @@ export class RecipeController {
         recipe_id: postCommentParseResult.data.recipe_id,
         recipe_name: postCommentParseResult.data.recipe_name,
         user_codename: user.user_details?.user_codename,
-        user_image: user.user_details?.user_image
+        user_image: user.user_details?.user_image,
+        notification_date: new Date()
       }),
       `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
     );
