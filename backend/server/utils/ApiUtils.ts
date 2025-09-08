@@ -1,4 +1,5 @@
 import { Response } from "express";
+import {log} from "@/server/utils/log";
 
 export interface ResponseData<T> {
   message: string;
@@ -19,7 +20,9 @@ export class ApiResponse {
     res.status(302).redirect(url);
   }
 
-  static error<T>(res: Response, message?: string, data?:T, status?: number) {
+  static error<T>(res: Response, message?: any, data?:T, status?: number) {
+    console.error("Error!");
+    log(message);
     res.status(status || 500).json({
       message: message || "Unsuccessful!",
       data: data || undefined,

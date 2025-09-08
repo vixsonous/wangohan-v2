@@ -7,10 +7,20 @@ type AddNotificationPayload = {
   type: string;
 }
 
+type SetNotificationPayload = {
+  payload: Array<z.infer<typeof EventSchema.Event>>;
+  type: string;
+}
+
 export const notificationsSlice = createSlice({
   name: 'Notification',
   initialState: [] as Array<z.infer<typeof EventSchema.Event>>,
   reducers: {
+    setNotification(state, action: SetNotificationPayload) {
+      state = action.payload;
+
+      return state;
+    },
     addNotification(state, action: AddNotificationPayload) {
       if(Array.isArray(action.payload)) {
         state = state.concat(action.payload);
@@ -32,5 +42,5 @@ export const notificationsSlice = createSlice({
   }
 })
 
-export const {addNotification, readAllNotifications} = notificationsSlice.actions;
+export const {addNotification, readAllNotifications, setNotification} = notificationsSlice.actions;
 export default notificationsSlice.reducer;

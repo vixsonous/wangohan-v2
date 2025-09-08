@@ -45,6 +45,7 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
     combinedNotifications,
     unread_notifications
   } = useHeader(user_data);
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -111,7 +112,6 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
   )
 }
 export default function RootNavigationUser({user_data}: RootNavigationUserProps) {
-
 
   return (
     <QueryClientProvider client={queryClient}>

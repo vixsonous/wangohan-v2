@@ -449,6 +449,11 @@ export class RecipeController {
 
     const owner = await RecipeService.getRecipeOwner(likeRecipeParseResult.data.recipe_id);
 
+    if(owner === undefined || owner === null) {
+      ApiResponse.error(res, "There was an error retrieving the owner data!");
+      return;
+    }
+
     const sendData = {
       type: likeRecipeParseResult.data.is_liked ? "like" : "unlike",
       recipe_id: likeRecipeParseResult.data.recipe_id,
@@ -474,7 +479,7 @@ export class RecipeController {
 
     const notificationData = notificationSendDataParseResult.data;
     const notification = await EventService.postNotification(
-      user.user_id,
+      owner.user_id,
       notificationData.user_codename,
       notificationData.user_image,
       false,
@@ -485,7 +490,10 @@ export class RecipeController {
       notificationData.notification_date
     );
 
-    console.log(notification);
+    if(notification === undefined) {
+      ApiResponse.error(res, "There was an error inserting the notification!");
+      return;
+    }
 
     ApiResponse.success(res, `Successfully ${likeRecipeParseResult.data.is_liked ? 'liked' : 'unliked'} the recipe!`);
   }
@@ -495,7 +503,7 @@ export class RecipeController {
 
     const user = getUserData(req);
 
-    if(user === undefined) {
+    if(user === undefined || user.user_details === undefined || user.user_details === null) {
       log("You must log in to comment to a recipe!");
       ApiResponse.error(res, "You must be logged in to comment to a recipe!");
       return;
@@ -531,6 +539,11 @@ export class RecipeController {
 
     const owner = await RecipeService.getRecipeOwner(postCommentParseResult.data.recipe_id);
 
+    if(owner === undefined || owner === null) {
+      ApiResponse.error(res, "There was an error retrieving the owner data!");
+      return;
+    }
+
     recipeEvents.sendMessageToClient(
       JSON.stringify({
         type: "comment",
@@ -542,6 +555,23 @@ export class RecipeController {
       }),
       `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
     );
+
+    const notification = await EventService.postNotification(
+      owner.user_id,
+      user.user_details.user_codename,
+      user.user_details.user_image,
+      false,
+      "comment",
+      true,
+      postCommentParseResult.data.recipe_id,
+      postCommentParseResult.data.recipe_name,
+      postCommentParseResult.data.created_at
+    );
+
+    if(notification === undefined) {
+      ApiResponse.error(res, "There was an error inserting the notification!");
+      return;
+    }
 
     ApiResponse.success(res, "Successfully posted the comment!", submittedComment);
   }

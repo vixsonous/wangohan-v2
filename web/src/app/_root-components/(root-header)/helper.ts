@@ -1,7 +1,11 @@
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import {useEffect} from "react";
-import {addNotification, readAllNotifications} from "@/app/_root-components/(root-header)/notifications-slice";
+import {
+  addNotification,
+  readAllNotifications,
+  setNotification
+} from "@/app/_root-components/(root-header)/notifications-slice";
 import {EventSchema} from "@/types/event-types";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store";
@@ -20,7 +24,7 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
 
   useEffect(() => {
     if(!user_data.user_details) return;
-    dispatch(addNotification(user_data.notifications));
+    dispatch(setNotification(user_data.notifications));
 
     const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + "/api/recipe-events?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
     event.onmessage = (event) => {
@@ -65,11 +69,14 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
         notification.type === curNotification.type
     );
 
+
     if(existingNotification) {
       existingNotification.duplicate_count = (existingNotification.duplicate_count || 0) + 1;
     } else {
       acc.push({...curNotification, duplicate_count: curNotification.duplicate_count || 1});
     }
+
+    console.log(acc);
 
     return acc;
   }, []);
