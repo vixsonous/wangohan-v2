@@ -7,7 +7,6 @@ import {RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import z from "zod";
 import {getUserData} from "@/server/utils/server-utils";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
-import {RecipeRepository} from "@/server/Recipes/recipe-repository";
 import {recipeEvents} from "@/server/server";
 import {EventSchema} from "@/server/types/event-types";
 import {EventService} from "@/server/Event/event-service";
@@ -401,7 +400,7 @@ export class RecipeController {
       return;
     }
 
-    const isLiked = await RecipeRepository.isLikedRecipe(
+    const isLiked = await RecipeService.isLikedRecipe(
       isLikedRecipeParseResult.data.recipe_id,
       isLikedRecipeParseResult.data.user_id
     );
