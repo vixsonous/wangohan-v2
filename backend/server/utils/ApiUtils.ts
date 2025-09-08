@@ -30,7 +30,9 @@ export class ApiResponse {
     } as ResponseData<T>)
   }
 
-  static unauthorized<T>(res: Response, message?: string) {
+  static unauthorized<T>(res: Response, message?: any) {
+    console.error("Error!");
+    log(message);
     res.status(401).json({
       message: message || "Unauthorized!",
       data: undefined,

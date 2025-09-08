@@ -2,6 +2,7 @@
 import {log} from "@/server/utils/log";
 import {NotificationInsert} from "@/database/types";
 import {db} from "@/database/database";
+import {EventMessageError, EventMessageSuccess} from "@/server/Event/event-messages";
 
 export class EventRepository {
 
@@ -54,11 +55,11 @@ export class EventRepository {
             .doUpdateSet({liked: liked, notification_date: notification_date}))
         .executeTakeFirstOrThrow();
 
-      log("Successfully posted notification!");
+      log(EventMessageSuccess.INSERT_NOTIFICATION);
 
       return notification;
     } catch (e) {
-      console.error("Error!");
+      log(EventMessageError.INSERT_NOTIFICATION);
       log(e);
       return undefined;
     }
