@@ -21,3 +21,10 @@ export class GetBlogSchema {
     total_blogs: z.number()
   })
 }
+
+export class BlogImageSchema {
+  static BlogImage = z.object({
+    blog_image_title: z.string(),
+    blog_image_url: z.string()
+  })
+}
