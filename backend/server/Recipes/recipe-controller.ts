@@ -10,42 +10,20 @@ import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.cont
 import {recipeEvents} from "@/server/server";
 import {EventSchema} from "@/server/types/event-types";
 import {EventService} from "@/server/Event/event-service";
+import {RecipeErrorMessage, RecipeSuccessMessage, RecipeUnauthorizedMessage} from "@/server/Recipes/recipe-messages";
 
 export class RecipeController {
-
-  private static RECIPE_SUCCESS_MESSAGE_RESPONSE = {
-    SUCCESS_WEEKLY_RECIPE: "Successfully retrieved weekly recipes!",
-    SUCCESS_POPULAR_RECIPE: "Successfully retrieved popular recipes!",
-    SUCCESS_GET_RECIPE: "Successfully retrieved the recipe!",
-    SUCCESS_POST_RECIPE: "Successfully posted recipe!",
-  }
-
-  private static RECIPE_ERROR_MESSAGE_RESPONSE = {
-    INVALID_RECIPE_ID: "Please provide a valid recipe id!",
-    INVALID_RECIPE_NAME: "Please provide a valid recipe name!",
-    UNSUCCESSFUL_RECIPE_RETRIEVAL: "Unsuccessful retrieval of recipe! Please try again!",
-    UNAUTHORIZED: "Please log in to upload recipe!",
-    RECIPE_UPLOAD_FAILED: "There was an error uploading recipe. Please try again!",
-  }
-
-  private static RECIPE_ERROR_MESSAGE_LOG = {
-    INVALID_RECIPE_ID: "Recipe ID is not valid!",
-    INVALID_RECIPE_NAME: "Recipe name is not valid!",
-    UNSUCCESSFUL_RECIPE_RETRIEVAL: "Recipe is not found!",
-    UNAUTHORIZED: "Unauthorized!",
-    RECIPE_UPLOAD_FAILED: "Failed to upload recipe!",
-  }
 
   static async getWeeklyRecipes(_: Request, res: Response) {
     const GET_WEEKLY_RECIPES_KEY = 'GET:weekly-recipes';
     const recipes = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[], typeof RecipeService.getWeeklyRecipes>(GET_WEEKLY_RECIPES_KEY, RecipeService.getWeeklyRecipes);
-    ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_WEEKLY_RECIPE, recipes, 200);
+    ApiResponse.success(res, RecipeSuccessMessage.SUCCESS_WEEKLY_RECIPE, recipes, 200);
   }
 
   static async getPopularRecipes(_: Request, res: Response) {
     const GET_POPULAR_RECIPES_KEY = 'GET:popular-recipes';
     const recipes = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[], typeof RecipeService.getPopularRecipes>(GET_POPULAR_RECIPES_KEY, RecipeService.getPopularRecipes);
-    ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_POPULAR_RECIPE, recipes, 200);
+    ApiResponse.success(res, RecipeSuccessMessage.SUCCESS_POPULAR_RECIPE, recipes, 200);
   }
   
   static async getRecipe(req: Request, res: Response) {
@@ -54,14 +32,14 @@ export class RecipeController {
     const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
 
     if(Number.isNaN(recipe_id) || Number.isInteger(recipe_id) || recipe_id === undefined) {
-      log(RecipeController.RECIPE_ERROR_MESSAGE_LOG.INVALID_RECIPE_ID);
-      ApiResponse.error(res, RecipeController.RECIPE_ERROR_MESSAGE_RESPONSE.INVALID_RECIPE_ID);
+      log(RecipeErrorMessage.INVALID_RECIPE_ID);
+      ApiResponse.error(res, RecipeErrorMessage.INVALID_RECIPE_ID);
       return;
     }
 
     if(recipe_name === undefined) {
-      log(RecipeController.RECIPE_ERROR_MESSAGE_LOG.INVALID_RECIPE_NAME);
-      ApiResponse.error(res, RecipeController.RECIPE_ERROR_MESSAGE_RESPONSE.INVALID_RECIPE_NAME);
+      log(RecipeErrorMessage.INVALID_RECIPE_NAME);
+      ApiResponse.error(res, RecipeErrorMessage.INVALID_RECIPE_NAME);
       return;
     }
     
@@ -71,19 +49,18 @@ export class RecipeController {
     ).catch( (err: undefined) => err);
 
     if(recipe === undefined) {
-      log(RecipeController.RECIPE_ERROR_MESSAGE_LOG.UNSUCCESSFUL_RECIPE_RETRIEVAL);
-      ApiResponse.error(res, RecipeController.RECIPE_ERROR_MESSAGE_RESPONSE.UNSUCCESSFUL_RECIPE_RETRIEVAL);
+      ApiResponse.error(res, RecipeErrorMessage.UNSUCCESSFUL_RECIPE_RETRIEVAL);
       return;
     }
 
-    log(RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_GET_RECIPE);
-    ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_GET_RECIPE, recipe);
+    log(RecipeSuccessMessage.SUCCESS_GET_RECIPE);
+    ApiResponse.success(res, RecipeSuccessMessage.SUCCESS_GET_RECIPE, recipe);
   }
 
   static async uploadRecipe(req: Request, res: Response) {
 
     if(req.user === undefined) {
-      ApiResponse.unauthorized(res, RecipeController.RECIPE_ERROR_MESSAGE_RESPONSE.UNAUTHORIZED);
+      ApiResponse.unauthorized(res, RecipeErrorMessage.UNAUTHORIZED);
       return;
     }
 
@@ -111,13 +88,12 @@ export class RecipeController {
     const insertRecipeId = await RecipeService.postRecipe(submitParseResult.data);
 
     if(insertRecipeId === undefined) {
-      log(RecipeController.RECIPE_ERROR_MESSAGE_LOG.RECIPE_UPLOAD_FAILED);
-      ApiResponse.error(res, RecipeController.RECIPE_ERROR_MESSAGE_RESPONSE.RECIPE_UPLOAD_FAILED);
+      ApiResponse.error(res, RecipeErrorMessage.RECIPE_UPLOAD_FAILED);
       return;
     }
 
     await RecipeCacheUtil.clearAllRecipesCache();
-    ApiResponse.success(res, RecipeController.RECIPE_SUCCESS_MESSAGE_RESPONSE.SUCCESS_POST_RECIPE);
+    ApiResponse.success(res, RecipeSuccessMessage.SUCCESS_POST_RECIPE);
   }
 
   static async updateRecipe(req: Request, res: Response) {
@@ -128,7 +104,7 @@ export class RecipeController {
 
     if(user === undefined || (user.user_id !== Number(formData.user_id))) {
 
-      ApiResponse.unauthorized(res, "You are not authorized to edit this recipe!");
+      ApiResponse.unauthorized(res, RecipeUnauthorizedMessage.UNAUTHORIZED_EDIT);
       return;
     }
 
@@ -172,7 +148,7 @@ export class RecipeController {
     await RecipeCacheUtil.clearAllRecipesCache();
     await CacheUtil.delete(GET_RECIPE_KEY);
 
-    ApiResponse.success(res, "Successfully updated the recipe!");
+    ApiResponse.success(res, RecipeSuccessMessage.UPDATE_RECIPE);
   }
 
   static async getLikedRecipes(req: Request, res: Response) {
@@ -181,11 +157,11 @@ export class RecipeController {
     const likedRecipes = await RecipeService.getLikedRecipe(Number(user_id), Number(page));
 
     if(likedRecipes === undefined) {
-      ApiResponse.error(res, "There was an error retrieving liked recipes!");
+      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_LIKED_RECIPES);
       return;
     }
 
-    ApiResponse.success(res, "Successfully retrieved additional liked recipes!", likedRecipes);
+    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_LIKED_RECIPES, likedRecipes);
   }
 
   static async getOwnRecipes(req: Request, res: Response) {
@@ -194,11 +170,11 @@ export class RecipeController {
     const ownedRecipes = await RecipeService.getOwnedRecipe(Number(user_id), Number(page));
 
     if(ownedRecipes === undefined) {
-      ApiResponse.error(res, "There was an error retrieving owned recipes!");
+      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_OWNED_RECIPES);
       return;
     }
 
-    ApiResponse.success(res, "Successfully retrieved additional owned recipes!", ownedRecipes);
+    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_OWNED_RECIPES, ownedRecipes);
   }
 
   static async getArchivedRecipes(req: Request, res: Response) {
@@ -207,11 +183,11 @@ export class RecipeController {
     const archivedRecipes = await RecipeService.getArchivedRecipes(Number(user_id), Number(page));
 
     if(archivedRecipes === undefined) {
-      ApiResponse.error(res, "There was an error retrieving owned recipes!");
+      ApiResponse.error(res, RecipeErrorMessage.ARCHIVED_RECIPES);
       return;
     }
 
-    ApiResponse.success(res, "Successfully retrieved additional owned recipes!", archivedRecipes);
+    ApiResponse.success(res, RecipeSuccessMessage.ARCHIVED_RECIPES, archivedRecipes);
   }
 
   static async archiveRecipe(req: Request, res: Response) {
@@ -220,7 +196,7 @@ export class RecipeController {
     const user = getUserData(req);
 
     if(user === undefined) {
-      ApiResponse.error(res, "You must log in to archive this recipe!");
+      ApiResponse.error(res, RecipeUnauthorizedMessage.UNAUTHORIZED_ARCHIVE);
       return;
     }
 
@@ -247,14 +223,14 @@ export class RecipeController {
     );
 
     if(!softDeleteResult) {
-      ApiResponse.error(res, `Failed to ${archiveRecipeParseResult.data.is_archive ? "archive" : "unarchive"} recipe!`);
+      ApiResponse.error(res, archiveRecipeParseResult.data.is_archive ? RecipeErrorMessage.ARCHIVE_RECIPE : RecipeErrorMessage.UNARCHIVE_RECIPE);
       return;
     }
 
     await RecipeCacheUtil.clearAllRecipesCache();
     await CacheUtil.delete(RecipeCacheKey.GET_RECIPE_KEY(String(archiveRecipeParseResult.data.recipe_id), archiveRecipeParseResult.data.recipe_name));
 
-    ApiResponse.success(res, `Successfully ${archiveRecipeParseResult.data.is_archive ? "archived" : "unarchived"} recipe!`);
+    ApiResponse.success(res, archiveRecipeParseResult.data.is_archive ? RecipeSuccessMessage.ARCHIVE_RECIPE : RecipeSuccessMessage.UNARCHIVE_RECIPE);
   }
 
   static async hardDeleteRecipe(req: Request, res: Response) {
@@ -263,12 +239,12 @@ export class RecipeController {
     const user = getUserData(req);
 
     if(user === undefined) {
-      ApiResponse.error(res, "You must log in to delete this recipe!");
+      ApiResponse.unauthorized(res, RecipeUnauthorizedMessage.LOGIN_REQUIRED);
       return;
     }
 
     if(user.user_id !== Number(recipe_user_id)) {
-      ApiResponse.unauthorized(res);
+      ApiResponse.unauthorized(res, RecipeUnauthorizedMessage.UNAUTHORIZED_DELETE);
       return;
     }
 
@@ -292,13 +268,13 @@ export class RecipeController {
     );
 
     if(!deleteResult) {
-      ApiResponse.error(res, "There was an error deleting recipe!");
+      ApiResponse.error(res, RecipeErrorMessage.DELETE_RECIPE);
       return;
     }
 
     await RecipeCacheUtil.clearAllRecipesCache();
 
-    ApiResponse.success(res, "Successfully deleted recipe!");
+    ApiResponse.success(res, RecipeSuccessMessage.DELETE_RECIPE);
   }
 
   static async getRecipeList(req: Request, res: Response) {
@@ -307,7 +283,7 @@ export class RecipeController {
     const pageParse = z.number().safeParse(Number(page_no));
 
     if(!pageParse.success) {
-      ApiResponse.error(res, "Invalid page number!");
+      ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
       return;
     }
 
@@ -317,12 +293,11 @@ export class RecipeController {
     >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
 
     if(recipeList === undefined) {
-      ApiResponse.error(res, "There was an error retrieving the recipe list!");
+      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
       return;
     }
 
-    log("Successfully retrieved recipe list!");
-    ApiResponse.success(res, "Successfully retrieved recipes!", recipeList);
+    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, recipeList);
   }
 
   static async getSearchRecipeList(req: Request, res: Response) {
@@ -334,7 +309,7 @@ export class RecipeController {
     });
 
     if(!searchRecipeParse.success) {
-      ApiResponse.error(res, "Invalid page number!");
+      ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
       return;
     }
 
@@ -347,12 +322,11 @@ export class RecipeController {
     ), RecipeService.getSearchRecipeList, 60, searchRecipeParse.data.page_no, searchRecipeParse.data.search_text);
 
     if(searchRecipeList === undefined) {
-      ApiResponse.error(res, "There was an error retrieving the recipe list!");
+      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
       return;
     }
 
-    log("Successfully retrieved search recipe list!");
-    ApiResponse.success(res, "Successfully retrieved search recipes!", searchRecipeList);
+    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, searchRecipeList);
   }
 
   static async viewedRecipe(req: Request, res: Response) {
@@ -360,18 +334,18 @@ export class RecipeController {
 
     const recipeIdParse = z.number().safeParse(Number(recipe_id));
     if(!recipeIdParse.success) {
-      ApiResponse.error(res, "Invalid recipe id!");
+      ApiResponse.error(res, RecipeErrorMessage.INVALID_RECIPE_ID);
       return;
     }
 
     const result = await RecipeService.viewedRecipe(recipeIdParse.data);
 
     if(!result) {
-      ApiResponse.error(res, "There was an error updating the recipe view number!");
+      ApiResponse.error(res, RecipeErrorMessage.VIEW_RECIPE);
       return;
     }
 
-    ApiResponse.success(res, "Successfully viewed recipe!");
+    ApiResponse.success(res, RecipeSuccessMessage.VIEW_RECIPE);
   }
 
   static async isLikedRecipe(req: Request, res: Response) {
@@ -380,9 +354,7 @@ export class RecipeController {
     const user = getUserData(req);
 
     if(user === undefined) {
-      console.error("Error!");
-      log("You must log in to like a recipe!");
-      ApiResponse.error(res, "You must log in to like a recipe!");
+      ApiResponse.error(res, RecipeUnauthorizedMessage.LOGIN_REQUIRED);
       return;
     }
 
@@ -394,8 +366,6 @@ export class RecipeController {
     const isLikedRecipeParseResult = RecipeControllerValidationSchema.IsLikedRecipe.safeParse(submitData);
 
     if(!isLikedRecipeParseResult.success) {
-      console.error("Error!");
-      log(isLikedRecipeParseResult.error.issues[0].message);
       ApiResponse.error(res, isLikedRecipeParseResult.error.issues[0].message);
       return;
     }
@@ -405,7 +375,7 @@ export class RecipeController {
       isLikedRecipeParseResult.data.user_id
     );
 
-    ApiResponse.success(res, "Successfully retrieved is liked!", {is_liked: isLiked});
+    ApiResponse.success(res, RecipeSuccessMessage.IS_LIKED_RECIPE, {is_liked: isLiked});
   }
 
   static async likeRecipe(req: Request, res: Response) {
@@ -414,7 +384,7 @@ export class RecipeController {
     const user = getUserData(req);
 
     if(user === undefined) {
-      ApiResponse.error(res, "You must be logged in to like a recipe!");
+      ApiResponse.error(res, RecipeUnauthorizedMessage.LOGIN_REQUIRED);
       return;
     }
 
@@ -439,7 +409,7 @@ export class RecipeController {
     );
 
     if(isLiked === undefined) {
-      ApiResponse.error(res, "There was an error liking the recipe!");
+      ApiResponse.error(res, RecipeErrorMessage.LIKE_RECIPE);
       return;
     }
 
@@ -449,7 +419,7 @@ export class RecipeController {
     const owner = await RecipeService.getRecipeOwner(likeRecipeParseResult.data.recipe_id);
 
     if(owner === undefined || owner === null) {
-      ApiResponse.error(res, "There was an error retrieving the owner data!");
+      ApiResponse.error(res, RecipeErrorMessage.OWNER_DATA);
       return;
     }
 
@@ -490,11 +460,11 @@ export class RecipeController {
     );
 
     if(notification === undefined) {
-      ApiResponse.error(res, "There was an error inserting the notification!");
+      ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
       return;
     }
 
-    ApiResponse.success(res, `Successfully ${likeRecipeParseResult.data.is_liked ? 'liked' : 'unliked'} the recipe!`);
+    ApiResponse.success(res, likeRecipeParseResult.data.is_liked ? RecipeSuccessMessage.LIKE_RECIPE : RecipeSuccessMessage.UNLIKE_RECIPE);
   }
 
   static async postComment(req: Request, res: Response) {
@@ -503,8 +473,7 @@ export class RecipeController {
     const user = getUserData(req);
 
     if(user === undefined || user.user_details === undefined || user.user_details === null) {
-      log("You must log in to comment to a recipe!");
-      ApiResponse.error(res, "You must be logged in to comment to a recipe!");
+      ApiResponse.error(res, RecipeUnauthorizedMessage.LOGIN_REQUIRED);
       return;
     }
 
@@ -520,8 +489,6 @@ export class RecipeController {
     const postCommentParseResult = RecipeControllerValidationSchema.PostComment.safeParse(submitData);
 
     if(!postCommentParseResult.success) {
-      console.error("Error!");
-      log(postCommentParseResult.error.issues[0].message);
       ApiResponse.error(res, postCommentParseResult.error.issues[0].message);
       return;
     }
@@ -529,8 +496,7 @@ export class RecipeController {
     const submittedComment = await RecipeService.postComment(postCommentParseResult.data);
 
     if(submittedComment === undefined) {
-      log("There was an error posting the comment!");
-      ApiResponse.error(res, "There was an error posting the comment!");
+      ApiResponse.error(res, RecipeErrorMessage.POST_COMMENT);
       return;
     }
 
@@ -539,7 +505,7 @@ export class RecipeController {
     const owner = await RecipeService.getRecipeOwner(postCommentParseResult.data.recipe_id);
 
     if(owner === undefined || owner === null) {
-      ApiResponse.error(res, "There was an error retrieving the owner data!");
+      ApiResponse.error(res, RecipeErrorMessage.OWNER_DATA);
       return;
     }
 
@@ -568,11 +534,11 @@ export class RecipeController {
     );
 
     if(notification === undefined) {
-      ApiResponse.error(res, "There was an error inserting the notification!");
+      ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
       return;
     }
 
-    ApiResponse.success(res, "Successfully posted the comment!", submittedComment);
+    ApiResponse.success(res, RecipeSuccessMessage.POST_COMMENT, submittedComment);
   }
 
   static async getComments(req: Request, res: Response) {
@@ -595,13 +561,11 @@ export class RecipeController {
     const comments = await RecipeService.getComments(getCommentsParseResult.data.recipe_id, getCommentsParseResult.data.page);
 
     if(comments === undefined) {
-      console.error("Error!");
-      log("There was an error getting comments!");
-      ApiResponse.error(res, "There was an error getting comments!");
+      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_COMMENTS);
       return;
     }
 
-    ApiResponse.success(res, "Successfully retrieved comments!", comments);
+    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_COMMENTS, comments);
   }
 
   static async recipeEvents(req: Request, res: Response) {
@@ -610,15 +574,12 @@ export class RecipeController {
     const user = getUserData(req);
 
     if(user === undefined) {
-      log("You must login to get notifications!");
-      ApiResponse.unauthorized(res, "Unauthorized");
+      ApiResponse.unauthorized(res, RecipeUnauthorizedMessage.LOGIN_REQUIRED);
       return;
     }
 
     if(Number(user_id) !== user.user_id || user.user_details?.user_codename !== user_codename) {
-      console.error("Error!");
-      log("Unauthorized user given!");
-      ApiResponse.unauthorized(res, "Unauthorized");
+      ApiResponse.unauthorized(res, RecipeUnauthorizedMessage.UNAUTHORIZED_NOTIFICATION);
       return;
     }
 
@@ -640,7 +601,7 @@ export class RecipeController {
 
     req.on("close", () => {
       recipeEvents.removeClient(id);
-      console.log("User disconnected");
+      console.log(RecipeUnauthorizedMessage.USER_DISCONNECT);
     });
   }
 }

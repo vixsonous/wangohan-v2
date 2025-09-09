@@ -39,7 +39,7 @@ export default function SidebarMenu(
     {text: "レシピを探す", show: true, condition: false, href: "/", src: "/icons/svg/white-magnifying-glass.svg", alt: "an icon for search recipe", type: "button"},
     {text: "レシピ図鑑", show: true, condition: pathname.includes("/recipe/list"), href: "/recipe/list/1", src: "/icons/svg/white-book.svg", alt: "an icon for recipe list", type: "link"},
     {text: "犬と食に関するコラム", show: true, condition: pathname.includes("/columns") , href: "/columns", src: "/icons/svg/white-paw-print.svg", alt: "an icon for columns/blog", type: "link"},
-    {text: "愛犬登録", show: true, condition: pathname.includes("/user/settings/"), href: `/user/settings/${1}?=#register-pet`, src: "/icons/svg/white-paw-print.svg", alt: "an icon for pet registration", type: "link"},
+    {text: "愛犬登録", show: true, condition: pathname.includes("/user/settings/"), href: user_data === undefined ? "/login" : `/user/${user_data?.user_id}/${user_data?.user_details?.user_codename}?register_pet=true`, src: "/icons/svg/white-paw-print.svg", alt: "an icon for pet registration", type: "link"},
     {text: "ログアウト", function: () => logoutMutation.mutate(), show: user_data !== undefined, condition: false, href: `/`, src: "/icons/svg/primary-sign-out.svg", alt: "sign out icon", type: "button"},
   ]
 

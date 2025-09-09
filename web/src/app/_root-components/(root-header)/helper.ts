@@ -69,14 +69,11 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
         notification.type === curNotification.type
     );
 
-
     if(existingNotification) {
       existingNotification.duplicate_count = (existingNotification.duplicate_count || 0) + 1;
     } else {
       acc.push({...curNotification, duplicate_count: curNotification.duplicate_count || 1});
     }
-
-    console.log(acc);
 
     return acc;
   }, []);
