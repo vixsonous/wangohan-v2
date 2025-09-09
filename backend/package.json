@@ -15,6 +15,8 @@
   "author": "Victor Chiong",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.859.0",
+    "@aws-sdk/lib-storage": "^3.859.0",
     "@types/express": "^5.0.3",
     "@types/pg": "^8.15.4",
     "bcrypt": "^6.0.0",
@@ -23,24 +25,29 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
+    "heic-convert": "^2.1.0",
     "kysely": "^0.28.2",
+    "multer": "^2.0.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
     "redis": "^5.6.0",
     "sharp": "^0.34.2",
+    "socket.io": "^4.8.1",
     "tsx": "^4.20.3",
     "uuid": "^11.1.0",
-    "zod": "^3.25.74"
+    "zod": "^4.0.10"
   },
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "@types/connect-redis": "^0.0.23",
     "@types/cors": "^2.8.19",
     "@types/express-session": "^1.18.2",
+    "@types/heic-convert": "^2.1.0",
+    "@types/multer": "^2.0.0",
     "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-local": "^1.0.38"
   }
 }

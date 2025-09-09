@@ -1,0 +1,37 @@
+"use client";
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
+
+export class ClientApiService {
+
+  private static BACKEND_SERVER_URL = process.env.NEXT_PUBLIC_ORIGIN + "/api";
+
+  static async get(url: string, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return await axios.get(this.BACKEND_SERVER_URL + url, {...getConfig, withCredentials: true});
+  }
+
+  static async post<T>(url: string, data: T, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return await axios.post(this.BACKEND_SERVER_URL + url, data, {...getConfig, withCredentials: true});
+  }
+
+  static async put<T>(url: string, data: T, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return await axios.put(this.BACKEND_SERVER_URL + url, data, {...getConfig, withCredentials: true});
+  }
+
+  static async delete(url: string, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return await axios.delete(this.BACKEND_SERVER_URL + url, {...getConfig, withCredentials: true});
+  }
+}
+
+export class ClientApiResponseService {
+  static getAxiosResponseMessage(response: AxiosResponse): string {
+    return response.data.message;
+  }
+
+  static getAxiosResponseData<T>(response: AxiosResponse): T {
+    return response.data.data as T;
+  }
+
+  static getAxiosErrorMessage(error: AxiosError) {
+    return (error.response as AxiosResponse).data.message;
+  }
+}

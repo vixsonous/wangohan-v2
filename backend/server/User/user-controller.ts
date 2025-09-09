@@ -1,16 +1,18 @@
-import { Request, Response } from "express";
+import {NextFunction, Request, Response} from "express";
 import { UserService } from "./user-service";
-import { ApiResponse } from "../utils/ApiUtils";
+import {ApiResponse} from "../utils/ApiUtils";
 import { log } from "../utils/log";
-import { UserLocalStrategyRegistrationSchema } from "./user-schema";
 import z from "zod";
 import { User } from "./user";
+import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
+import {UserDetailSchema} from "@/server/types/user-types.user-detail";
+import passport from "@/server/utils/passport";
 
 export class UserController {
   static async getUser(req: Request, res: Response) {
     const {user_id, user_codename} = req.query;
     const user = await UserService.getUser(Number(user_id), String(user_codename));
-    
+
     if(user === undefined) {
       ApiResponse.error(res, "User not found!", user);
       return;
@@ -19,19 +21,40 @@ export class UserController {
     ApiResponse.success(res, "User found!", user);
   }
 
-  static async login(req: Request, res: Response) {
-    console.log(req.user);
-    console.log("yes");
-    ApiResponse.success(res, "Successfully logged in!");
+  static async isAuthenticated(req: Request, res: Response) {
+    ApiResponse.success(res, req.user ? "Authenticated": "Not authenticated", req.user, 200);
+  }
+
+  static async login(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if(err) {
+        ApiResponse.error(res, err);
+        return;
+      }
+
+      log(info);
+
+      req.logIn(user, (loginError) => {
+        if(loginError){
+          ApiResponse.redirect(res, "/login");
+          return;
+        }
+
+        ApiResponse.success(res, "Successfully logged in!");
+      })
+
+
+    })(req, res, next);
+
   }
 
   static async register(req: Request, res: Response) {
-    const data: z.infer<typeof UserLocalStrategyRegistrationSchema> = req.body;
+    const data: z.infer<typeof UserAuthenticationSchema.UserLocalStrategyRegistration> = req.body;
     
-    const result = UserLocalStrategyRegistrationSchema.safeParse(data);
+    const result = UserAuthenticationSchema.UserLocalStrategyRegistration.safeParse(data);
 
-    if(result.success === false) {
-      ApiResponse.error(res, result.error.errors[0].message);
+    if(!result.success) {
+      ApiResponse.error(res, result.error.issues[0].message);
       return;
     }
 
@@ -52,9 +75,113 @@ export class UserController {
     req.logIn(createResult.getId(), (err) => {
       if(err) {
         ApiResponse.error(res, "Error in saving to session!");
+        return;
       }
+
+      ApiResponse.success(res, "Successfully registered!");
     });
 
-    ApiResponse.success(res, "Successfully registered!");
+
+  }
+
+  static async registerPersonalInfo(req: Request, res: Response) {
+    const submitData = {
+      ...req.body,
+      user_id: Number(req.body.user_id),
+      user_agreement: Number(req.body.user_agreement),
+      user_birthdate: new Date(req.body.user_birthdate),
+      user_image: req.file,
+      updated_at: new Date(req.body.updated_at),
+      created_at: new Date(req.body.created_at),
+    };
+
+    const personalInfoData = UserDetailSchema.PostUserDetails.safeParse(submitData);
+
+    if(!personalInfoData.success) {
+      ApiResponse.error(res, "Invalid personal information data!");
+      return;
+    }
+
+    const userDetail = await UserService.postPersonalInfo(personalInfoData.data);
+
+    if(userDetail === undefined) {
+      ApiResponse.error(res, "Error in saving personal information!");
+      return;
+    }
+
+    const userData = userDetail.getDisplayUser();
+
+    if(userData === null) {
+      ApiResponse.error(res, "Error in saving personal information!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully registered personal info!", userData);
+  }
+
+  static async updatePersonalInfo(req: Request, res: Response) {
+
+    const submitData = {
+      ...req.body,
+      user_id: Number(req.body.user_id),
+      user_agreement: Number(req.body.user_agreement),
+      user_birthdate: new Date(req.body.user_birthdate),
+      updated_at: new Date(req.body.updated_at),
+      user_image: req.file
+    }
+
+    const updatePersonalInfoParseResult = UserDetailSchema.UpdateUserDetails.safeParse(submitData);
+
+    if(!updatePersonalInfoParseResult.success) {
+      ApiResponse.error(res, "Error in saving personal information!");
+      log(updatePersonalInfoParseResult.error.issues);
+      return;
+    }
+
+    const updatedPersonalInfo = await UserService.updatePersonalInfo(updatePersonalInfoParseResult.data);
+
+    if(updatedPersonalInfo === undefined) {
+      ApiResponse.error(res, "Error in updating personal information!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully updated personal info!", updatedPersonalInfo);
+  }
+
+  static async logout(req: Request, res: Response) {
+    if(req.user === undefined) {
+      ApiResponse.error(res, "Unauthorized log out!");
+      return;
+    }
+
+    req.logOut(err => {
+      if(err) {
+        ApiResponse.error(res, "Error logging out!");
+        return;
+      }
+
+      ApiResponse.success(res, "Successfully logged out!");
+    })
+  }
+
+  static async googleLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate("google", (err: any, user: any, _: any) => {
+      if(err) {
+        log(err);
+        ApiResponse.redirect(res, "/login?error=" + err);
+        return;
+      }
+
+      req.logIn(user, (err) => {
+        if(err) {
+          ApiResponse.redirect(res, "/login?error=" + "Google account access was denied!");
+          return;
+        }
+
+        ApiResponse.redirect(res, "/?google-login-success=true");
+      });
+
+    })(req, res, next);
+
   }
 }

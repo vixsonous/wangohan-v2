@@ -1,15 +1,37 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import {headers} from "next/headers";
 
+export class ServerApiResponseService {
+  static async getResponseData<T>(res: Response): Promise<T>{
+    const responseData = await res.json();
+    return responseData.data as T;
+  }
+
+  static async getResponseJson<T>(res: Response): Promise<{message: string, data: T} | undefined> {
+    try {
+      return await res.json();
+    } catch(e) {
+      console.error(e);
+      return undefined
+    }
+
+  }
+}
 export class ServerApiService {
 
   private static BACKEND_SERVER_URL = "http://wangohan_server:3001/api";
 
-  static async get(url: string, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
-    return await axios.get(this.BACKEND_SERVER_URL + url, getConfig);
-  }
+  static async get(url: string, getConfig?: RequestInit): Promise<Response> {
+    const h = headers();
+    const cookies = (await h).get("cookie") || "";
 
-  static async post<T>(url: string, data: T, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
-    return await axios.post(this.BACKEND_SERVER_URL + url, data, getConfig);
+    return await fetch(this.BACKEND_SERVER_URL + url, {
+      method: "GET",
+      headers: {
+        'Cookie': cookies
+      },
+      credentials: "include",
+      ...getConfig
+    })
   }
 }
 
@@ -22,7 +44,6 @@ export class ServerUtils {
   }
 
   static getPreloads() {
-    const preloadUrls = Array.from(this._urls);
-    return preloadUrls;
+    return Array.from(this._urls);
   }
 }

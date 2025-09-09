@@ -1,7 +1,10 @@
 import z from "zod";
 import { UserDetailsRepository, UserRepository } from "./user-repository";
-import { UserCredentials, UserDetailsData, UserDisplay } from "./user-types";
-import { UserCredentialsSchema, UserSchema } from "./user-schema";
+import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
+import {UserDetailSchema} from "@/server/types/user-types.user-detail";
+import {UserSchema} from "@/server/types/user-types.user";
+import {PetSchema} from "@/server/types/pet-types.pet";
+import {RecipeSchema} from "@/server/types/recipe-types";
 
 export class User {
   
@@ -13,7 +16,7 @@ export class User {
   private updated_at?: Date;
   private created_at?: Date;
   
-  constructor(user: z.infer<typeof UserSchema>) {
+  constructor(user: z.infer<typeof UserAuthenticationSchema.User>) {
     this.user_id = user.user_id;
     this.google_id = user.google_id;
     this.email = user.email;
@@ -23,41 +26,37 @@ export class User {
     this.created_at = user.created_at;
   }
   
-  static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<UserCredentials | undefined> {
-    const user = await UserRepository.findUser({user_email: email, google_id: googleId});
+  static async findUser({email, googleId}: {email?: string | undefined, googleId?: string | undefined}): Promise<z.infer<typeof UserAuthenticationSchema.UserCredentials> | undefined> {
 
-    return user;
+    return await UserRepository.findUser({user_email: email, google_id: googleId});
   }
 
   async createUser(): Promise<User | undefined> {
-    const createResult = await UserRepository.createUser({email: this.email, google_id: this.google_id, password: this.password});
-
-    return createResult;
+    return await UserRepository.createUser({email: this.email, google_id: this.google_id, password: this.password});
   }
 
   getId(): number {
     return this.user_id || -1;
   }
 }
+
 export class UserDetails {
-  private user_first_name: string;
-  private user_last_name: string;
-  private user_codename: string;
-  private user_image: string;
-  private user_agreement: number;
-  private user_gender: string;
-  private user_birthdate: Date;
-  private user_id: number;
-  private user_occupation: string;
-  private updated_at: Date;
-  private created_at: Date;
+  protected user_first_name: string;
+  protected user_last_name: string;
+  protected user_codename: string;
+  protected user_agreement: number;
+  protected user_gender: string;
+  protected user_birthdate: Date;
+  protected user_id: number;
+  protected user_occupation: string;
+  protected updated_at: Date | undefined;
+  protected created_at: Date | undefined;
   constructor(
-    user: UserDetailsData
+    user: z.infer<typeof UserDetailSchema.UserDetails>
   ) {
     this.user_first_name = user.user_first_name; 
     this.user_last_name  = user.user_last_name ;
     this.user_codename  = user.user_codename ;
-    this.user_image = user.user_image;
     this.user_agreement  = user.user_agreement ;
     this.user_gender = user.user_gender;
     this.user_birthdate = user.user_birthdate;
@@ -67,18 +66,90 @@ export class UserDetails {
     this.created_at = user.created_at;
   }
 
-  getDisplayUser(): UserDisplay {
+  getDisplayUser(): z.infer<typeof UserSchema.UserDisplay> {
     return {
       user_id: this.user_id,
       user_codename: this.user_codename,
-      user_image: this.user_image
+      user_image: ""
     }
   }
 
-  static async getUser(user_id: number, user_codename: string): Promise<UserDetails | undefined> {
-    const user = await UserDetailsRepository.getUser(user_id, user_codename);
+}
 
-    return user ? new UserDetails(user) : user;
+export class GetUserDetails extends UserDetails {
+  private user_image: string;
+  private pets?: Array<z.infer<typeof PetSchema.GetPet>> | undefined;
+  private liked_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private my_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private deleted_recipes?: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined;
+  private total_liked?: number | undefined;
+  private total_recipes?: number | undefined;
+  private total_deleted_recipes?: number | undefined;
+
+  constructor(user_details: z.infer<typeof UserDetailSchema.GetUserDetails>) {
+    super(user_details);
+    this.user_image = user_details.user_image;
+    this.pets = user_details.pets;
+    this.liked_recipes = user_details.liked_recipes;
+    this.my_recipes = user_details.my_recipes;
+    this.total_liked = user_details.total_liked;
+    this.total_recipes = user_details.total_recipes;
+    this.deleted_recipes = user_details.deleted_recipes;
+    this.total_deleted_recipes = user_details.total_deleted_recipes;
   }
 
+  static async getUser(user_id: number, user_codename: string): Promise<GetUserDetails | undefined> {
+    const user: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined = await UserDetailsRepository.getUser(user_id, user_codename);
+    return user ? new GetUserDetails(user) : user;
+  }
+}
+
+export class PostUserDetails extends UserDetails {
+  private user_image: Express.Multer.File;
+
+  constructor(user_details: z.infer<typeof UserDetailSchema.PostUserDetails>) {
+    super(user_details);
+    this.user_image = user_details.user_image;
+  }
+
+  async create() {
+    const userDetail: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined= await UserDetailsRepository.postUserDetails({
+      user_id: this.user_id,
+      user_codename: this.user_codename,
+      user_image: this.user_image,
+      user_first_name: this.user_first_name,
+      user_last_name: this.user_last_name,
+      user_occupation: this.user_occupation,
+      user_gender: this.user_gender,
+      user_birthdate: this.user_birthdate,
+      user_agreement: this.user_agreement,
+    });
+
+    return userDetail ? new GetUserDetails(userDetail) : userDetail;
+  }
+}
+
+export class UpdateUserDetails extends UserDetails {
+  private user_image?: Express.Multer.File | undefined;
+
+  constructor(user_details: z.infer<typeof UserDetailSchema.UpdateUserDetails>) {
+    super(user_details);
+    this.user_image = user_details.user_image;
+  }
+
+  async update() {
+    const userDetail: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined= await UserDetailsRepository.updateUserDetails({
+      user_id: this.user_id,
+      user_codename: this.user_codename,
+      user_image: this.user_image,
+      user_first_name: this.user_first_name,
+      user_last_name: this.user_last_name,
+      user_occupation: this.user_occupation,
+      user_gender: this.user_gender,
+      user_birthdate: this.user_birthdate,
+      user_agreement: this.user_agreement,
+    });
+
+    return userDetail ? new GetUserDetails(userDetail) : userDetail;
+  }
 }

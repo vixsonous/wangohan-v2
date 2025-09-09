@@ -1,37 +1,135 @@
-import sharp from "sharp";
+// @ts-ignore
+import sharp, {FitEnum} from "sharp";
+import z from "zod";
+import {ImageSchema, ImageTypes} from "@/server/types/image-types.image";
+import {Request} from "express";
+import {log} from "@/server/utils/log";
 
-export class Image {
+export type Formats = "webp" | "png" | "jpg" | "jpeg";
+
+export class ImageProcess {
   private image: ArrayBuffer;
 
   // Resizing
   private shouldResize: boolean = false;
   private width?: number | undefined = undefined;
   private height?: number | undefined = undefined;
+  private resizeOptions?: sharp.ResizeOptions | undefined = undefined;
+  
+  private shouldChangeToWebp: boolean = false;
+  private webpOptions: sharp.WebpOptions = {};
 
+  // Change format
+  private shouldChangeFormat: boolean = false;
+  private format: Formats = "webp";
 
   constructor(arrayBuffer: ArrayBuffer) {
     this.image = arrayBuffer;
     return this;
   }
 
-  resize(width: number, height?: number) {
+  resize(width: number, height?: number | undefined, options?: sharp.ResizeOptions | undefined) {
     this.width = width;
     this.height = height;
+    this.resizeOptions = options;
     this.shouldResize = true;
 
     return this;
+  }
+
+  webp(options: sharp.WebpOptions) {
+    this.shouldChangeToWebp = true;
+    this.webpOptions = options;
+
+    return this;
+  }
+
+  changeFormat(format: Formats) {
+    this.shouldChangeFormat = true;
+    this.format = format;
+
+    return this;
+  }
+
+  metadata() {
+    return sharp(this.image).metadata();
   }
 
   result() {
     let procImg = sharp(this.image);
     
     if(this.shouldResize) {
-      procImg = procImg.resize({
-        width: this.width,
-        height: this.height
-      })
+      procImg = procImg.resize(this.width, this.height || null, this.resizeOptions)
     }
 
-    return procImg.toBuffer();
+    if(this.shouldChangeToWebp) {
+      procImg = procImg.toFormat("webp").webp(this.webpOptions);
+    }
+
+    if(this.shouldChangeFormat) {
+      procImg = procImg.toFormat(this.format);
+    }
+
+    return procImg.withMetadata().toBuffer();
+  }
+}
+
+export class ImageService {
+  static async imageTransformService(req: Request):
+    Promise<z.infer<typeof ImageSchema.TransformImage> | undefined> {
+
+    const {src,h ,w, fit='cover', quality=undefined, format=undefined, upscale=false, upscaleMethod="nearest"} = req.query;
+
+    try {
+      let response: any;
+
+      if(String(src).startsWith("/")) {
+        response = await fetch(process.env.BASE_WEB_INTERNAL_URL + "/" + src);
+      } else if(String(src).startsWith("r2://")) {
+        response = await fetch(process.env.BASE_PUBLIC_BUCKET_URL + "/" + String(src).split("r2://")[1]);
+      } else {
+        response = await fetch(src as string);
+      }
+
+      if(!response.ok) {
+        log("Failed to fetch image: " + response.statusText);
+        return undefined;
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+
+      let image = new ImageProcess(arrayBuffer);
+
+      const widthCheck: boolean = z.number().safeParse(Number(w)).success;
+      const heightCheck: boolean = z.number().safeParse(Number(h)).success;
+
+      if(widthCheck) {
+        image = heightCheck ?
+          image.resize(Number(w), Number(h), {fit: fit as keyof FitEnum, kernel: upscale || upscale === "true" ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined}) :
+          image.resize(Number(w), undefined, {fit: fit as keyof FitEnum, kernel: upscale || upscale === "true" ? sharp.kernel[String(upscaleMethod) as keyof typeof sharp.kernel] : undefined});
+      }
+
+      if(quality !== undefined) {
+        image = image.webp({quality: Number(quality) });
+      }
+
+      if(format !== undefined) {
+        image = image.changeFormat(format as Formats || "webp");
+      }
+
+      const resultImage = await image.result();
+      const metadata = await image.metadata();
+
+      return {
+        image_buffer: resultImage.toString("base64"),
+        image_type: metadata.format === 'jpg' ? 'image/jpeg':'image/' + metadata.format as ImageTypes
+      }
+
+    } catch(e) {
+      log(e);
+
+      return undefined;
+    }
+
   }
 }

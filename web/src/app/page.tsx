@@ -6,15 +6,16 @@ import RecipeCarouselWrapper from "./_root-components/recipe-carousel-wrapper";
 import BirthdayWrapper from "./_root-components/birthday-wrapper";
 import ColumnBanner from "./_root-components/column-banner";
 import { getSliderRecipes } from "@/server-actions/Recipe/recipe";
+import {getBirthdayMonthPets} from "@/server-actions/Pet/pet";
 
-export const gloria = Gloria_Hallelujah({
+const gloria = Gloria_Hallelujah({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
   adjustFontFallback: false,
 });
 
-export const mochi = Mochiy_Pop_P_One({
+const mochi = Mochiy_Pop_P_One({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
@@ -33,15 +34,36 @@ export default async function Home() {
     </section>
   }
 
+  const birthdayPets = await getBirthdayMonthPets();
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "name": "わんごはん",
+    "description": "わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？",
+    "image": "https://wangohanjp.com/logo-final.webp",
+    "author": {
+      "@type": "Person",
+      "name": "Victor Chiong"
+    },
+    "keywords": "犬用レシピ, 手作りごはん",
+  };
+
   return (
-    <section className={`w-full flex gap-2.5 flex-col items-center px-6 py-6 lg:px-0 min-h-screen`}>
-      <HomeLogoHeader mochi={mochi} gloria={gloria}/>
-      <HomeNavigation />
-      <BannerSection />
-      <RecipeCarouselWrapper title="今週のレシピ" recipes={sliderData.weeklyRecipes}/>
-      <RecipeCarouselWrapper title="人気レシピ" recipes={sliderData.popularRecipes}/>
-      <BirthdayWrapper />
-      <ColumnBanner />
-    </section>
+    <>
+      <section className={`w-full flex gap-2.5 flex-col items-center px-6 py-6 lg:px-0 min-h-screen`}>
+        <HomeLogoHeader mochi={mochi} gloria={gloria}/>
+        <HomeNavigation />
+        <BannerSection recipes={sliderData.popularRecipes} />
+        <RecipeCarouselWrapper title="今週のレシピ" recipes={sliderData.weeklyRecipes}/>
+        <RecipeCarouselWrapper title="人気レシピ" recipes={sliderData.popularRecipes}/>
+        <BirthdayWrapper birthday_pets={birthdayPets} />
+        <ColumnBanner />
+      </section>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+    </>
   );
 }

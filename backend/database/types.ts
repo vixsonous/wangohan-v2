@@ -1,4 +1,4 @@
-import { Generated, Insertable, Updateable } from "kysely";
+import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 export interface DatabaseTableName {
   users_table: "users_table";
@@ -39,6 +39,7 @@ export interface UserTable {
   email: string;
   password:string;
   user_lvl: number;
+  is_inactive: boolean;
   updated_at: Date;
   created_at: Date;
 }
@@ -102,10 +103,12 @@ export interface RecipesTable {
   total_favourites: number;
   total_views: number;
   user_id: number;
+  is_deleted: boolean;
   updated_at: Date;
   created_at: Date;
 }
 
+export type RecipeSelect = Selectable<RecipesTable>;
 export type RecipeInsert = Insertable<RecipesTable>;
 export type RecipeUpdate = Updateable<RecipesTable>;
 
@@ -185,15 +188,15 @@ export type LikeUpdate = Updateable<LikesTable>;
 export interface NotificationsTable {
   notification_id: Generated<number>;
   user_id: number;
-  recipe_owner_id: number;
-  notification_content: string;
+  user_codename: string;
+  user_image: string;
   is_read: boolean;
   type: string;
   liked: boolean;
   recipe_id: number;
-  recipe_image: string;
+  recipe_name: string;
+  notification_date: Date;
   updated_at: Date;
-  created_at: Date;
 }
 
 export type NotificationInsert = Insertable<NotificationsTable>;
@@ -205,6 +208,7 @@ export interface BlogColumnsTable {
   blog_image: string;
   blog_category: string;
   editor_state: JSON;
+  is_deleted: boolean;
   updated_at: Date;
   created_at: Date;
 }

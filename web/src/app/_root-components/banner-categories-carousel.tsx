@@ -5,25 +5,21 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/componen
 import Link from "next/link";
 import React, { useCallback, useEffect, useState } from "react";
 
-const categories = [
-
-]
-
 const dogCategory = [
   {
     title: "年齢別で探す",
     items: [
-      {text: "子犬用レシピ", href: "/recipe/search/子犬", img: "/icons/categories/puppy-thumbnail.png", alt: "wangohan puppy category thumbnail"},
-      {text: "成犬用レシピ", href: "/recipe/search/成犬", img: "/icons/categories/adult-thumbnail.png", alt: "wangohan adult dog category thumbnail"},
-      {text: "シニア犬用レシピ", href: "/recipe/search/シニア犬", img: "/icons/categories/senior-thumbnail.png", alt: "wangohan senior dog category thumbnail"},
+      {text: "子犬用レシピ", href: "/recipe/search/子犬/1", img: "/icons/categories/puppy-thumbnail.png", alt: "wangohan puppy category thumbnail"},
+      {text: "成犬用レシピ", href: "/recipe/search/成犬/1", img: "/icons/categories/adult-thumbnail.png", alt: "wangohan adult dog category thumbnail"},
+      {text: "シニア犬用レシピ", href: "/recipe/search/シニア犬/1", img: "/icons/categories/senior-thumbnail.png", alt: "wangohan senior dog category thumbnail"},
     ]
   },
   {
     title: "サイズ別で探す",
     items: [
-      {text: "小型犬用レシピ", href: "/recipe/search/小型犬", img: "/icons/categories/smalldog-thumbnail.png", alt: "wangohan small size dogs category thumbnail"},
-      {text: "中型犬用レシピ", href: "/recipe/search/中型犬", img: "/icons/categories/averagedog-thumbnail.png", alt: "wangohan average size dogs category thumbnail"},
-      {text: "大型犬用レシピ", href: "/recipe/search/大型犬", img: "/icons/categories/bigdog-thumbnail.png", alt: "wangohan big size dogs category thumbnail"},
+      {text: "小型犬用レシピ", href: "/recipe/search/小型犬/1", img: "/icons/categories/smalldog-thumbnail.png", alt: "wangohan small size dogs category thumbnail"},
+      {text: "中型犬用レシピ", href: "/recipe/search/中型犬/1", img: "/icons/categories/averagedog-thumbnail.png", alt: "wangohan average size dogs category thumbnail"},
+      {text: "大型犬用レシピ", href: "/recipe/search/大型犬/1", img: "/icons/categories/bigdog-thumbnail.png", alt: "wangohan big size dogs category thumbnail"},
     ]
   }
 ]
@@ -35,36 +31,36 @@ const events = [
       {
         text: "お誕生日",
         img: "/icons/categories/events/birthday.webp",
-        href: "/recipe/search/お誕生日",
+        href: "/recipe/search/お誕生日/1",
         alt: "birthday category icon for search"
       },
       {
         text: "おうち記念日",
         img: "/icons/categories/events/ouchianniversary.webp",
-        href: "/recipe/search/おうち記念日",
+        href: "/recipe/search/おうち記念日/1",
         alt: "birthday category icon for search"
       },
       {
         text: "お正月",
         img: "/icons/categories/events/newyears.webp",
-        href: "/recipe/search/お正月",
+        href: "/recipe/search/お正月/1",
         alt: "birthday category icon for search"
       },
       { text: "節分", 
         img: "/icons/categories/events/setsubun.webp", 
-        href: "/recipe/search/節分",
+        href: "/recipe/search/節分/1",
         alt: "birthday category icon for search"
       },
       {
         text: "ひな祭り",
         img: "/icons/categories/events/hinamatsuri.webp",
-        href: "/recipe/search/ひな祭り",
+        href: "/recipe/search/ひな祭り/1",
         alt: "birthday category icon for search"
       },
       {
         text: "こどもの日",
         img: "/icons/categories/events/kodomonohi.webp",
-        href: "/recipe/search/こどもの日",
+        href: "/recipe/search/こどもの日/1",
         alt: "birthday category icon for search"
       },
     ]
@@ -75,30 +71,30 @@ const events = [
       {
         text: "七夕",
         img: "/icons/categories/events/tanabata.webp",
-        href: "/recipe/search/七夕",
+        href: "/recipe/search/七夕/1",
         alt: "birthday category icon for search"
       },
       {
         text: "ハロウィン",
         img: "/icons/categories/events/halloween.webp",
-        href: "/recipe/search/ハロウィン",
+        href: "/recipe/search/ハロウィン/1",
         alt: "birthday category icon for search"
       },
       {
         text: "クリスマス",
         img: "/icons/categories/events/christmas.webp",
-        href: "/recipe/search/クリスマス",
+        href: "/recipe/search/クリスマス/1",
         alt: "birthday category icon for search"
       },
       { text: "おやつ", 
         img: "/icons/categories/events/snack.webp", 
-        href: "/recipe/search/おやつ",
+        href: "/recipe/search/おやつ/1",
         alt: "birthday category icon for search"
       },
       {
         text: "ダイエット",
         img: "/icons/categories/events/diet.webp",
-        href: "/recipe/search/ダイエット",
+        href: "/recipe/search/ダイエット/1",
         alt: "birthday category icon for search"
       },
     ]
@@ -199,7 +195,7 @@ export default function BannerCategoriesCarousel() {
       <section className="flex justify-center w-full gap-2 mt-2">
         {Array(cnt).fill(0).map( (c, idx) => {
           return (
-            <Button key={idx} onClick={apiScrollTo(idx)} className={`w-2 h-2 rounded-full ${(cur - 1) === idx ? 'bg-bullet' : 'bg-inactive'}`}></Button>
+            <Button role={"button"} key={idx} aria-label={"carousel-categories-button-" + idx} name={"carousel-categories-button-" + idx} aria-labelledby={"carousel-categories-button-" + idx} onClick={apiScrollTo(idx)} className={`w-2 h-2 rounded-full ${(cur - 1) === idx ? 'bg-bullet' : 'bg-inactive'}`}></Button>
           )
         })}
       </section>

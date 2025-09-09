@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import { ServerUtils } from "@/lib/server-utils";
-import Head from "next/head";
 import React, { ImgHTMLAttributes } from "react";
 
 interface ImageProps {

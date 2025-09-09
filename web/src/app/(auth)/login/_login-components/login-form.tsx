@@ -9,13 +9,25 @@ import React, { HTMLAttributes, memo, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Image from "@/components/Image/client";
 import Link from "next/link";
-import axios from "axios";
 import { gloria, inter, mochi } from "@/app/_root-components/client-fonts";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
+import {AxiosError} from "axios";
+import {useRouter} from "next/navigation";
+
+const UserLoginSchema = z.object({
+  email: z.string().min(1, "Email is required!").email("Invalid email format!"),
+  password: z.string().min(7, "Password must be at least 7 characters!")
+});
 
 export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivElement>) {
 
-  const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onChange'});
+  const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserLoginSchema)});
   const [passwordState, setPasswordState] = useState('password');
+  const router = useRouter();
 
   const ShowPasswordBtn = memo(function ShowPassword() {
     return <ButtonX onClick={() => setPasswordState(prev => prev === 'password' ? 'text' : 'password')}>
@@ -27,11 +39,20 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
     </ButtonX>
   });
 
-  const onSubmit = async (data: FieldValues) => {
-    console.log(data);
+  const loginMutation = useMutation({
+    mutationFn: (data: FieldValues) => ClientApiService.post("/login", data),
+    onSuccess: (data) => {
+      toast.success("Successful!", {description: data.data.message});
+      router.replace("/");
+      router.refresh();
+    },
+    onError:(error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
+    }
+  });
 
-    const q = await axios.post("http://app.localhost/api/login", data);
-  }
+  const onSubmit = async (data: FieldValues) => loginMutation.mutate(data);
 
   return (
     <div suppressHydrationWarning className={cn("flex flex-col gap-6", className)} {...props}>
@@ -48,12 +69,7 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
               <div className="grid gap-3">
                 <Label htmlFor="email">メールアドレス</Label>
                 <InputField
-                  {...register("email", {
-                    required: true,
-                    onChange: (e:React.MouseEvent<HTMLInputElement>) => {
-                      console.log(e.currentTarget.value);
-                    }
-                  })}
+                  {...register("email")}
                   errors={errors}
                   id="email"
                   type="email"
@@ -72,23 +88,21 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
                   </a>
                 </div>
                 <InputField 
-                  {...register("password", {
-                    required: true,
-                    onChange: (e:React.MouseEvent<HTMLInputElement>) => {
-                      console.log(e.currentTarget.value);
-                    }
-                  })}
+                  {...register("password")}
                   errors={errors}
                   id="password"
                   placeholder="Password"
                   type={passwordState} 
-                  icon={<ShowPasswordBtn />} 
-                  required 
+                  icon={<ShowPasswordBtn />}  
                   className={`bg-white ${inter.className}`} 
                 />
               </div>
-              <Button type="submit" className="w-full bg-primary-text">
-                ログイン
+              <Button disabled={loginMutation.isSuccess} type="submit" className="w-full flex items-center gap-2 bg-primary-text">
+                {loginMutation.isPending ? (
+                  <><Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} /> ログイン</>
+                ): (
+                  "ログイン"
+                )}
               </Button>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-secondary-bg text-muted-foreground relative z-10 px-2">
@@ -105,7 +119,7 @@ export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivE
                   </svg>
                   <span className="sr-only">Login with Apple</span>
                 </Button>
-                <Button variant="outline" type="button" className="w-full">
+                <Button onClick={() => window.location.href=`${process.env.NEXT_PUBLIC_ORIGIN}/api/google`} variant="outline" type="button" className="w-full">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                       d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"

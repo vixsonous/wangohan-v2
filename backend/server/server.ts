@@ -2,12 +2,22 @@ import express, { urlencoded } from 'express';
 import { router } from './routes';
 import passport from './utils/passport';
 import session from 'express-session';
-import {RedisStore} from 'connect-redis';
 import { redisClient } from './utils/redis';
+import {RedisStore} from 'connect-redis';
+import cors from 'cors';
+import {RecipeEvents} from "@/server/utils/recipe-events";
+
+const SESSION_MINUTES = 30;
 
 const app = express();
+
+export const recipeEvents = new RecipeEvents();
+
 app.use(express.json());
 app.use(urlencoded({extended: false}));
+app.use(cors({
+  origin: "*",
+}))
 
 app.use(session({
   store: new RedisStore({client: redisClient}),
@@ -15,7 +25,7 @@ app.use(session({
   saveUninitialized: false,
   resave: false,
   cookie: {
-    maxAge: 60000* 60
+    maxAge: 60000 * SESSION_MINUTES
   }
 }))
 app.use(passport.initialize());

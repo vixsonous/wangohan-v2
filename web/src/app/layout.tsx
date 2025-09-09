@@ -1,22 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import RootHeader from "./_root-components/root-header";
+import RootHeader from "./_root-components/(root-header)/root-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ServerUtils } from "@/lib/server-utils";
 import RootFooter from "./_root-components/root-footer";
 import { Toaster } from "@/components/ui/sonner";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 
 export const metadata:Metadata = {
   title: {
@@ -50,28 +38,20 @@ export const metadata:Metadata = {
   
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Recipe",
-    "name": "わんごはん",
-    "description": "わんちゃん専用投稿型レシピサイト。レシピ投稿や検索はもちろん、愛犬登録や誕生日月アナウンスなど盛りだくさん！皆さんの『わんごはん』レシピを投稿してみませんか？",
-    "image": "https://wangohanjp.com/logo-final.webp",
-    "author": {
-      "@type": "Person",
-      "name": "Victor Chiong"
-    },
-    "keywords": "犬用レシピ, 手作りごはん",
-  };
+
 
   const preloads = ServerUtils.getPreloads();
   return (
     <html lang="en">
       <head>
+        <title>わんごはん</title>
         {preloads.map( l => {
           return (
             <link key={l} rel="preload" href={l} as="image"/>
@@ -94,10 +74,6 @@ export default async function RootLayout({
           <RootFooter />
         </SidebarProvider>
         <Toaster richColors position="top-center"/>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
       </body>
     </html>
   );
