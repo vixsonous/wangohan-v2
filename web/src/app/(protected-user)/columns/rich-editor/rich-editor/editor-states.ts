@@ -2,7 +2,7 @@
 import { useState } from "react";
 import z from "zod";
 import {BlogImageSchema} from "@/types/blog-types";
-import {content} from "@/app/(public)/columns/rich-editor/rich-editor/editor-helper";
+import {content} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor-helper";
 
 export const useEditorStates = () => {
   const [state, setState] = useState<String>();

@@ -1,7 +1,7 @@
 
 import useToolbarStates from "../toolbar-states";
 import { LexicalEditor } from "lexical";
-import { FORMAT_FONTSIZE_COMMAND } from "@/app/(public)/columns/rich-editor/nodes/FontSizeNode";
+import { FORMAT_FONTSIZE_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
 
 const FontSizeDropdown = ({
   states,

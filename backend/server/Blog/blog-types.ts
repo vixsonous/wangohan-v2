@@ -19,6 +19,11 @@ export class BlogControllerSchema {
   static GetBlogs = z.object({
     page_no: z.number("Provide a valid page number!"),
     category: z.string().optional()
+  });
+
+  static GetBlog = z.object({
+    blog_id: z.number("Please provide a valid blog id!"),
+    blog_title: z.string("Please provide a valid blog title!"),
   })
 }
 

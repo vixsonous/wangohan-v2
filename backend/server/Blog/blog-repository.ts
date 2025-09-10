@@ -4,6 +4,32 @@ import z from "zod";
 import {BlogSchema, GetBlogSchema} from "@/server/Blog/blog-types";
 
 export class BlogRepository {
+  static async getBlog(blog_id: number, blog_title: string) {
+    try {
+      const blog: z.infer<typeof BlogSchema.Blog> = await db.selectFrom("blog_columns_table")
+        .select([
+          "blog_id",
+          "user_id",
+          "title",
+          "editor_state",
+          "is_deleted",
+          "blog_image",
+          "blog_category",
+          "updated_at"
+        ])
+        .where(eb => eb.and({
+          blog_id: blog_id,
+          title: blog_title
+        }))
+        .executeTakeFirstOrThrow();
+
+      log("Successfully retrieved blog!");
+      return blog;
+    } catch (e) {
+      log(e);
+      return undefined;
+    }
+  }
   static BLOG_LIMIT = 6;
   static async getBlogs(page_no: number, category: string = "全て"): Promise<z.infer<typeof GetBlogSchema.GetBlogList> | undefined> {
     try {

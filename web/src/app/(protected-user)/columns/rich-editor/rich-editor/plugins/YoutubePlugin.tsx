@@ -7,7 +7,7 @@ import {
 } from "lexical";
 import {JSX, useEffect} from "react";
 
-import { $createYouTubeNode, YouTubeNode } from "../../nodes/YoutubeNode";
+import { $createYouTubeNode, YouTubeNode } from "@/app/(protected-user)/columns/rich-editor/nodes/YoutubeNode";
 
 export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand(
   "INSERT_YOUTUBE_COMMAND"

@@ -4,6 +4,32 @@ import {BlogControllerSchema} from "@/server/Blog/blog-types";
 import {BlogService} from "@/server/Blog/blog-service";
 
 export class BlogController {
+
+  static async getBlog(req: Request, res: Response) {
+    const {blog_id, blog_title} = req.query;
+
+    const submitData = {
+      blog_id: Number(blog_id),
+      blog_title: blog_title,
+    }
+
+    const getBlogParseResult = BlogControllerSchema.GetBlog.safeParse(submitData);
+
+    if(!getBlogParseResult.success){
+      ApiResponse.error(res, getBlogParseResult.error.issues[0].message);
+      return;
+    }
+
+    const blog = await BlogService.getBlog(getBlogParseResult.data.blog_id, getBlogParseResult.data.blog_title);
+
+    if(blog === undefined) {
+      ApiResponse.error(res, "Failed to retrieve the blog!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully retrieved the blog!", blog);
+  }
+
   static async getBlogs(req: Request, res: Response) {
     const {page_no, category} = req.query;
     const submitData = {

@@ -10,7 +10,7 @@ import {
 } from "lexical";
 import {JSX, useEffect} from "react";
 
-import { $createImageNode, ImageNode, ImagePayload } from "../../nodes/ImageNode";
+import { $createImageNode, ImageNode, ImagePayload } from "@/app/(protected-user)/columns/rich-editor/nodes/ImageNode";
 
 export type InsertImagePayload = Readonly<ImagePayload>;
 

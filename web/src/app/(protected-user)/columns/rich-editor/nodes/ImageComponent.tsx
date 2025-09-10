@@ -21,7 +21,7 @@ import {
 import * as React from "react";
 import {JSX, Suspense, useCallback, useEffect, useRef, useState} from "react";
 
-import ImageResizer from "../lib/ImageResizer";
+import ImageResizer from "@/app/(protected-user)/columns/rich-editor/lib/ImageResizer";
 import { $isImageNode } from "./ImageNode";
 
 const imageCache: Set<string> = new Set();

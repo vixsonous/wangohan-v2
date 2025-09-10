@@ -55,3 +55,4 @@ router.get("/set-user-notifications-read", EventController.setUserNotificationsR
 
 // Blogs
 router.get("/get-blogs", BlogController.getBlogs);
+router.get("/get-blog", BlogController.getBlog);

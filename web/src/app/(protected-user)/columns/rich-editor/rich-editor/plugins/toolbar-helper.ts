@@ -2,8 +2,8 @@ import { LexicalEditor, RangeSelection } from "lexical";
 import useToolbarStates from "./toolbar-states";
 import { $isAtNodeEnd } from "@lexical/selection";
 import { useMemo } from "react";
-import { FORMAT_FONTCOLOR_COMMAND } from "../../nodes/FontColorNode";
-import { FORMAT_FONTBACKGROUNDCOLOR_COMMAND } from "../../nodes/FontBackgroundColorNode";
+import { FORMAT_FONTCOLOR_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontColorNode";
+import { FORMAT_FONTBACKGROUNDCOLOR_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontBackgroundColorNode";
 
 const useToolbarHelper = (
   editor: LexicalEditor,

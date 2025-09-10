@@ -2,7 +2,7 @@
 import useToolbarStates from "../toolbar-states";
 import { LexicalCommand, LexicalEditor } from "lexical";
 import useFontFamilyHelper from "./font-family-helper";
-import { FORMAT_FONTFAMILY_COMMAND } from "@/app/(public)/columns/rich-editor/nodes/FontNode";
+import { FORMAT_FONTFAMILY_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontNode";
 import React, {JSX} from "react";
 
 const FontFamily = ({

@@ -23,8 +23,8 @@ import { $isListNode, ListNode } from "@lexical/list";
 import { $isCodeNode, getDefaultCodeLanguage } from "@lexical/code";
 
 import React, { memo, useCallback, useEffect, useRef } from "react";
-import { FORMAT_FONTCOLOR_COMMAND } from "../../nodes/FontColorNode";
-import { FORMAT_FONTBACKGROUNDCOLOR_COMMAND } from "../../nodes/FontBackgroundColorNode";
+import { FORMAT_FONTCOLOR_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontColorNode";
+import { FORMAT_FONTBACKGROUNDCOLOR_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontBackgroundColorNode";
 import useToolbarStates from "./toolbar-states";
 import useEditorHelper from "../editor-helper";
 import FetchedImageList from "../fetched-image-list";

@@ -8,15 +8,15 @@ import {
   ParagraphNode,
   TextNode,
 } from "lexical";
-import { FontColorNode } from "../nodes/FontColorNode";
-import { FontNode } from "../nodes/FontNode";
-import { FontBackgroundColorNode } from "../nodes/FontBackgroundColorNode";
-import { FontSizeNode } from "../nodes/FontSizeNode";
+import { FontColorNode } from "@/app/(protected-user)/columns/rich-editor/nodes/FontColorNode";
+import { FontNode } from "@/app/(protected-user)/columns/rich-editor/nodes/FontNode";
+import { FontBackgroundColorNode } from "@/app/(protected-user)/columns/rich-editor/nodes/FontBackgroundColorNode";
+import { FontSizeNode } from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
 import { HeadingNode } from "@lexical/rich-text";
 import { LinkNode, AutoLinkNode } from "@lexical/link";
-import { ImageNode } from "../nodes/ImageNode";
-import { YouTubeNode } from "../nodes/YoutubeNode";
-import { IndentationNode } from "../nodes/IndentationNode";
+import { ImageNode } from "@/app/(protected-user)/columns/rich-editor/nodes/ImageNode";
+import { YouTubeNode } from "@/app/(protected-user)/columns/rich-editor/nodes/YoutubeNode";
+import { IndentationNode } from "@/app/(protected-user)/columns/rich-editor/nodes/IndentationNode";
 import { parseAllowedColor, parseAllowedFontSize } from "./styleConfig";
 import ExampleTheme from "./Theme";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
