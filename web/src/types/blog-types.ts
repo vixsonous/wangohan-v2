@@ -22,6 +22,15 @@ export class GetBlogSchema {
   })
 }
 
+export class PostBlogSchema {
+  static PostBlog = z.object({
+    title: z.string(),
+    category: z.string(),
+    editor_state: z.string(),
+    file: z.file()
+  })
+}
+
 export class BlogImageSchema {
   static BlogImage = z.object({
     blog_image_title: z.string(),

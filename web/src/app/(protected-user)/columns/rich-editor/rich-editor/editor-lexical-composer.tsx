@@ -108,7 +108,7 @@ export default function EditorLexicalComposer({
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                className="editor-input"
+                className="editor-input py-2 px-4 w-full h-auto border border-primary-text rounded-md text-xs md:text-sm bg-secondary-bg"
                 aria-placeholder={placeholder}
                 placeholder={
                   <div className="editor-placeholder">{placeholder}</div>
