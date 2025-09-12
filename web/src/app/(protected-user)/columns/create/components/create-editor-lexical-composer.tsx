@@ -1,5 +1,4 @@
 import {editorConfig} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor-config";
-import ToolbarPlugin from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/ToolbarPlugin";
 import {RichTextPlugin} from "@lexical/react/LexicalRichTextPlugin";
 import {ContentEditable} from "@lexical/react/LexicalContentEditable";
 import {LexicalErrorBoundary} from "@lexical/react/LexicalErrorBoundary";
@@ -21,7 +20,18 @@ import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {customGenerateHtmlFromNodes} from "@/app/(protected-user)/columns/rich-editor/lib/GenerateHtml";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store";
-import {setEditorState, setHTMLString} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+import {
+  setEditorState,
+  setHTMLString
+} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+import dynamic from "next/dynamic";
+import SpinLoader from "@/components/SpinLoader";
+import "@/app/(protected-user)/columns/rich-editor/rich-editor/style.css";
+
+const ToolbarPlugin = dynamic(
+  () => import("@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/ToolbarPlugin"),
+  {ssr: false, loading: () => <SpinLoader />
+  })
 
 const OnChangePlugin = memo(function OnChangePlugin() {
   const [editor] = useLexicalComposerContext();

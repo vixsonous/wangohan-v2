@@ -1,4 +1,5 @@
 import z from "zod";
+import {content} from "@/app/(protected-user)/columns/create/components/create-editor";
 
 export class BlogSchema {
   static Blog = z.object({
@@ -24,10 +25,13 @@ export class GetBlogSchema {
 
 export class PostBlogSchema {
   static PostBlog = z.object({
-    title: z.string(),
-    category: z.string(),
+    title: z.string().min(1, "Please provide the blog title!"),
+    category: z.string("Please provide the blog category!"),
     editor_state: z.string(),
-    file: z.file()
+    file: z.file("Please provide the blog image!")
+  }).refine(data => data.editor_state !== content, {
+    message: "Please provide the content of your blog!",
+    path: ["editor_state"]
   })
 }
 
@@ -35,5 +39,15 @@ export class BlogImageSchema {
   static BlogImage = z.object({
     blog_image_title: z.string(),
     blog_image_url: z.string()
+  });
+
+  static BlogImages = z.array(BlogImageSchema.BlogImage);
+}
+
+export class GetBlogImagesSchema {
+
+  static GetBlogImages = z.object({
+    blog_images: BlogImageSchema.BlogImages,
+    total_blog_images: z.number()
   })
 }

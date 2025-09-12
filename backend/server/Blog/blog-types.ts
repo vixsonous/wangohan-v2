@@ -24,12 +24,28 @@ export class BlogControllerSchema {
   static GetBlog = z.object({
     blog_id: z.number("Please provide a valid blog id!"),
     blog_title: z.string("Please provide a valid blog title!"),
-  })
+  });
+
+  static GetBlogImages = z.number("Please provide a valid page number!");
 }
 
 export class GetBlogSchema {
   static GetBlogList = z.object({
     blogs: BlogSchema.BlogList,
     total_blogs: z.number()
+  })
+}
+
+export class GetBlogImagesSchema {
+  static BlogImage = z.object({
+    blog_image_title: z.string(),
+    blog_image_url: z.string()
+  });
+
+  static BlogImages = z.array(GetBlogImagesSchema.BlogImage);
+
+  static GetBlogImages = z.object({
+    blog_images: GetBlogImagesSchema.BlogImages,
+    total_blog_images: z.number()
   })
 }

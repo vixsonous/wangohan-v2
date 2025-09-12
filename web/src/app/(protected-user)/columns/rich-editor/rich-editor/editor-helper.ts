@@ -1,12 +1,11 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import useEditorStates from "./editor-states";
 import heic2any from "heic2any";
 import useToolbarStates from "./plugins/toolbar-states";
 import { LexicalEditor } from "lexical";
 import { INSERT_IMAGE_COMMAND } from "./plugins/ImagePlugin";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-
-export const content = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
+import {content} from "@/app/(protected-user)/columns/create/components/create-editor";
 
 const useEditorHelper = () => {
 

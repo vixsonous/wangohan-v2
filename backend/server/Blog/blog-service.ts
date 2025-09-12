@@ -8,4 +8,8 @@ export class BlogService {
   static async getBlog(blog_id: number, blog_title: string) {
     return await BlogRepository.getBlog(blog_id, blog_title);
   }
+
+  static async getBlogImages(page_no: number) {
+    return await BlogRepository.getBlogImages(page_no);
+  }
 }

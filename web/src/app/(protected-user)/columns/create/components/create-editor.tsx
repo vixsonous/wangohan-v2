@@ -1,12 +1,11 @@
 import InputField from "@/components/Input";
 import Error from "@/components/Error";
-import EditorLexicalComposer from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor-lexical-composer";
 import React, {useEffect} from "react";
 import CreateEditorLexicalComposer
   from "@/app/(protected-user)/columns/create/components/create-editor-lexical-composer";
 import {Controller, FieldValues, useForm} from "react-hook-form";
 import z from "zod";
-import {PostBlogSchema} from "@/types/blog-types";
+import {GetBlogImagesSchema, PostBlogSchema} from "@/types/blog-types";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {
   Select,
@@ -17,15 +16,26 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Button} from "@/components/ui/button";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store";
 import CreateEditorFileUpload from "@/app/(protected-user)/columns/create/components/create-editor-file-upload";
+import {
+  setTotalBlogImages,
+  setUploadedImages
+} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
 
-export default function CreateEditor() {
+type CreateEditorWrapperProps = {
+  blog_images: z.infer<typeof GetBlogImagesSchema.GetBlogImages>;
+}
 
-  const {register, control, setValue, handleSubmit} = useForm<z.infer<typeof PostBlogSchema.PostBlog>>({
+export const content = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
+
+export default function CreateEditor({blog_images}: CreateEditorWrapperProps) {
+
+  const dispatch = useDispatch();
+
+
+  const {register, control, setValue, handleSubmit, formState: {errors}} = useForm<z.infer<typeof PostBlogSchema.PostBlog>>({
     mode: 'onBlur',
     resolver: zodResolver(PostBlogSchema.PostBlog)
   });
@@ -35,9 +45,19 @@ export default function CreateEditor() {
   const onSubmit = (data: FieldValues) => console.log(data);
   useEffect(() => {
     setValue("editor_state", editorState.editorState);
+    console.log(editorState.editorState);
+    console.log(editorState.editorState === content);
   }, [editorState.editorState]);
+
+  useEffect(() => {
+    dispatch(setUploadedImages(blog_images.blog_images));
+    dispatch(setTotalBlogImages(blog_images.total_blog_images));
+  }, [blog_images.blog_images]);
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
+      {Object.keys(errors).map((err, idx) => {
+        return idx < 1 ? <Error key={idx}>{errors[err as keyof typeof errors]?.message}</Error> : undefined
+      })}
       <label htmlFor="">
         <InputField
           {...register("title")}

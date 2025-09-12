@@ -48,4 +48,24 @@ export class BlogController {
 
     ApiResponse.success(res, "Successfully retrieved blogs!", blogList);
   }
+
+  static async getBlogImages(req: Request, res: Response) {
+    const {page_no} = req.query;
+
+    const getBlogImagesParseResult = BlogControllerSchema.GetBlogImages.safeParse(Number(page_no) - 1);
+
+    if(!getBlogImagesParseResult.success) {
+      ApiResponse.error(res, getBlogImagesParseResult.error.issues[0].message);
+      return;
+    }
+
+    const blogImages = await BlogService.getBlogImages(getBlogImagesParseResult.data);
+
+    if(blogImages === undefined) {
+      ApiResponse.error(res, "Failed to get blog images!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully retrieved blog images!", blogImages);
+  }
 }
