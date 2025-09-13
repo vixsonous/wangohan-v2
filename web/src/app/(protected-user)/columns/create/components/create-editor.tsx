@@ -23,17 +23,19 @@ import {
   setTotalBlogImages,
   setUploadedImages
 } from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+import {UserSchema} from "@/types/user-types.user";
+import {setUser} from "@/store/slice/user-slice";
 
 type CreateEditorWrapperProps = {
   blog_images: z.infer<typeof GetBlogImagesSchema.GetBlogImages>;
+  user_data: z.infer<typeof UserSchema.User>;
 }
 
 export const content = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
 
-export default function CreateEditor({blog_images}: CreateEditorWrapperProps) {
+export default function CreateEditor({blog_images, user_data}: CreateEditorWrapperProps) {
 
   const dispatch = useDispatch();
-
 
   const {register, control, setValue, handleSubmit, formState: {errors}} = useForm<z.infer<typeof PostBlogSchema.PostBlog>>({
     mode: 'onBlur',
@@ -51,6 +53,10 @@ export default function CreateEditor({blog_images}: CreateEditorWrapperProps) {
     dispatch(setUploadedImages(blog_images.blog_images));
     dispatch(setTotalBlogImages(blog_images.total_blog_images));
   }, [blog_images.blog_images]);
+
+  useEffect(() => {
+    dispatch(setUser(user_data));
+  }, [user_data]);
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
       {Object.keys(errors).map((err, idx) => {
