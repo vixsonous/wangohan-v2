@@ -19,7 +19,7 @@ export default function Undo() {
       onClick={() => {
         editor.dispatchCommand(UNDO_COMMAND, undefined);
       }}
-      className="toolbar-item spaced"
+      className="toolbar-item spaced self-center"
       aria-label="Undo"
     >
       <Image src={"/icons/svg/primary-arrow-clockwise.svg"} alt={"icon for undo"} width={20} height={20}/>

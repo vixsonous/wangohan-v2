@@ -53,7 +53,12 @@ import Redo from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins
 import AddTable from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/add-table";
 import AddLink from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/add-link";
 import {$isFontSizeNode, FORMAT_FONTSIZE_COMMAND} from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
-import FontColor from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/font-color";
+import FontColor, {
+  BG_COLOR,
+  FONT_COLOR
+} from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/font-color";
+import Bold from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/bold";
+import TextFormat from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/bold";
 
 const LowPriority = 1;
 export const DEFAULT_FONT_SIZE = "15";
@@ -238,90 +243,14 @@ export default function ToolbarPlugin() {
       <Separator orientation={'vertical'}/>
       <FontSizeDropdown />
       <Separator orientation={'vertical'}/>
-      <FontColor />
-      <Button
-        className={
-          "toolbar-item flex justify-center items-center spaced cursor-pointer " +
-          (state.text_formats.bold ? "active" : "")
-        }
-        aria-label="Format Bold"
-        // onClick={tbHelper.resetFontColor}
-      >
-        {/*<ArrowClockwise size={IconSize - 4} />*/}
-      </Button>
+      <FontColor type={FONT_COLOR}/>
+      <FontColor type={BG_COLOR}/>
       <Separator orientation={'vertical'}/>
-      <Button
-        className={
-          "toolbar-item spaced cursor-pointer " +
-          (state.text_formats.bold ? "active" : "")
-        }
-        aria-label="Format Bold"
-      >
-        <label
-          htmlFor="text-background-color"
-          className="flex gap-1 items-center cursor-pointer"
-        >
-          {/*<PaintBucket size={IconSize} className="cursor-pointer" />*/}
-          {/*<input*/}
-          {/*  // onChange={tbHelper.fontBackgroundColorOnChange}*/}
-          {/*  type="color"*/}
-          {/*  id="text-background-color"*/}
-          {/*  value={state.colors.background}*/}
-          {/*  className="bg-none p-0 cursor-pointer w-2"*/}
-          {/*/>*/}
-        </label>
-      </Button>
-      <Button
-        className={
-          "toolbar-item flex justify-center items-center spaced cursor-pointer " +
-          (state.text_formats.bold ? "active" : "")
-        }
-        aria-label="Format Bold"
-        // onClick={tbHelper.resetFontBackgroundColor}
-      >
-        {/*<ArrowClockwise size={IconSize - 4} />*/}
-      </Button>
+      <TextFormat type={"bold"} />
+      <TextFormat type={"italic"} />
+      <TextFormat type={"underline"} />
+      <TextFormat type={"code"} />
       <Separator orientation={'vertical'}/>
-      <Button
-        // className={
-        //   "toolbar-item flex justify-center items-center spaced cursor-pointer " +
-        //   (states.isBold ? "active" : "")
-        // }
-        aria-label="Format Bold"
-        // onClick={tbHelper.resetFontBackgroundColor}
-      >
-        {/*<ArrowClockwise size={IconSize - 4} />*/}
-      </Button>
-      <Separator orientation={'vertical'}/>
-      <Button
-        onClick={() => {
-          // editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
-        }}
-        className={"toolbar-item spaced " + (state.text_formats.bold ? "active" : "")}
-        aria-label="Format Bold"
-      >
-        {/*<TextBolder size={IconSize} />*/}
-      </Button>
-      <Button
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
-        }}
-        className={"toolbar-item spaced " + (state.text_formats.italic ? "active" : "")}
-        aria-label="Format Italics"
-      >
-        {/*<TextItalic size={IconSize} />*/}
-      </Button>
-      <Button
-        // onClick={() => {
-        //   editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
-        // }}
-        // className={
-        //   "toolbar-item spaced " + (states.isUnderline ? "active" : "")
-        // }
-        aria-label="Format Underline"
-      >
-        {/*<TextUnderline size={IconSize} />*/}
-      </Button>
       <Button
         // onClick={() => {
         //   editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
