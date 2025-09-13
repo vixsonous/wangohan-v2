@@ -4,7 +4,7 @@ import { $getNearestNodeOfType, $insertNodeToNearestRoot, mergeRegister } from "
 import {
   $createTextNode,
   $getSelection,
-  $isRangeSelection,
+  $isRangeSelection, $isTextNode,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_EDITOR,
@@ -43,7 +43,7 @@ import {Separator} from "@/components/ui/separator";
 import {useDispatch, useSelector} from "react-redux";
 import {
   setBlockType, setCodeLanguage,
-  setColors, setSelectedElementKey,
+  setColors, setFontFamily, setFontSize, setSelectedElementKey,
   setTextFormats,
   setToolbarActions
 } from "@/app/(protected-user)/columns/create/components/create-editor-slice";
@@ -52,9 +52,20 @@ import Undo from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins
 import Redo from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/redo";
 import AddTable from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/add-table";
 import AddLink from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/add-link";
+import {$isFontSizeNode, FORMAT_FONTSIZE_COMMAND} from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
+import FontColor from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/font-color";
 
 const LowPriority = 1;
-const IconSize = 20;
+export const DEFAULT_FONT_SIZE = "15";
+export const DEFAULT_FONT_FAMILY = "mitimasu";
+
+export type FONT_FAMILY_LIST = "sans" | "sans-serif" | "mitimasu";
+
+export const FONT_SIZE_FIELD = "font-size: ";
+export const FONT_FAMILY_FIELD = "font-family: ";
+
+export const SEMICOLON_DELIMITER = ";";
+export const PIXEL_DELIMITER = "px;";
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -71,7 +82,7 @@ export default function ToolbarPlugin() {
   const linkText = useRef<HTMLInputElement>(null);
   const linkUrl = useRef<HTMLInputElement>(null);
 
-  const $updateToolbar = useCallback(() => {
+  const $updateToolbar = () => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       // Update text format
@@ -116,9 +127,36 @@ export default function ToolbarPlugin() {
           if ($isCodeNode(element)) {
             dispatch(setCodeLanguage(element.getLanguage() || getDefaultCodeLanguage()));
           }
+
+          // Update font size and text font
+          const nodes = selection.getNodes();
+          nodes.forEach((node) => {
+            if($isTextNode(node) && node.__style) {
+
+              // Update font size
+              if(node.__style.includes(FONT_SIZE_FIELD)) {
+                const size = node.__style.split(FONT_SIZE_FIELD)[1].split(PIXEL_DELIMITER)[0];
+                dispatch(setFontSize(size));
+              } else {
+                dispatch(setFontSize(DEFAULT_FONT_SIZE));
+              }
+
+              // Update text font
+              if(node.__style.includes(FONT_FAMILY_FIELD)) {
+                const font = node.__style.split(FONT_FAMILY_FIELD)[1].split(SEMICOLON_DELIMITER)[0];
+                dispatch(setFontFamily(font as FONT_FAMILY_LIST));
+              } else {
+                dispatch(setFontFamily(DEFAULT_FONT_FAMILY));
+              }
+            } else {
+              dispatch(setFontFamily(DEFAULT_FONT_FAMILY));
+              dispatch(setFontSize(DEFAULT_FONT_SIZE));
+            }
+          })
         }
       }
       // Update text format
+
 
       // Update links
       const node = tbHelper.getSelectedNode(selection);
@@ -129,7 +167,7 @@ export default function ToolbarPlugin() {
         dispatch(setTextFormats({field: "link", value: false}));
       }
     }
-  }, []);
+  };
 
   useEffect(() => {
     return mergeRegister(
@@ -140,6 +178,14 @@ export default function ToolbarPlugin() {
       }),
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
+        (_payload, _newEditor) => {
+          $updateToolbar();
+          return false;
+        },
+        LowPriority
+      ),
+      editor.registerCommand(
+        FORMAT_FONTSIZE_COMMAND,
         (_payload, _newEditor) => {
           $updateToolbar();
           return false;
@@ -175,7 +221,7 @@ export default function ToolbarPlugin() {
         COMMAND_PRIORITY_EDITOR
       )
     );
-  }, [editor, $updateToolbar]);
+  }, [editor, $updateToolbar, state.font.size]);
 
   return (
     <div className="toolbar bg-secondary-bg flex flex-wrap" ref={toolbarRef}>
@@ -188,31 +234,11 @@ export default function ToolbarPlugin() {
       <Separator orientation={'vertical'}/>
       <AddLink />
       <Separator orientation={'vertical'}/>
-      {/*<FontFamily states={states} editor={editor} />*/}
+      <FontFamily />
       <Separator orientation={'vertical'}/>
-      {/*<FontSizeDropdown states={states} editor={editor} />*/}
+      <FontSizeDropdown />
       <Separator orientation={'vertical'}/>
-      <Button
-        className={
-          "toolbar-item spaced cursor-pointer " +
-          (state.text_formats.bold ? "active" : "")
-        }
-        aria-label="Format Bold"
-      >
-        <label
-          htmlFor="text-color"
-          className="flex gap-1 items-center cursor-pointer"
-        >
-          {/*<TextAa size={IconSize} className="cursor-pointer" />*/}
-          <input
-            // onChange={tbHelper.fontColorOnChange}
-            type="color"
-            id="text-color"
-            // value={states.fontColor}
-            className="bg-none p-0 cursor-pointer w-2"
-          />
-        </label>
-      </Button>
+      <FontColor />
       <Button
         className={
           "toolbar-item flex justify-center items-center spaced cursor-pointer " +

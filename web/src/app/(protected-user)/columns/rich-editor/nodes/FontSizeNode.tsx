@@ -9,7 +9,7 @@ import {
   createCommand,
   EditorConfig,
   LexicalCommand,
-  LexicalEditor,
+  LexicalEditor, LexicalNode,
   NodeKey,
   SerializedLexicalNode,
   SerializedTextNode,
@@ -36,8 +36,9 @@ export class FontSizeNode extends TextNode {
   }
 
   createDOM(config: EditorConfig, editor?: LexicalEditor): HTMLElement {
-    const element = document.createElement("p");
-    element.style.fontSize = config.theme.fontSize;
+    const element = document.createElement("span");
+    element.style.fontSize = this.__size + "px";
+    element.textContent = this.getTextContent();
     return element;
   }
 
@@ -72,7 +73,7 @@ export function $createFontSizeNode(text: string, size: string): FontSizeNode {
   return new FontSizeNode(text, size);
 }
 
-export function $isFontSizeNode(node: FontSizeNode): node is FontSizeNode {
+export function $isFontSizeNode(node: LexicalNode): node is FontSizeNode {
   return node instanceof FontSizeNode;
 }
 

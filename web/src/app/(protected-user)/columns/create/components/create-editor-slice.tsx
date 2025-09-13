@@ -64,6 +64,16 @@ type SetCodeLanguageAction = {
   type: string;
 }
 
+type SetFontFamilyAction = {
+  payload: "sans-serif" | "sans" | "mitimasu";
+  type: string;
+}
+
+type SetFontSizeAction = {
+  payload: string,
+  type: string;
+}
+
 export const createEditorSlice = createSlice({
   name: 'Create Editor State',
   initialState: {
@@ -71,6 +81,10 @@ export const createEditorSlice = createSlice({
     htmlString: "",
     uploadedImages: [] as z.infer<typeof BlogImageSchema.BlogImages>,
     total_blog_images: 0,
+    font: {
+      family: "mitimasu" as "sans-serif" | "sans" | "mitimasu",
+      size: "15",
+    },
     toolbar_actions: {
       undo: false,
       redo: false,
@@ -94,6 +108,15 @@ export const createEditorSlice = createSlice({
     }
   },
   reducers: {
+    setFontSize: (state, action: SetFontSizeAction) => {
+      console.log("set size!" + action.payload);
+      state.font.size = action.payload;
+      return state;
+    },
+    setFontFamily: (state, action: SetFontFamilyAction) => {
+      state.font.family = action.payload;
+      return state;
+    },
     setCodeLanguage: (state, action: SetCodeLanguageAction) => {
       state.code_language = action.payload;
       return state;
@@ -145,6 +168,8 @@ export const createEditorSlice = createSlice({
 });
 
 export const {
+  setFontSize,
+  setFontFamily,
   setCodeLanguage,
   setSelectedElementKey,
   setBlockType,

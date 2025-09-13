@@ -45,8 +45,6 @@ export default function CreateEditor({blog_images}: CreateEditorWrapperProps) {
   const onSubmit = (data: FieldValues) => console.log(data);
   useEffect(() => {
     setValue("editor_state", editorState.editorState);
-    console.log(editorState.editorState);
-    console.log(editorState.editorState === content);
   }, [editorState.editorState]);
 
   useEffect(() => {
