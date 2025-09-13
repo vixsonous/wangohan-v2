@@ -251,18 +251,7 @@ export default function ToolbarPlugin() {
       <TextFormat type={"underline"} />
       <TextFormat type={"code"} />
       <Separator orientation={'vertical'}/>
-      <Button
-        // onClick={() => {
-        //   editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-        // }}
-        // className={
-        //   "toolbar-item spaced " + (states.isUnderline ? "active" : "")
-        // }
-        aria-label="Format Code"
-      >
-        {/*<BracketsAngle size={IconSize} />*/}
-      </Button>
-      {/*<TextMod states={states} editor={editor} />*/}
+      <TextMod />
       <Separator orientation={'vertical'}/>
       {/*<ImageYoutube states={states} dispatch={dispatch} editor={editor} />*/}
       <Separator orientation={'vertical'}/>
