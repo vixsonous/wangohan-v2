@@ -1,9 +1,8 @@
 import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import React, {useState} from "react";
 import InputField from "@/components/Input";
-import {Button} from "@/components/ui/button";
-import {$createTableNodeWithDimensions} from "@lexical/table";
-import {$insertNodeToNearestRoot} from "@lexical/utils";
+import {Button as ButtonUI} from "@/components/ui/button";
+import Button from "@/components/Button";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {$createTextNode, $getSelection, $isRangeSelection} from "lexical";
 import {$createLinkNode} from "@lexical/link";
@@ -26,8 +25,10 @@ export default function AddLink() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        Add Link
+      <DialogTrigger asChild={true}>
+        <Button>
+          Add Link
+        </Button>
       </DialogTrigger>
       <DialogContent className={""}>
         <DialogTitle>リンクを追加</DialogTitle>
@@ -39,7 +40,7 @@ export default function AddLink() {
           <span>リンクURL</span>
           <InputField type={"url"} onChange={fieldOnChange("link")} />
         </p>
-        <Button onClick={() => {
+        <ButtonUI onClick={() => {
           const vlinkText = link.text;
           const vlinkUrl = link.link;
 
@@ -57,7 +58,7 @@ export default function AddLink() {
           setOpen(false);
         }}>
           リンクを追加
-        </Button>
+        </ButtonUI>
       </DialogContent>
     </Dialog>
   )

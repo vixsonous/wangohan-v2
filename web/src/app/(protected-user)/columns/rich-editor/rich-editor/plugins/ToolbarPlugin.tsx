@@ -1,34 +1,24 @@
 "use client";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getNearestNodeOfType, $insertNodeToNearestRoot, mergeRegister } from "@lexical/utils";
+import { $getNearestNodeOfType, mergeRegister } from "@lexical/utils";
 import {
-  $createTextNode,
   $getSelection,
   $isRangeSelection, $isTextNode,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_EDITOR,
-  FORMAT_TEXT_COMMAND,
   INDENT_CONTENT_COMMAND,
   KEY_TAB_COMMAND,
   OUTDENT_CONTENT_COMMAND,
-  RangeSelection,
-  REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
-  UNDO_COMMAND,
 } from "lexical";
-import { $createAutoLinkNode, $createLinkNode, $isLinkNode } from "@lexical/link";
+import { $isLinkNode } from "@lexical/link";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { $isListNode, ListNode } from "@lexical/list";
 import { $isCodeNode, getDefaultCodeLanguage } from "@lexical/code";
 
-import React, { memo, useCallback, useEffect, useRef } from "react";
-import { FORMAT_FONTCOLOR_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontColorNode";
-import { FORMAT_FONTBACKGROUNDCOLOR_COMMAND } from "@/app/(protected-user)/columns/rich-editor/nodes/FontBackgroundColorNode";
+import React, { useEffect, useRef } from "react";
 import useToolbarStates from "./toolbar-states";
-import useEditorHelper from "../editor-helper";
-import FetchedImageList from "../fetched-image-list";
-import ImageUploadSelection from "../image-upload-selection";
 import JustifyGroup from "./toolbar-groups/justify-group";
 import ImageYoutube from "./toolbar-groups/image-youtube";
 import TextMod from "./toolbar-groups/text-mod";
@@ -36,14 +26,11 @@ import FontSizeDropdown from "./toolbar-groups/font-size";
 import TextHeading from "./toolbar-buttons/text-heading";
 import FontFamily from "./toolbar-groups/font-family";
 import useToolbarHelper from "./toolbar-helper";
-import { $createTableNodeWithDimensions } from "@lexical/table";
-import Button from "@/components/Button";
-import {SeparatorVertical} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {useDispatch, useSelector} from "react-redux";
 import {
   setBlockType, setCodeLanguage,
-  setColors, setFontFamily, setFontSize, setSelectedElementKey,
+  setColors, setFontFamily, setFontSize, setSelectedElementKey, setTextAlignment,
   setTextFormats,
   setToolbarActions
 } from "@/app/(protected-user)/columns/create/components/create-editor-slice";
@@ -52,12 +39,11 @@ import Undo from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins
 import Redo from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/redo";
 import AddTable from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/add-table";
 import AddLink from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/add-link";
-import {$isFontSizeNode, FORMAT_FONTSIZE_COMMAND} from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
+import { FORMAT_FONTSIZE_COMMAND} from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
 import FontColor, {
   BG_COLOR,
   FONT_COLOR
 } from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/font-color";
-import Bold from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/bold";
 import TextFormat from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/bold";
 
 const LowPriority = 1;
@@ -72,6 +58,25 @@ export const FONT_FAMILY_FIELD = "font-family: ";
 export const SEMICOLON_DELIMITER = ";";
 export const PIXEL_DELIMITER = "px;";
 
+export const FORMAT_NO_FORMAT = 0;
+export const FORMAT_LEFT_FORMAT = 1;
+export const FORMAT_CENTER_FORMAT = 2;
+export const FORMAT_RIGHT_FORMAT = 3;
+export const FORMAT_JUSTIFY_FORMAT = 4;
+export const FORMAT_START_FORMAT = 5;
+export const FORMAT_END_FORMAT = 6;
+
+export const LEFT_FORMAT = "left";
+export const CENTER_FORMAT = "center";
+export const RIGHT_FORMAT = "right";
+export const JUSTIFY_FORMAT = "justify";
+
+function ToolbarSeparator() {
+  return (
+    <Separator className={"bg-primary-text/30 min-h-[20px]"} orientation={"vertical"} />
+  )
+}
+
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
 
@@ -80,12 +85,7 @@ export default function ToolbarPlugin() {
 
   const toolbarRef = useRef(null);
   const states = useToolbarStates();
-  const editorHelper = useEditorHelper();
   const tbHelper = useToolbarHelper(editor, states);
-  const numRows = useRef<HTMLInputElement>(null);
-  const numCols = useRef<HTMLInputElement>(null);
-  const linkText = useRef<HTMLInputElement>(null);
-  const linkUrl = useRef<HTMLInputElement>(null);
 
   const $updateToolbar = () => {
     const selection = $getSelection();
@@ -104,6 +104,8 @@ export default function ToolbarPlugin() {
         anchorNode.getKey() === "root"
           ? anchorNode
           : anchorNode.getTopLevelElementOrThrow();
+
+
       const elementKey = element.getKey();
       const elementDOM = editor.getElementByKey(elementKey);
       if (elementDOM !== null) {
@@ -117,8 +119,6 @@ export default function ToolbarPlugin() {
             ? element.getTag()
             : element.getType();
           dispatch(setBlockType(type));
-          const computedStyle = window.getComputedStyle(elementDOM);
-          const fontSize = computedStyle.fontSize;
 
           dispatch(setColors({field: "font", value: selection.style.includes("color:")
               ? selection.style.split("color: ")[1].split(";")[0] || "#523636"
@@ -136,8 +136,8 @@ export default function ToolbarPlugin() {
           // Update font size and text font
           const nodes = selection.getNodes();
           nodes.forEach((node) => {
-            if($isTextNode(node) && node.__style) {
 
+            if($isTextNode(node) && node.__style) {
               // Update font size
               if(node.__style.includes(FONT_SIZE_FIELD)) {
                 const size = node.__style.split(FONT_SIZE_FIELD)[1].split(PIXEL_DELIMITER)[0];
@@ -153,14 +153,21 @@ export default function ToolbarPlugin() {
               } else {
                 dispatch(setFontFamily(DEFAULT_FONT_FAMILY));
               }
+
             } else {
               dispatch(setFontFamily(DEFAULT_FONT_FAMILY));
               dispatch(setFontSize(DEFAULT_FONT_SIZE));
             }
-          })
+          });
         }
       }
-      // Update text format
+      // Update text alignment
+      switch (element.getFormat()) {
+        case FORMAT_NO_FORMAT: case FORMAT_LEFT_FORMAT: case FORMAT_START_FORMAT: dispatch(setTextAlignment({field: LEFT_FORMAT, value: true}));break;
+        case FORMAT_CENTER_FORMAT: dispatch(setTextAlignment({field: CENTER_FORMAT, value: true}));break;
+        case FORMAT_RIGHT_FORMAT: case FORMAT_END_FORMAT: dispatch(setTextAlignment({field: RIGHT_FORMAT, value: true}));break;
+        case FORMAT_JUSTIFY_FORMAT: dispatch(setTextAlignment({field: JUSTIFY_FORMAT, value: true}));break;
+      }
 
 
       // Update links
@@ -229,139 +236,33 @@ export default function ToolbarPlugin() {
   }, [editor, $updateToolbar, state.font.size]);
 
   return (
-    <div className="toolbar bg-secondary-bg flex flex-wrap" ref={toolbarRef}>
+    <div className="toolbar bg-secondary-bg flex flex-wrap gap-2 items-center" ref={toolbarRef}>
       <Undo />
       <Redo />
-      <Separator orientation={'vertical'} />
+      <ToolbarSeparator />
       <TextHeading />
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <AddTable />
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <AddLink />
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <FontFamily />
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <FontSizeDropdown />
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <FontColor type={FONT_COLOR}/>
       <FontColor type={BG_COLOR}/>
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <TextFormat type={"bold"} />
       <TextFormat type={"italic"} />
       <TextFormat type={"underline"} />
       <TextFormat type={"code"} />
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <TextMod />
-      <Separator orientation={'vertical'}/>
+      <ToolbarSeparator />
       <ImageYoutube />
-      <Separator orientation={'vertical'}/>
-      {/*<JustifyGroup states={states} editor={editor} />*/}
-      {/*<Modal modalIdProps={modalIds.toolbarpluginModal}>*/}
-      {/*  {states.modalMode === "image-upload" ? (*/}
-      {/*    <ImageUploadSelection*/}
-      {/*      states={states}*/}
-      {/*      dispatch={dispatch}*/}
-      {/*      toolbar={editorHelper}*/}
-      {/*      editor={editor}*/}
-      {/*    />*/}
-      {/*  ) : (*/}
-      {/*    <FetchedImageList*/}
-      {/*      states={states}*/}
-      {/*      dispatch={dispatch}*/}
-      {/*      toolbar={editorHelper}*/}
-      {/*      editor={editor}*/}
-      {/*    />*/}
-      {/*  )}*/}
-      {/*</Modal>*/}
-      {/*<Modal modalIdProps={modalIds.addTableModal}>*/}
-      {/*  <div className="relative bg-secondary-bg flex flex-col gap-4 z-[999] py-4 px-8 rounded-lg">*/}
-      {/*    <div className="flex flex-col gap-1">*/}
-      {/*      <p>Number of rows</p>*/}
-      {/*      <input*/}
-      {/*        ref={numRows}*/}
-      {/*        className="w-[100%] text-[12px] sm:text-[16px] px-[10px] py-[10px] border-[2px] rounded-md border-[#ffcd92]"*/}
-      {/*        type="number"*/}
-      {/*        name="add-table-rows"*/}
-      {/*        placeholder="Rows"*/}
-      {/*      />*/}
-      {/*    </div>*/}
-      {/*    <div className="flex flex-col gap-1">*/}
-      {/*      <p>Number of columns</p>*/}
-      {/*      <input*/}
-      {/*        ref={numCols}*/}
-      {/*        className="w-[100%] text-[12px] sm:text-[16px] px-[10px] py-[10px] border-[2px] rounded-md border-[#ffcd92]"*/}
-      {/*        type="number"*/}
-      {/*        name="add-table-columns"*/}
-      {/*        placeholder="Columns"*/}
-      {/*      />*/}
-      {/*    </div>*/}
-      {/*    <Button*/}
-      {/*      onClick={() => {*/}
-      {/*        if(!numRows.current || !numCols.current) return;*/}
-      
-      {/*        const numR = numRows.current.value;*/}
-      {/*        const numC = numCols.current.value;*/}
-      
-      {/*        editor.update(() => {*/}
-      {/*          const tableNode = $createTableNodeWithDimensions(Number(numR || 0),Number(numC || 0), false);*/}
-      {/*          $insertNodeToNearestRoot(tableNode);*/}
-      {/*        });*/}
-      {/*        dispatch.hideModal();*/}
-      {/*      }}*/}
-      {/*      className={`w-[100%] bg-[#ffb762] border-[1px] border-primary-text text-primary-text py-2 rounded-md text-sm font-semibold`}*/}
-      {/*    >*/}
-      {/*      <span>Add Table</span>*/}
-      {/*    </Button>*/}
-      {/*  </div>*/}
-      {/*</Modal>*/}
-      {/*<Modal modalIdProps={modalIds.addLinkModal}>*/}
-      {/*  <div className="relative bg-secondary-bg flex flex-col gap-4 z-[999] py-4 px-8 rounded-lg">*/}
-      {/*    <div className="flex flex-col gap-1">*/}
-      {/*      <p>Link Text</p>*/}
-      {/*      <input*/}
-      {/*        ref={linkText}*/}
-      {/*        className="w-[100%] text-[12px] sm:text-[16px] px-[10px] py-[10px] border-[2px] rounded-md border-[#ffcd92]"*/}
-      {/*        type="text"*/}
-      {/*        name="add-link-text"*/}
-      {/*        placeholder="Enter link text"*/}
-      {/*      />*/}
-      {/*    </div>*/}
-      {/*    <div className="flex flex-col gap-1">*/}
-      {/*      <p>Link URL</p>*/}
-      {/*      <input*/}
-      {/*        ref={linkUrl}*/}
-      {/*        className="w-[100%] text-[12px] sm:text-[16px] px-[10px] py-[10px] border-[2px] rounded-md border-[#ffcd92]"*/}
-      {/*        type="text"*/}
-      {/*        name="add-link-url"*/}
-      {/*        placeholder="Enter link URL"*/}
-      {/*      />*/}
-      {/*    </div>*/}
-      {/*    <Button*/}
-      {/*      onClick={() => {*/}
-      {/*        if(!linkText.current || !linkUrl.current) return;*/}
-      
-      {/*        const vlinkText = linkText.current.value;*/}
-      {/*        const vlinkUrl = linkUrl.current.value;*/}
-      
-      {/*        const filteredUrl = vlinkUrl.startsWith("https://") || vlinkUrl.startsWith("http://") ? vlinkUrl : "https://" + vlinkUrl;*/}
-      
-      {/*        editor.update(() => {*/}
-      {/*          const selection = $getSelection();*/}
-      {/*          const link = $createLinkNode(filteredUrl, {target: '_blank'});*/}
-      {/*          const text = $createTextNode(vlinkText);*/}
-      {/*          link.append(text);*/}
-      {/*          if($isRangeSelection(selection)) {*/}
-      {/*            selection.anchor.getNode().insertAfter(link);*/}
-      {/*          }*/}
-      {/*        });*/}
-      {/*        dispatch.hideModal();*/}
-      {/*      }}*/}
-      {/*      className={`w-[100%] bg-[#ffb762] border-[1px] border-primary-text text-primary-text py-2 rounded-md text-sm font-semibold`}*/}
-      {/*    >*/}
-      {/*      <span>Add Link</span>*/}
-      {/*    </Button>*/}
-      {/*  </div>*/}
-      {/*</Modal>*/}
+      <ToolbarSeparator />
+      <JustifyGroup />
     </div>
   );
 }

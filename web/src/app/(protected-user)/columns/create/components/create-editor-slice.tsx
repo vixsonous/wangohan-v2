@@ -73,6 +73,14 @@ type SetFontSizeAction = {
   type: string;
 }
 
+type SetTextAlignmentAction = {
+  payload: {
+    field: "left" |  "right" | "center" | "justify" | "start" | "end";
+    value: boolean;
+  };
+  type: string;
+}
+
 export const createEditorSlice = createSlice({
   name: 'Create Editor State',
   initialState: {
@@ -104,11 +112,23 @@ export const createEditorSlice = createSlice({
       superscript: false,
       code: false,
       link: false,
-    }
+    },
+    align: {
+      left: true,
+      right: false,
+      center: false,
+      justify: false,
+      start: false,
+      end: false,
+    },
   },
   reducers: {
+    setTextAlignment: (state, action: SetTextAlignmentAction) => {
+      Object.keys(state.align).forEach(align => state.align[align as keyof typeof state.align] = false);
+      state.align[action.payload.field] = action.payload.value;
+      return state;
+    },
     setFontSize: (state, action: SetFontSizeAction) => {
-      console.log("set size!" + action.payload);
       state.font.size = action.payload;
       return state;
     },
@@ -172,6 +192,7 @@ export const createEditorSlice = createSlice({
 });
 
 export const {
+  setTextAlignment,
   prependUploadedImages,
   setFontSize,
   setFontFamily,

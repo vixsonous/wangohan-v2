@@ -4,7 +4,6 @@ import {ContentEditable} from "@lexical/react/LexicalContentEditable";
 import {LexicalErrorBoundary} from "@lexical/react/LexicalErrorBoundary";
 import {HistoryPlugin} from "@lexical/react/LexicalHistoryPlugin";
 import {LinkPlugin} from "@lexical/react/LexicalLinkPlugin";
-import {AutoLinkPlugin} from "@lexical/react/LexicalAutoLinkPlugin";
 import ImagesPlugin from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/ImagePlugin";
 import YouTubePlugin from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/YoutubePlugin";
 import {FontSizePlugin} from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
@@ -13,9 +12,8 @@ import {TablePlugin} from "@lexical/react/LexicalTablePlugin";
 import {FontBackgroundColorNodePlugin} from "@/app/(protected-user)/columns/rich-editor/nodes/FontBackgroundColorNode";
 import {FontFamilyPlugin} from "@/app/(protected-user)/columns/rich-editor/nodes/FontNode";
 import {LexicalComposer} from "@lexical/react/LexicalComposer";
-import React, {memo, useEffect, useState} from "react";
+import React, {memo, useEffect } from "react";
 import {Button} from "@/components/ui/button";
-import useEditorStates from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor-states";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {customGenerateHtmlFromNodes} from "@/app/(protected-user)/columns/rich-editor/lib/GenerateHtml";
 import {useDispatch, useSelector} from "react-redux";
@@ -68,7 +66,7 @@ export default function CreateEditorLexicalComposer() {
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                className="editor-input py-2 px-4 w-full h-auto border border-primary-text rounded-md text-xs md:text-sm bg-secondary-bg"
+                className="editor-input py-2 px-4 w-full h-auto rounded-b-md text-xs md:text-sm bg-secondary-bg"
                 aria-placeholder={"Enter some text"}
                 placeholder={
                   <div className="editor-placeholder">{"Enter some text"}</div>

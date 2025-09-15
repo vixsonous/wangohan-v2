@@ -1,195 +1,89 @@
-
-import useToolbarStates from "../toolbar-states";
-import useJustifyGroupHelper from "./justify-group-helper";
 import {
   ElementFormatType,
   FORMAT_ELEMENT_COMMAND,
-  INDENT_CONTENT_COMMAND,
   LexicalCommand,
-  LexicalEditor,
-  OUTDENT_CONTENT_COMMAND,
 } from "lexical";
 import React from "react";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import Button from "@/components/Button";
+import Image from "@/components/Image/client";
+import {Separator} from "@/components/ui/separator";
+import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
+import { useSelector} from "react-redux";
+import {RootState} from "@/store/store";
+
+const elementFormats = [
+  {type: "left" as ElementFormatType, text: "Left Align"},
+  {type: "right" as ElementFormatType, text: "Right Align"},
+  {type: "center" as ElementFormatType, text: "Center Align"},
+  {type: "justify" as ElementFormatType, text: "Justify Align"},
+  {type: "start" as ElementFormatType, text: "Start Align"},
+  {type: "end" as ElementFormatType, text: "End Align"},
+]
 
 const ElementFormatTypeObject = {
-  LEFT: "left" as ElementFormatType,
-  RIGHT: "right" as ElementFormatType,
-  CENTER: "center" as ElementFormatType,
-  JUSTIFY: "justify" as ElementFormatType,
-  START: "start" as ElementFormatType,
-  END: "end" as ElementFormatType,
+  LEFT: {type: "left" as ElementFormatType, text: "Left Align"},
+  RIGHT: { type: "right" as ElementFormatType, text: "Right Align"},
+  CENTER: {type: "center" as ElementFormatType, text: "Center Align"},
+  JUSTIFY: {type: "justify" as ElementFormatType, text: "Justify Align"},
+  START: {type: "start" as ElementFormatType, text: "Start Align"},
+  END: {type: "end" as ElementFormatType, text: "End Align"},
 };
 
-const JustifyGroup = ({
-  states,
-  editor,
-}: {
-  states: ReturnType<typeof useToolbarStates>;
-  editor: LexicalEditor;
-}) => {
-  const jgHelper = useJustifyGroupHelper(editor, states);
+const JustifyGroup = () => {
 
+  const [editor] = useLexicalComposerContext();
+  const state = useSelector((state: RootState) => state.editorState);
   const handleDispatchCommand =
     (
       command: LexicalCommand<ElementFormatType>,
       payload: ElementFormatType,
-      icon: React.JSX.Element,
-      justifyIdx: number
     ) =>
-    (e: React.MouseEvent<HTMLButtonElement>) =>
-      jgHelper.handleJustifyClick(command, payload, icon, justifyIdx);
+    () => {
+      editor.dispatchCommand(command, payload as ElementFormatType);
+    }
 
   return (
-    <h1>
-      Justify group
-    </h1>
-    // <Dropdown openIcon={states.icons.justify} closeIcon={states.icons.justify}>
-    //   <ul className=" flex flex-col gap-2 bg-secondary-bg items-center rounded-md border border-primary-text">
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 ${
-    //         states.icons.justifyIdx === 0 ? "bg-primary-bg" : ""
-    //       } rounded-t-md`}
-    //     >
-    //       <Button
-    //         onClick={handleDispatchCommand(
-    //           FORMAT_ELEMENT_COMMAND,
-    //           ElementFormatTypeObject.LEFT,
-    //           <LeftAlign />,
-    //           0
-    //         )}
-    //         className="toolbar-item spaced flex gap-4"
-    //         aria-label="Left Align"
-    //       >
-    //         <TextAlignLeft size={REGICONSIZE} />
-    //         <ButtonText>Left Align</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 ${
-    //         states.icons.justifyIdx === 1 ? "bg-primary-bg" : ""
-    //       }`}
-    //     >
-    //       <Button
-    //         onClick={handleDispatchCommand(
-    //           FORMAT_ELEMENT_COMMAND,
-    //           ElementFormatTypeObject.CENTER,
-    //           <CenterAlign />,
-    //           1
-    //         )}
-    //         className="toolbar-item spaced flex gap-4"
-    //         aria-label="Center Align"
-    //       >
-    //         <TextAlignCenter size={REGICONSIZE} />
-    //         <ButtonText>Center Align</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 ${
-    //         states.icons.justifyIdx === 2 ? "bg-primary-bg" : ""
-    //       }`}
-    //     >
-    //       <Button
-    //         onClick={handleDispatchCommand(
-    //           FORMAT_ELEMENT_COMMAND,
-    //           ElementFormatTypeObject.RIGHT,
-    //           <RightAlign />,
-    //           2
-    //         )}
-    //         className="toolbar-item spaced flex gap-4"
-    //         aria-label="Right Align"
-    //       >
-    //         <TextAlignRight size={REGICONSIZE} />
-    //         <ButtonText>Right Align</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 ${
-    //         states.icons.justifyIdx === 3 ? "bg-primary-bg" : ""
-    //       } rounded-b-md`}
-    //     >
-    //       <Button
-    //         onClick={handleDispatchCommand(
-    //           FORMAT_ELEMENT_COMMAND,
-    //           ElementFormatTypeObject.JUSTIFY,
-    //           <JustifyAlign />,
-    //           3
-    //         )}
-    //         className="toolbar-item flex gap-4"
-    //         aria-label="Justify Align"
-    //       >
-    //         <TextAlignJustify size={REGICONSIZE} />
-    //         <ButtonText>Justify Align</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 ${
-    //         states.icons.justifyIdx === 4 ? "bg-primary-bg" : ""
-    //       } rounded-b-md`}
-    //     >
-    //       <Button
-    //         onClick={handleDispatchCommand(
-    //           FORMAT_ELEMENT_COMMAND,
-    //           ElementFormatTypeObject.START,
-    //           <JustifyAlign />,
-    //           4
-    //         )}
-    //         className="toolbar-item flex gap-4"
-    //         aria-label="Justify Align"
-    //       >
-    //         <TextAlignJustify size={REGICONSIZE} />
-    //         <ButtonText>Start Align</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 ${
-    //         states.icons.justifyIdx === 5 ? "bg-primary-bg" : ""
-    //       } rounded-b-md`}
-    //     >
-    //       <Button
-    //         onClick={handleDispatchCommand(
-    //           FORMAT_ELEMENT_COMMAND,
-    //           ElementFormatTypeObject.END,
-    //           <JustifyAlign />,
-    //           5
-    //         )}
-    //         className="toolbar-item flex gap-4"
-    //         aria-label="Justify Align"
-    //       >
-    //         <TextAlignJustify size={REGICONSIZE} />
-    //         <ButtonText>End Align</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <hr className="border-b-[1px] border-black w-[90%]" />
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 rounded-b-md`}
-    //     >
-    //       <Button
-    //         onClick={() => {
-    //           editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined);
-    //         }}
-    //         className="toolbar-item flex gap-4"
-    //         aria-label="Justify Align"
-    //       >
-    //         <TextOutdent size={REGICONSIZE} />
-    //         <ButtonText>Outdent</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 rounded-b-md`}
-    //     >
-    //       <Button
-    //         onClick={() => {
-    //           editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
-    //         }}
-    //         className="toolbar-item flex gap-4"
-    //         aria-label="Justify Align"
-    //       >
-    //         <TextIndent size={REGICONSIZE} />
-    //         <ButtonText>Indent</ButtonText>
-    //       </Button>
-    //     </li>
-    //   </ul>
-    // </Dropdown>
+    <Popover>
+      <PopoverTrigger asChild={true}>
+        <Button className={"flex items-center gap-2"}>
+          {Object.keys(state.align).map((align, idx) => {
+            if(state.align[align as keyof typeof state.align]) {
+              return <React.Fragment key={idx} >
+                <Image src={`/icons/svg/primary-align-${ElementFormatTypeObject[String(align).toUpperCase() as keyof typeof ElementFormatTypeObject].type}.svg`} alt={"icon for undo"} width={20} height={20}/>
+                {ElementFormatTypeObject[String(align).toUpperCase() as keyof typeof ElementFormatTypeObject].text}
+              </React.Fragment>;
+            }
+          })}
+
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className={"sm:max-w-max p-0"}>
+        <ul className={"flex flex-col bg-secondary-bg items-center rounded-md"}>
+          {elementFormats.map((format, idx)=> (
+            <React.Fragment key={idx}>
+              <li
+                className={`flex items-center justify-between w-full rounded-t-md`}
+              >
+                <Button
+                  onClick={handleDispatchCommand(
+                    FORMAT_ELEMENT_COMMAND,
+                    format.type
+                  )}
+                  name={format.text}
+                  className={`toolbar-item spaced flex gap-4 p-2 w-full ${state.align[format.type as keyof typeof state.align] ? 'bg-primary-bg' : 'bg-secondary-bg'} hover:bg-primary-bg/30`}
+                  aria-label="Image Insert"
+                >
+                  <Image src={`/icons/svg/primary-align-${format.type}.svg`} alt={"icon for undo"} width={20} height={20}/>
+                  <span>{format.text}</span>
+                </Button>
+              </li>
+              <Separator />
+            </React.Fragment>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
   );
 };
 

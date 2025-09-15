@@ -1,6 +1,7 @@
 import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import InputField from "@/components/Input";
-import {Button} from "@/components/ui/button";
+import {Button as ButtonUI} from "@/components/ui/button";
+import Button from "@/components/Button";
 import React, {useState} from "react";
 import { $createTableNodeWithDimensions } from "@lexical/table";
 import { $insertNodeToNearestRoot } from "@lexical/utils";
@@ -23,8 +24,10 @@ export default function AddTable() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        Add Table
+      <DialogTrigger asChild={true}>
+        <Button>
+          Add Table
+        </Button>
       </DialogTrigger>
       <DialogContent >
         <DialogTitle>
@@ -40,7 +43,7 @@ export default function AddTable() {
             <InputField type={"number"} onChange={fieldOnChange("columns")} />
           </p>
         </section>
-        <Button onClick={() => {
+        <ButtonUI onClick={() => {
 
           const numR = table.rows;
           const numC = table.columns;
@@ -52,7 +55,7 @@ export default function AddTable() {
           setOpen(false);
         }}>
           テーブルを追加
-        </Button>
+        </ButtonUI>
       </DialogContent>
     </Dialog>
   )
