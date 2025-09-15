@@ -57,3 +57,4 @@ router.get("/set-user-notifications-read", EventController.setUserNotificationsR
 router.get("/get-blogs", BlogController.getBlogs);
 router.get("/get-blog", BlogController.getBlog);
 router.get("/get-blog-images", BlogController.getBlogImages);
+router.post("/post-blog-image",upload.single('blog_image'), BlogController.postBlogImage);

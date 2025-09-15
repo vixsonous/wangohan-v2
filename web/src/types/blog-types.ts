@@ -51,3 +51,10 @@ export class GetBlogImagesSchema {
     total_blog_images: z.number()
   })
 }
+
+export class PostBlogImageSchema {
+  static PostBlogImage = z.object({
+    blog_image_title: z.string("Please provide the title text of the image!"),
+    blog_image: z.file("Please provide the image!"),
+  })
+}

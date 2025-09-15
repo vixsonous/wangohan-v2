@@ -253,7 +253,7 @@ export default function ToolbarPlugin() {
       <Separator orientation={'vertical'}/>
       <TextMod />
       <Separator orientation={'vertical'}/>
-      {/*<ImageYoutube states={states} dispatch={dispatch} editor={editor} />*/}
+      <ImageYoutube />
       <Separator orientation={'vertical'}/>
       {/*<JustifyGroup states={states} editor={editor} />*/}
       {/*<Modal modalIdProps={modalIds.toolbarpluginModal}>*/}

@@ -23,7 +23,7 @@ export async function generateMetadata({
     }
   }
 
-  const userImage = String(user.user_image).startsWith("r2://") ? process.env.BASE_PUBLIC_BUCKET_URL + "/" + String(user.user_image).split("r2://")[1] : user.user_image;
+  const userImage = String(user.user_image).startsWith("r2://") ? process.env.NEXT_PUBLIC_BUCKET_URL + "/" + String(user.user_image).split("r2://")[1] : user.user_image;
 
   return {
     title: user.user_codename,

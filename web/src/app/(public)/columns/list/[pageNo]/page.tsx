@@ -37,7 +37,7 @@ export async function generateMetadata({params,searchParams }: Props): Promise<M
       type: "article",
       images: [
         { url: blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
-            process.env.BASE_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
+            process.env.NEXT_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
             blogsResponse.blogs[0].blog_image, width: 500, height: 500, alt: blogsResponse.blogs[0].title }
       ]
     },
@@ -70,7 +70,7 @@ export default async function Columns({params, searchParams}: Props) {
     "name": `${category || ""}ブログ${pageNo}`,
     "description": "わんごはん公式ブログ",
     "image": blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
-      process.env.BASE_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
+      process.env.NEXT_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
       blogsResponse.blogs[0].blog_image,
     "author": {
       "@type": "Person",

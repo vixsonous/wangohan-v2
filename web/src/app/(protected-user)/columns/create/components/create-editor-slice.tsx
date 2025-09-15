@@ -2,7 +2,6 @@ import {createSlice} from "@reduxjs/toolkit";
 import z from "zod";
 import {BlogImageSchema} from "@/types/blog-types";
 import {content} from "@/app/(protected-user)/columns/create/components/create-editor";
-import {LexicalEditor} from "lexical";
 import {ListNodeTagType} from "@lexical/list";
 
 type SetEditorStateAction = {
@@ -79,7 +78,7 @@ export const createEditorSlice = createSlice({
   initialState: {
     editorState: content,
     htmlString: "",
-    uploadedImages: [] as z.infer<typeof BlogImageSchema.BlogImages>,
+    blog_images: [] as z.infer<typeof BlogImageSchema.BlogImages>,
     total_blog_images: 0,
     font: {
       family: "mitimasu" as "sans-serif" | "sans" | "mitimasu",
@@ -151,12 +150,17 @@ export const createEditorSlice = createSlice({
     },
 
     setUploadedImages(state, action: SetUploadedImagesAction) {
-      state.uploadedImages = action.payload;
+      state.blog_images = action.payload;
       return state;
     },
 
     addUploadedImages(state, action: SetUploadedImagesAction) {
-      state.uploadedImages = state.uploadedImages.concat(action.payload);
+      state.blog_images = state.blog_images.concat(action.payload);
+      return state;
+    },
+
+    prependUploadedImages(state, action: SetUploadedImagesAction) {
+      state.blog_images = action.payload.concat(state.blog_images);
       return state;
     },
 
@@ -168,6 +172,7 @@ export const createEditorSlice = createSlice({
 });
 
 export const {
+  prependUploadedImages,
   setFontSize,
   setFontFamily,
   setCodeLanguage,

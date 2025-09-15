@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {ApiResponse} from "@/server/utils/ApiUtils";
-import {BlogControllerSchema} from "@/server/Blog/blog-types";
+import {BlogControllerSchema, PostBlogImageSchema} from "@/server/Blog/blog-types";
 import {BlogService} from "@/server/Blog/blog-service";
 
 export class BlogController {
@@ -67,5 +67,33 @@ export class BlogController {
     }
 
     ApiResponse.success(res, "Successfully retrieved blog images!", blogImages);
+  }
+
+  static async postBlogImage(req: Request, res: Response) {
+    const blog_image = req.file;
+    const {blog_image_title} = req.body;
+
+    const submitData = {
+      blog_image_title: blog_image_title,
+      blog_image: blog_image,
+    }
+
+    const postBlogImageParseResult = PostBlogImageSchema.PostBlogImage.safeParse(submitData);
+    if(!postBlogImageParseResult.success){
+      ApiResponse.error(res, postBlogImageParseResult.error.issues[0].message);
+      return;
+    }
+
+    const blogImage = await BlogService.postBlogImage(
+      postBlogImageParseResult.data.blog_image,
+      postBlogImageParseResult.data.blog_image_title
+    );
+
+    if(blogImage === undefined) {
+      ApiResponse.error(res, "Error uploading blog image!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully posted the blog image!", blogImage);
   }
 }
