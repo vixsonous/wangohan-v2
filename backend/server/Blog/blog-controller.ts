@@ -1,7 +1,8 @@
 import {Request, Response} from "express";
 import {ApiResponse} from "@/server/utils/ApiUtils";
-import {BlogControllerSchema, PostBlogImageSchema} from "@/server/Blog/blog-types";
+import {BlogControllerSchema, PostBlogImageSchema, PostBlogSchema} from "@/server/Blog/blog-types";
 import {BlogService} from "@/server/Blog/blog-service";
+import {getUserData} from "@/server/utils/server-utils";
 
 export class BlogController {
 
@@ -30,11 +31,39 @@ export class BlogController {
     ApiResponse.success(res, "Successfully retrieved the blog!", blog);
   }
 
+  static async postBlog(req: Request, res: Response) {
+    const data = req.body;
+    const {publish} = req.query;
+
+    const user = getUserData(req);
+
+    if(user === undefined) {
+      ApiResponse.unauthorized(res, "You need to login to post blog!");
+      return;
+    }
+
+    const postBlogParseResult = PostBlogSchema.PostBlog.safeParse(data);
+
+    if(!postBlogParseResult.success){
+      ApiResponse.error(res, postBlogParseResult.error.issues[0].message);
+      return;
+    }
+
+    const blog = await BlogService.postBlog(postBlogParseResult.data, publish === 'true', user.user_id);
+
+    if(blog === undefined || !blog) {
+      ApiResponse.error(res, "Failed to post blog!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully posted the blog!");
+  }
+
   static async getBlogs(req: Request, res: Response) {
     const {page_no, category} = req.query;
     const submitData = {
       page_no: Number(page_no) - 1,
-      category: category,
+      category: category === "undefined" ? "全て" : category,
     }
 
     const getBlogsParseResult = BlogControllerSchema.GetBlogs.safeParse(submitData);
@@ -44,7 +73,7 @@ export class BlogController {
       return;
     }
 
-    const blogList = await BlogService.getBlogs(getBlogsParseResult.data.page_no, getBlogsParseResult.data.category);
+    const blogList = await BlogService.getBlogs(getBlogsParseResult.data.page_no, getBlogsParseResult.data.category );
 
     ApiResponse.success(res, "Successfully retrieved blogs!", blogList);
   }

@@ -1,4 +1,6 @@
 import {BlogRepository} from "@/server/Blog/blog-repository";
+import {PostBlogSchema} from "@/server/Blog/blog-types";
+import z from "zod";
 
 export class BlogService {
   static async getBlogs(page_no: number, category?: string | undefined) {
@@ -7,6 +9,10 @@ export class BlogService {
 
   static async getBlog(blog_id: number, blog_title: string) {
     return await BlogRepository.getBlog(blog_id, blog_title);
+  }
+
+  static async postBlog(blog: z.infer<typeof PostBlogSchema.PostBlog>, publish: boolean, user_id: number) {
+    return await BlogRepository.postBlog(blog, publish, user_id);
   }
 
   static async getBlogImages(page_no: number) {

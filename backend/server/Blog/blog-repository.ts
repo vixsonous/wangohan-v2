@@ -1,7 +1,7 @@
 import {log} from "@/server/utils/log";
 import {db} from "@/database/database";
 import z from "zod";
-import {BlogSchema, GetBlogImagesSchema, GetBlogSchema} from "@/server/Blog/blog-types";
+import {BlogSchema, GetBlogImagesSchema, GetBlogSchema, PostBlogSchema} from "@/server/Blog/blog-types";
 import {ImageProcess} from "@/server/Images/image-service";
 import {Image} from "@/server/Images/image";
 import {BlogImageInsert} from "@/database/types";
@@ -33,9 +33,34 @@ export class BlogRepository {
       return undefined;
     }
   }
+
+  static async postBlog(blog: z.infer<typeof PostBlogSchema.PostBlog>, publish: boolean, user_id: number): Promise<boolean | undefined> {
+    try {
+      await db.insertInto("blog_columns_table")
+        .values({
+          blog_category: blog.category,
+          user_id: user_id,
+          title: blog.title,
+          is_deleted: false,
+          is_published: publish,
+          blog_image: blog.file,
+          editor_state: blog.editor_state,
+          updated_at: new Date(),
+          created_at: new Date(),
+        })
+        .executeTakeFirstOrThrow();
+
+      log("Successfully posted blog!");
+      return true;
+    } catch(e) {
+      log(e);
+      return undefined;
+    }
+  }
   static BLOG_LIMIT = 6;
   static async getBlogs(page_no: number, category: string = "全て"): Promise<z.infer<typeof GetBlogSchema.GetBlogList> | undefined> {
     try {
+
       const blogs: z.infer<typeof BlogSchema.BlogList> = await db.selectFrom("blog_columns_table")
         .select([
           "blog_id",
@@ -48,7 +73,11 @@ export class BlogRepository {
           "updated_at"
         ])
         .$if(category !== "全て", q => q.where("blog_columns_table.blog_category", "=", category))
-        .where("is_deleted", "=", false)
+        .where(eb => eb.and({
+          is_deleted: false,
+          is_published: true
+        }))
+        .orderBy("created_at", "desc")
         .offset(BlogRepository.BLOG_LIMIT * page_no)
         .limit(BlogRepository.BLOG_LIMIT)
         .execute();
@@ -57,8 +86,14 @@ export class BlogRepository {
         .select(lteb => [
           lteb.fn.coalesce(lteb.selectFrom("blog_columns_table").select(({fn}) => [
             fn.count<number>("blog_columns_table.blog_id").as("total_blogs")
-          ]), lteb.val(0)).as("total_blogs")
-        ]).executeTakeFirstOrThrow();
+          ]).$if(category !== "全て", q => q.where("blog_columns_table.blog_category", "=", category))
+            .where(eb => eb.and({
+              is_deleted: false,
+              is_published: true
+            })), lteb.val(0)).as("total_blogs")
+        ])
+
+        .executeTakeFirstOrThrow();
 
       log("Successfully retrieved blogs!");
       return {blogs, total_blogs: totalBlogs.total_blogs};

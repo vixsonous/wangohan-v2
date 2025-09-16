@@ -209,6 +209,7 @@ export interface BlogColumnsTable {
   blog_category: string;
   editor_state: string;
   is_deleted: boolean;
+  is_published: boolean;
   updated_at: Date;
   created_at: Date;
 }

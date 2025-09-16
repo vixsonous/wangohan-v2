@@ -63,15 +63,14 @@ export default async function Columns({params, searchParams}: Props) {
   }
 
   const blogsResponse = await ServerApiResponseService.getResponseData<z.infer<typeof GetBlogSchema.GetBlogList>>(response);
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
     "name": `${category || ""}ブログ${pageNo}`,
     "description": "わんごはん公式ブログ",
-    "image": blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
+    "image": blogsResponse.blogs.length > 0 ? blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
       process.env.NEXT_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
-      blogsResponse.blogs[0].blog_image,
+      blogsResponse.blogs[0].blog_image : "https://wangohanjp.com/logo-v2.png",
     "author": {
       "@type": "Person",
       "name": "わんごはん公式"

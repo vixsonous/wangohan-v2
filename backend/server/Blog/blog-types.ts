@@ -36,6 +36,15 @@ export class GetBlogSchema {
   })
 }
 
+export class PostBlogSchema {
+  static PostBlog = z.object({
+    title: z.string().min(1, "Please provide the blog title!"),
+    category: z.string().min(1, "Please provide a valid blog category!"),
+    editor_state: z.string().min(1, "Please provide the blog content!"),
+    file: z.string().min(1, "Please provide the blog image!")
+  })
+}
+
 export class GetBlogImagesSchema {
   static BlogImage = z.object({
     blog_image_title: z.string(),
@@ -53,6 +62,6 @@ export class GetBlogImagesSchema {
 export class PostBlogImageSchema {
   static PostBlogImage = z.object({
     blog_image_title: z.string("Please provide the title text of the image!"),
-    blog_image: z.custom<Express.Multer.File>().nonoptional("Please provide the image file!"),
+    blog_image: z.custom<Express.Multer.File>().nonoptional(),
   })
 }

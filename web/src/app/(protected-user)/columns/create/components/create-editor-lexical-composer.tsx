@@ -27,6 +27,11 @@ import SpinLoader from "@/components/SpinLoader";
 import "@/app/(protected-user)/columns/rich-editor/rich-editor/style.css";
 import {FieldValues, SubmitErrorHandler, SubmitHandler} from "react-hook-form";
 import z from "zod";
+import {useMutation} from "@tanstack/react-query";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
+import {AxiosResponse} from "axios";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 const ToolbarPlugin = dynamic(
   () => import("@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/ToolbarPlugin"),
@@ -66,6 +71,22 @@ export default function CreateEditorLexicalComposer({handleSubmit}: {
 }) {
 
   const editorState = useSelector((state: RootState) => state.editorState);
+  const router = useRouter();
+
+  const submitBlogMutation = useMutation({
+    mutationFn: ({data, publish} : {data: FieldValues, publish: boolean}) =>
+      ClientApiService.post("/post-blog?publish=" + publish, data),
+    onSuccess: (response: AxiosResponse) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(response);
+      toast.success("Successful!", {description: message});
+      router.push("/columns/list/1");
+      router.refresh();
+    },
+    onError: (err: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(err);
+      toast.error("Error!", {description: message});
+    }
+  })
 
   return (
     <LexicalComposer
@@ -104,11 +125,11 @@ export default function CreateEditorLexicalComposer({handleSubmit}: {
         </div>
       </div>
       <div className="w-full flex justify-center gap-2 items-center mt-8">
-        <Button onClick={handleSubmit((data: FieldValues) => console.log(data + "hello"))} type={"button"}>
-          Post Blog
+        <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: true}))} type={"button"}>
+          {submitBlogMutation.isPending && <SpinLoader />} Post Blog
         </Button>
-        <Button onClick={handleSubmit((data: FieldValues) => console.log(data))} type={"button"}>
-          Save blog
+        <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: false}))} type={"button"}>
+          {submitBlogMutation.isPending && <SpinLoader />} Save blog
         </Button>
       </div>
       <div
