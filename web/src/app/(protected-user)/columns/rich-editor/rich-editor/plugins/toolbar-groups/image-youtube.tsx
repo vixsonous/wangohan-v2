@@ -52,22 +52,16 @@ const ImageYoutube = () => {
   const [url, setUrl] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleYoutubeInsert = () => (e: React.MouseEvent<HTMLButtonElement>) => {
-    const url = prompt("Enter the URL of the YouTube video:", "");
-    editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, fillUrl(url || ""));
-  }
-
   return (
     <Popover>
       <PopoverTrigger asChild={true}>
-        <Button className={"flex items-center gap-2"}>
+        <Button type={"button"} aria-label={"Insert Image/Video"} className={"flex items-center gap-2"}>
           <Image src={`/icons/svg/primary-plus.svg`} alt={"icon for undo"} width={20} height={20}/>
           Insert Image/Video
         </Button>
       </PopoverTrigger>
       <PopoverContent className={"sm:max-w-max p-0"}>
         <ul className={"flex flex-col bg-secondary-bg items-center rounded-md"}>
-
           <UploadedImages action={(i) => {
             editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
               altText: i.blog_image_title,
@@ -81,9 +75,10 @@ const ImageYoutube = () => {
               className={`flex items-center justify-between w-full rounded-t-md`}
             >
               <Button
+                type={"button"}
                 name="image-button"
                 className={`toolbar-item spaced flex gap-4 p-2 w-full bg-secondary-bg hover:bg-primary-bg/30`}
-                aria-label="Image Insert"
+                aria-label="Uploaded Images"
               >
                 <Image src={"/icons/svg/primary-image.svg"} alt={"icon for undo"} width={20} height={20}/>
                 <span>Image</span>
@@ -97,7 +92,7 @@ const ImageYoutube = () => {
                 className={`flex items-center justify-between w-full`}
               >
                 <Button
-                  onClick={handleYoutubeInsert}
+                  type={"button"}
                   name="h1-1"
                   className={`toolbar-item spaced flex gap-4 p-2 w-full bg-secondary-bg hover:bg-primary-bg/30`}
                   aria-label="Youtube Insert"
@@ -116,7 +111,7 @@ const ImageYoutube = () => {
                   setUrl(e.currentTarget.value);
                 }} />
               </p>
-              <ButtonUI onClick={() => {
+              <ButtonUI type={"button"} onClick={() => {
                 editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, fillUrl(url || ""));
                 setDialogOpen(false);
               }}>
@@ -127,49 +122,6 @@ const ImageYoutube = () => {
         </ul>
       </PopoverContent>
     </Popover>
-    // <Dropdown
-    //   openIcon={
-    //     <ButtonIcon>
-    //       <Plus />
-    //       <ButtonText>Insert</ButtonText>
-    //       <CaretDown size={REGICONSIZE} />
-    //     </ButtonIcon>
-    //   }
-    //   closeIcon={
-    //     <ButtonIcon>
-    //       <Plus />
-    //       <ButtonText>Insert</ButtonText>
-    //       <CaretDown size={REGICONSIZE} />
-    //     </ButtonIcon>
-    //   }
-    // >
-    //   <ul className=" flex flex-col gap-2 bg-secondary-bg items-center rounded-md border border-primary-text">
-    //     <li
-    //       className={`flex items-center justify-between w-full px-2 ${
-    //         states.icons.justifyIdx === 0 ? "bg-primary-bg" : ""
-    //       } rounded-t-md`}
-    //     >
-    //       <Button
-    //         onClick={imgYtHelper.displayImageSelection}
-    //         className="toolbar-item spaced flex gap-4"
-    //         aria-label="Image Insert"
-    //       >
-    //         <Image size={REGICONSIZE} />
-    //         <ButtonText>Image</ButtonText>
-    //       </Button>
-    //     </li>
-    //     <li className={`flex items-center justify-between w-full px-2`}>
-    //       <Button
-    //         onClick={handleYoutubeInsert(editor)}
-    //         className="toolbar-item spaced flex gap-4"
-    //         aria-label="Youtube Video"
-    //       >
-    //         <YoutubeLogo size={REGICONSIZE} />
-    //         <ButtonText>Youtube Video</ButtonText>
-    //       </Button>
-    //     </li>
-    //   </ul>
-    // </Dropdown>
   );
 };
 

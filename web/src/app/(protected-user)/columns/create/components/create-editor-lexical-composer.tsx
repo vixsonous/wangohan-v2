@@ -25,6 +25,8 @@ import {
 import dynamic from "next/dynamic";
 import SpinLoader from "@/components/SpinLoader";
 import "@/app/(protected-user)/columns/rich-editor/rich-editor/style.css";
+import {FieldValues, SubmitErrorHandler, SubmitHandler} from "react-hook-form";
+import z from "zod";
 
 const ToolbarPlugin = dynamic(
   () => import("@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/ToolbarPlugin"),
@@ -49,7 +51,19 @@ const OnChangePlugin = memo(function OnChangePlugin() {
 });
 
 
-export default function CreateEditorLexicalComposer() {
+export default function CreateEditorLexicalComposer({handleSubmit}: {
+  handleSubmit:  (onValid: SubmitHandler<{
+    title: string
+    category: string
+    editor_state: string
+    file: z.core.File
+  }>, onInvalid?: (SubmitErrorHandler<{
+    title: string
+    category: string
+    editor_state: string
+    file: z.core.File
+  }> | undefined)) => (e?: React.BaseSyntheticEvent) => Promise<void>
+}) {
 
   const editorState = useSelector((state: RootState) => state.editorState);
 
@@ -89,9 +103,12 @@ export default function CreateEditorLexicalComposer() {
           <FontFamilyPlugin />
         </div>
       </div>
-      <div className="w-full flex justify-center items-center mt-8">
-        <Button type={"submit"}>
-          Create blog
+      <div className="w-full flex justify-center gap-2 items-center mt-8">
+        <Button onClick={handleSubmit((data: FieldValues) => console.log(data + "hello"))} type={"button"}>
+          Post Blog
+        </Button>
+        <Button onClick={handleSubmit((data: FieldValues) => console.log(data))} type={"button"}>
+          Save blog
         </Button>
       </div>
       <div

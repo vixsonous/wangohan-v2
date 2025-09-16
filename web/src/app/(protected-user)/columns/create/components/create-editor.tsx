@@ -3,7 +3,7 @@ import Error from "@/components/Error";
 import React, {useEffect} from "react";
 import CreateEditorLexicalComposer
   from "@/app/(protected-user)/columns/create/components/create-editor-lexical-composer";
-import {Controller, FieldValues, useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import z from "zod";
 import {GetBlogImagesSchema, PostBlogSchema} from "@/types/blog-types";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -44,7 +44,6 @@ export default function CreateEditor({blog_images, user_data}: CreateEditorWrapp
 
   const editorState = useSelector((state: RootState) => state.editorState);
 
-  const onSubmit = (data: FieldValues) => console.log(data);
   useEffect(() => {
     setValue("editor_state", editorState.editorState);
   }, [editorState.editorState]);
@@ -58,7 +57,7 @@ export default function CreateEditor({blog_images, user_data}: CreateEditorWrapp
     dispatch(setUser(user_data));
   }, [user_data]);
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
+    <form className="mt-6">
       {Object.keys(errors).map((err, idx) => {
         return idx < 1 ? <Error key={idx}>{errors[err as keyof typeof errors]?.message}</Error> : undefined
       })}
@@ -91,7 +90,7 @@ export default function CreateEditor({blog_images, user_data}: CreateEditorWrapp
         />
         <CreateEditorFileUpload control={control} />
       </div>
-      <CreateEditorLexicalComposer />
+      <CreateEditorLexicalComposer handleSubmit={handleSubmit} />
     </form>
   )
 }

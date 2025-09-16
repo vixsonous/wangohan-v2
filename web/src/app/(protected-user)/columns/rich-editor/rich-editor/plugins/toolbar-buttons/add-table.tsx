@@ -25,7 +25,7 @@ export default function AddTable() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild={true}>
-        <Button>
+        <Button type={"button"}>
           Add Table
         </Button>
       </DialogTrigger>
@@ -43,7 +43,7 @@ export default function AddTable() {
             <InputField type={"number"} onChange={fieldOnChange("columns")} />
           </p>
         </section>
-        <ButtonUI onClick={() => {
+        <ButtonUI type={"button"} onClick={() => {
 
           const numR = table.rows;
           const numC = table.columns;

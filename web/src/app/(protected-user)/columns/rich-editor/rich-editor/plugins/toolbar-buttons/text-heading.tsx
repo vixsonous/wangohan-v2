@@ -15,7 +15,7 @@ const TextHeading = () => {
   return (
     <Popover>
       <PopoverTrigger asChild={true}>
-        <Button className={"flex items-center gap-2"}>
+        <Button type={"button"} className={"flex items-center gap-2"}>
           <Image src={`/icons/svg/primary-${state.block_type}.svg`} alt={"icon for undo"} width={20} height={20}/>
           {state.block_type.charAt(0).toUpperCase() + state.block_type.slice(1)}
         </Button>
@@ -26,6 +26,7 @@ const TextHeading = () => {
             className={`flex items-center justify-between w-full rounded-t-md`}
           >
             <Button
+              type={"button"}
               onClick={textHeading.formatHeading}
               name="paragraph-0"
               className={`toolbar-item spaced flex gap-4 p-2 w-full ${state.block_type === "paragraph" ? "bg-primary-bg" : "bg-secondary-bg"} hover:bg-primary-bg/30`}
@@ -40,6 +41,7 @@ const TextHeading = () => {
             className={`flex items-center justify-between w-full`}
           >
             <Button
+              type={"button"}
               onClick={textHeading.formatHeading}
               name="h1-1"
               className={`toolbar-item spaced flex gap-4 p-2 w-full ${state.block_type === "h1" ? "bg-primary-bg" : "bg-secondary-bg"} hover:bg-primary-bg/30`}
@@ -54,6 +56,7 @@ const TextHeading = () => {
             className={`flex items-center justify-between w-full`}
           >
             <Button
+              type={"button"}
               onClick={textHeading.formatHeading}
               name="h2-2"
               className={`toolbar-item spaced flex gap-4 p-2 w-full ${state.block_type === "h2" ? "bg-primary-bg" : "bg-secondary-bg"} hover:bg-primary-bg/30`}
@@ -68,6 +71,7 @@ const TextHeading = () => {
             className={`flex items-center justify-between w-full rounded-b-md`}
           >
             <Button
+              type={"button"}
               onClick={textHeading.formatHeading}
               name="h3-3"
               className={`toolbar-item spaced flex gap-4 p-2 w-full ${state.block_type === "h3" ? "bg-primary-bg" : "bg-secondary-bg"} hover:bg-primary-bg/30`}

@@ -14,6 +14,7 @@ export default function Redo() {
 
   return (
     <Button
+      type={"button"}
       disabled={!state.toolbar_actions.redo}
       onClick={() => {
         editor.dispatchCommand(REDO_COMMAND, undefined);

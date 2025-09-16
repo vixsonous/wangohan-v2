@@ -46,7 +46,7 @@ const JustifyGroup = () => {
   return (
     <Popover>
       <PopoverTrigger asChild={true}>
-        <Button className={"flex items-center gap-2"}>
+        <Button type={"button"} aria-label={"Alignment Format"} className={"flex items-center gap-2"}>
           {Object.keys(state.align).map((align, idx) => {
             if(state.align[align as keyof typeof state.align]) {
               return <React.Fragment key={idx} >
@@ -72,7 +72,7 @@ const JustifyGroup = () => {
                   )}
                   name={format.text}
                   className={`toolbar-item spaced flex gap-4 p-2 w-full ${state.align[format.type as keyof typeof state.align] ? 'bg-primary-bg' : 'bg-secondary-bg'} hover:bg-primary-bg/30`}
-                  aria-label="Image Insert"
+                  aria-label={format.text}
                 >
                   <Image src={`/icons/svg/primary-align-${format.type}.svg`} alt={"icon for undo"} width={20} height={20}/>
                   <span>{format.text}</span>

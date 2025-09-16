@@ -30,11 +30,6 @@ body {
   text-align: center;
 }
 
-h1 {
-  font-size: 24px;
-  color: #333;
-}
-
 .ltr {
   text-align: left;
 }
@@ -65,7 +60,6 @@ h1 {
   min-height: 350px;
   resize: none;
   font-size: 15px;
-  caret-color: rgb(5, 5, 5);
   position: relative;
   tab-size: 1;
   outline: 0;
@@ -345,7 +339,6 @@ pre::-webkit-scrollbar-thumb {
 
 .toolbar button.toolbar-item i.format {
   background-size: contain;
-  display: inline-block;
   height: 18px;
   width: 18px;
   margin-top: 2px;
@@ -384,7 +377,6 @@ pre::-webkit-scrollbar-thumb {
   font-size: 14px;
   color: #777;
   text-overflow: ellipsis;
-  width: 70px;
   overflow: hidden;
   height: 20px;
   text-align: left;
@@ -460,7 +452,6 @@ pre::-webkit-scrollbar-thumb {
   cursor: pointer;
 }
 .theme__tableAddColumns:after {
-  background-image: url("/next.svg");
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -486,7 +477,6 @@ pre::-webkit-scrollbar-thumb {
   cursor: pointer;
 }
 .theme__tableAddRows:after {
-  background-image: url("/next.svg");
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;

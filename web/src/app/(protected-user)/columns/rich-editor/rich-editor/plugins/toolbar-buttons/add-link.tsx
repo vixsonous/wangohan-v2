@@ -26,7 +26,7 @@ export default function AddLink() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild={true}>
-        <Button>
+        <Button type={"button"}>
           Add Link
         </Button>
       </DialogTrigger>
@@ -40,7 +40,7 @@ export default function AddLink() {
           <span>リンクURL</span>
           <InputField type={"url"} onChange={fieldOnChange("link")} />
         </p>
-        <ButtonUI onClick={() => {
+        <ButtonUI type={"button"} onClick={() => {
           const vlinkText = link.text;
           const vlinkUrl = link.link;
 

@@ -15,6 +15,7 @@ export default function Undo() {
 
   return (
     <Button
+      type={"button"}
       disabled={!state.toolbar_actions.undo}
       onClick={() => {
         editor.dispatchCommand(UNDO_COMMAND, undefined);

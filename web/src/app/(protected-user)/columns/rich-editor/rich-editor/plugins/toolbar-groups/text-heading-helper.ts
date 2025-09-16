@@ -17,9 +17,7 @@ const useTextHeadingHelper = () => {
     () => ({
       formatHeading(e: React.MouseEvent<HTMLButtonElement>) {
         const nameDetail = e.currentTarget.name;
-        const idx = nameDetail.split("-")[1];
         const name = nameDetail.split("-")[0];
-        // states.setIcons((prev) => ({ ...prev, textTypeIdx: Number(idx) }));
 
         if (state.block_type !== "paragraph" || state.block_type !== name) {
           editor.update(() => {
