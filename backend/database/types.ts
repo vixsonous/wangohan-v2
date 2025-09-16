@@ -207,7 +207,7 @@ export interface BlogColumnsTable {
   title: string;
   blog_image: string;
   blog_category: string;
-  editor_state: JSON;
+  editor_state: string;
   is_deleted: boolean;
   updated_at: Date;
   created_at: Date;

@@ -1,0 +1,156 @@
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { editorConfig } from "./editor-config";
+import useEditorStates from "./editor-states";
+import {LexicalErrorBoundary} from "@lexical/react/LexicalErrorBoundary";
+import { FontFamilyPlugin } from "@/app/(protected-user)/columns/rich-editor/nodes/FontNode";
+import { FontSizePlugin } from "@/app/(protected-user)/columns/rich-editor/nodes/FontSizeNode";
+import { FontColorPlugin } from "@/app/(protected-user)/columns/rich-editor/nodes/FontColorNode";
+import { FontBackgroundColorNodePlugin } from "@/app/(protected-user)/columns/rich-editor/nodes/FontBackgroundColorNode";
+import ImagesPlugin from "./plugins/ImagePlugin";
+import YouTubePlugin from "./plugins/YoutubePlugin";
+import ToolbarPlugin from "./plugins/ToolbarPlugin";
+import {
+  AutoLinkPlugin,
+  createLinkMatcherWithRegExp,
+} from "@lexical/react/LexicalAutoLinkPlugin";
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import React, { memo, useEffect } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { customGenerateHtmlFromNodes } from "@/app/(protected-user)/columns/rich-editor/lib/GenerateHtml";
+import useEditorHelper from "./editor-helper";
+import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
+import { useRouter } from "next/navigation";
+
+const placeholder = "Enter some rich text...";
+
+const URL_REGEX =
+  /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
+
+const EMAIL_REGEX =
+  /(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+
+
+const OnChangePlugin = memo(function OnChangePlugin({
+  states,
+}: {
+  states: ReturnType<typeof useEditorStates>;
+}) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({ editorState }) => {
+      editor.read(() => {
+        const jsonState = editorState.toJSON();
+        states.setState(JSON.stringify(jsonState));
+        const html = customGenerateHtmlFromNodes(editor);
+        states.setHtmlString(html);
+        sessionStorage.setItem("editor", JSON.stringify(jsonState));
+      });
+    });
+  }, [editor]);
+  return null;
+});
+
+export default function EditorLexicalComposer({
+  states,
+  helper,
+  userId,
+  isEdit,
+  blogId
+}: {
+  states: ReturnType<typeof useEditorStates>;
+  helper: ReturnType<typeof useEditorHelper>;
+  userId: number;
+  isEdit: boolean;
+  blogId?: number;
+}) {
+
+  const router = useRouter();
+  const handleCreateBlog = (
+    states: ReturnType<typeof useEditorStates>,
+    userId: number
+  ) => {
+    return (e: React.MouseEvent<HTMLButtonElement>) =>
+      helper.createBlog(e, states, userId, router);
+  };
+
+  const handleEditBlog = (
+    states: ReturnType<typeof useEditorStates>,
+    blogId: number
+  ) => {
+    return (e: React.MouseEvent<HTMLButtonElement>) => 
+      helper.editBlog(e, states, blogId);
+  }
+
+  const MATCHERS = [
+    createLinkMatcherWithRegExp(URL_REGEX, (text) => {
+      return text;
+    }),
+    createLinkMatcherWithRegExp(EMAIL_REGEX, (text) => {
+      return `mailto:${text}`;
+    }),
+  ];
+
+  return (
+    <LexicalComposer
+      initialConfig={{ ...editorConfig, editorState: states.editorState }}
+    >
+      <div
+        className="editor-container"
+        style={{ margin: "0", marginTop: "1em", maxWidth: "none" }}
+      >
+        <ToolbarPlugin />
+        <div className="editor-inner">
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable
+                className="editor-input py-2 px-4 w-full h-auto border border-primary-text rounded-md text-xs md:text-sm bg-secondary-bg"
+                aria-placeholder={placeholder}
+                placeholder={
+                  <div className="editor-placeholder">{placeholder}</div>
+                }
+              />
+            }
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+          <HistoryPlugin />
+          {/* <AutoFocusPlugin /> */}
+          <LinkPlugin />
+          {!states.titleFocus && <AutoLinkPlugin matchers={MATCHERS} />}
+          <ImagesPlugin />
+          <OnChangePlugin states={states} />
+          <YouTubePlugin />
+          <FontSizePlugin />
+          <FontColorPlugin />
+          <TablePlugin />
+          <FontBackgroundColorNodePlugin />
+          <FontFamilyPlugin />
+        </div>
+      </div>
+      <div className="w-full flex justify-center items-center mt-8">
+        {/*<GeneralButton*/}
+        {/*  onClick={isEdit && blogId ? handleEditBlog(states, blogId) : handleCreateBlog(states, userId)}*/}
+        {/*  aria-label="create-recipe-button"*/}
+        {/*  disabled={states.submit}*/}
+        {/*  type="submit"*/}
+        {/*>*/}
+        {/*  {!states.submit ? (*/}
+        {/*    isEdit ? "Edit" : "作成する"*/}
+        {/*  ) : (*/}
+        {/*    <span className="flex justify-center items-center">*/}
+        {/*      <CircleNotch size={20} className="animate-spin" /> {isEdit ? "Edit" : "作成する"}*/}
+        {/*    </span>*/}
+        {/*  )}*/}
+        {/*</GeneralButton>*/}
+      </div>
+      <div
+        className="mt-8 max-w-full whitespace-pre-wrap break-all"
+        dangerouslySetInnerHTML={{ __html: states.htmlString }}
+      ></div>
+    </LexicalComposer>
+  );
+}

@@ -10,6 +10,7 @@
   --secondary-text: #6b4528;
   --inactive: #999999;
   --bullet-color: #FFBA08;
+  --shadow: #cdc6bc;
   --error: red;
   --text: 1rem;
   --radius: 0.625rem;
@@ -69,6 +70,7 @@ input[type="checkbox"]:checked+label>span{
   --color-secondary-text: var(--secondary-text);
   --color-inactive: var(--inactive);
   --color-bullet: var(--bullet-color);
+  --color-shadow: var(--shadow);
   --color-error: var(--error);
   --text-xxs: calc(var(--text)*0.60);
 

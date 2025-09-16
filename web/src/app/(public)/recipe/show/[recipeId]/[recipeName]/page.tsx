@@ -42,7 +42,7 @@ export async function generateMetadata({
       type: "article",
       images: [
           { url: recipe.recipe_images[0].recipe_image.startsWith("r2://") ?
-              process.env.BASE_PUBLIC_BUCKET_URL + recipe.recipe_images[0].recipe_image.split("r2://")[1] :
+              process.env.NEXT_PUBLIC_BUCKET_URL + recipe.recipe_images[0].recipe_image.split("r2://")[1] :
               recipe.recipe_images[0].recipe_image, width: 500, height: 500, alt: recipe.recipe_images[0].recipe_image_title }
       ]
     },
