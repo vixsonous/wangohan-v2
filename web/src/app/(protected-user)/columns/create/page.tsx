@@ -1,4 +1,4 @@
-import CreateEditorWrapper from "@/app/(protected-user)/columns/create/components/create-editor-wrapper";
+import EditorWrapper from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-wrapper";
 import {ServerApiResponseService, ServerApiService} from "@/lib/server-utils";
 import z from "zod";
 import {GetBlogImagesSchema} from "@/types/blog-types";
@@ -24,7 +24,7 @@ export default async function CreateBlog() {
 
   return (
     <div className="w-full px-4 flex flex-col gap-4">
-      <CreateEditorWrapper blog_images={blogImages} user_data={userData} />
+      <EditorWrapper blog_images={blogImages} user_data={userData} />
     </div>
   )
 }

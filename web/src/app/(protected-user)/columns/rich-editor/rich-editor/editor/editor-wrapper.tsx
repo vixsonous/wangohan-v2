@@ -4,23 +4,24 @@ import dynamic from "next/dynamic";
 import {Provider} from "react-redux";
 import {store} from "@/store/store";
 import z from "zod";
-import {GetBlogImagesSchema} from "@/types/blog-types";
+import {BlogSchema, GetBlogImagesSchema} from "@/types/blog-types";
 import {QueryClientProvider} from "@tanstack/react-query";
 import {queryClient} from "@/lib/tanstack-query";
 import {UserSchema} from "@/types/user-types.user";
 
-const CreateEditor = dynamic(() => import("./create-editor"), {ssr: false, loading: () => <span>Loading</span>});
+const CreateEditor = dynamic(() => import("./editor"), {ssr: false, loading: () => <span>Loading</span>});
 
 type CreateEditorWrapperProps = {
   blog_images: z.infer<typeof GetBlogImagesSchema.GetBlogImages>;
   user_data: z.infer<typeof UserSchema.User>;
+  blog?: z.infer<typeof BlogSchema.Blog> | undefined;
 }
-export default function CreateEditorWrapper({blog_images, user_data}: CreateEditorWrapperProps) {
+export default function EditorWrapper({blog_images, user_data, blog}: CreateEditorWrapperProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <CreateEditor blog_images={blog_images} user_data={user_data} />
+        <CreateEditor blog_images={blog_images} user_data={user_data} blog={blog} />
       </Provider>
     </QueryClientProvider>
   )

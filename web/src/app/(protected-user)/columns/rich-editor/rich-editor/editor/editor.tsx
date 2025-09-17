@@ -1,11 +1,11 @@
 import InputField from "@/components/Input";
 import Error from "@/components/Error";
 import React, {useEffect} from "react";
-import CreateEditorLexicalComposer
-  from "@/app/(protected-user)/columns/create/components/create-editor-lexical-composer";
+import EditorLexicalComposer
+  from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-lexical-composer";
 import {Controller, useForm} from "react-hook-form";
 import z from "zod";
-import {GetBlogImagesSchema, PostBlogSchema} from "@/types/blog-types";
+import {BlogSchema, GetBlogImagesSchema, PostBlogSchema} from "@/types/blog-types";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {
   Select,
@@ -18,28 +18,36 @@ import {
 } from "@/components/ui/select";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store";
-import CreateEditorFileUpload from "@/app/(protected-user)/columns/create/components/create-editor-file-upload";
+import EditorFileUpload from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-file-upload";
 import {
   setTotalBlogImages,
   setUploadedImages
-} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 import {UserSchema} from "@/types/user-types.user";
 import {setUser} from "@/store/slice/user-slice";
 
 type CreateEditorWrapperProps = {
   blog_images: z.infer<typeof GetBlogImagesSchema.GetBlogImages>;
   user_data: z.infer<typeof UserSchema.User>;
+  blog?: z.infer<typeof BlogSchema.Blog> | undefined;
 }
 
 export const content = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
 
-export default function CreateEditor({blog_images, user_data}: CreateEditorWrapperProps) {
+export default function Editor({blog_images, user_data, blog}: CreateEditorWrapperProps) {
 
   const dispatch = useDispatch();
 
   const {register, control, setValue, handleSubmit, formState: {errors}} = useForm<z.infer<typeof PostBlogSchema.PostBlog>>({
     mode: 'onBlur',
-    resolver: zodResolver(PostBlogSchema.PostBlog)
+    resolver: zodResolver(PostBlogSchema.PostBlog),
+    defaultValues: blog ? {
+      blog_id: blog.blog_id,
+      title: blog.title,
+      editor_state: blog.editor_state,
+      category: blog.blog_category,
+      file: blog.blog_image,
+    } : undefined
   });
 
   const editorState = useSelector((state: RootState) => state.editorState);
@@ -88,9 +96,9 @@ export default function CreateEditor({blog_images, user_data}: CreateEditorWrapp
           name={"category"}
           control={control}
         />
-        <CreateEditorFileUpload control={control} />
+        <EditorFileUpload control={control} />
       </div>
-      <CreateEditorLexicalComposer handleSubmit={handleSubmit} />
+      <EditorLexicalComposer handleSubmit={handleSubmit} blog={blog} />
     </form>
   )
 }

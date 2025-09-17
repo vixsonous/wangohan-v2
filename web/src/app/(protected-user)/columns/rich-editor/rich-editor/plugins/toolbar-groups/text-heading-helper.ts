@@ -6,7 +6,7 @@ import { $createParagraphNode } from "lexical";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store";
-import {setBlockType} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+import {setBlockType} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 
 const useTextHeadingHelper = () => {
 

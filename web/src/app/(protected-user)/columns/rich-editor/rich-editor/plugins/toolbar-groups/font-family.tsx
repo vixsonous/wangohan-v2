@@ -9,7 +9,7 @@ import {Separator} from "@/components/ui/separator";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store";
-import {setFontFamily} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+import {setFontFamily} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 
 const FONT_TEXT = {
   'mitimasu': "Mitimasu",

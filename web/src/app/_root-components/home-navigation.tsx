@@ -22,7 +22,7 @@ export default function HomeNavigation() {
       </Link>
       <span className="select-none opacity-0 md:opacity-100">|</span>
       <Link
-        href={"/columns"}
+        href={"/columns/list/1"}
         className="text-primary-text font-semibold hover:text-[#9ba3af]"
       >
         犬と食に関するコラム

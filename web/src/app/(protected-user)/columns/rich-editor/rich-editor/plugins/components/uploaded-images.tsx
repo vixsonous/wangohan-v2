@@ -17,7 +17,7 @@ import {BlogImageSchema, GetBlogImagesSchema, PostBlogImageSchema} from "@/types
 import {
   addUploadedImages,
   prependUploadedImages
-} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 import {toast} from "sonner";
 import InputField from "@/components/Input";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";

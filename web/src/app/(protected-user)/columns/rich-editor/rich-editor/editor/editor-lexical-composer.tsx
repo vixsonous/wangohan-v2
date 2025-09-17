@@ -21,7 +21,7 @@ import {RootState} from "@/store/store";
 import {
   setEditorState,
   setHTMLString
-} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 import dynamic from "next/dynamic";
 import SpinLoader from "@/components/SpinLoader";
 import "@/app/(protected-user)/columns/rich-editor/rich-editor/style.css";
@@ -29,9 +29,26 @@ import {FieldValues, SubmitErrorHandler, SubmitHandler} from "react-hook-form";
 import z from "zod";
 import {useMutation} from "@tanstack/react-query";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
-import {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
+import InitEditor from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/components/init-editor";
+import {BlogSchema} from "@/types/blog-types";
+import UpdateButton from "@/app/(protected-user)/columns/edit/[blogId]/[blogTitle]/components/update-button";
+
+export type HandleSubmit = (onValid: SubmitHandler<{
+  blog_id?: number | undefined,
+  title: string
+  category: string
+  editor_state: string
+  file: string
+}>, onInvalid?: (SubmitErrorHandler<{
+  blog_id?: number | undefined,
+  title: string
+  category: string
+  editor_state: string
+  file: string
+}> | undefined)) => (e?: React.BaseSyntheticEvent) => Promise<void>;
 
 const ToolbarPlugin = dynamic(
   () => import("@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/ToolbarPlugin"),
@@ -56,18 +73,9 @@ const OnChangePlugin = memo(function OnChangePlugin() {
 });
 
 
-export default function CreateEditorLexicalComposer({handleSubmit}: {
-  handleSubmit:  (onValid: SubmitHandler<{
-    title: string
-    category: string
-    editor_state: string
-    file: z.core.File
-  }>, onInvalid?: (SubmitErrorHandler<{
-    title: string
-    category: string
-    editor_state: string
-    file: z.core.File
-  }> | undefined)) => (e?: React.BaseSyntheticEvent) => Promise<void>
+export default function EditorLexicalComposer({handleSubmit, blog}: {
+  handleSubmit: HandleSubmit,
+  blog?: z.infer<typeof BlogSchema.Blog> | undefined;
 }) {
 
   const editorState = useSelector((state: RootState) => state.editorState);
@@ -86,7 +94,7 @@ export default function CreateEditorLexicalComposer({handleSubmit}: {
       const message = ClientApiResponseService.getAxiosErrorMessage(err);
       toast.error("Error!", {description: message});
     }
-  })
+  });
 
   return (
     <LexicalComposer
@@ -96,6 +104,7 @@ export default function CreateEditorLexicalComposer({handleSubmit}: {
         className="editor-container"
         style={{ margin: "0", marginTop: "1em", maxWidth: "none" }}
       >
+        <InitEditor blog={blog} />
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
@@ -125,12 +134,18 @@ export default function CreateEditorLexicalComposer({handleSubmit}: {
         </div>
       </div>
       <div className="w-full flex justify-center gap-2 items-center mt-8">
-        <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: true}))} type={"button"}>
-          {submitBlogMutation.isPending && <SpinLoader />} Post Blog
-        </Button>
-        <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: false}))} type={"button"}>
-          {submitBlogMutation.isPending && <SpinLoader />} Save blog
-        </Button>
+        {blog === undefined ? (
+          <>
+            <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: true}))} type={"button"}>
+              {submitBlogMutation.isPending && <SpinLoader />} Post Blog
+            </Button>
+            <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: false}))} type={"button"}>
+              {submitBlogMutation.isPending && <SpinLoader />} Save blog
+            </Button>
+          </>
+        ) : (
+          <UpdateButton handleSubmit={handleSubmit} />
+        )}
       </div>
       <div
         className="mt-8 max-w-full whitespace-pre-wrap break-all"

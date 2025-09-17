@@ -16,6 +16,7 @@ export class BlogRepository {
           "title",
           "editor_state",
           "is_deleted",
+          "is_published",
           "blog_image",
           "blog_category",
           "updated_at"
@@ -68,6 +69,7 @@ export class BlogRepository {
           "title",
           "editor_state",
           "is_deleted",
+          "is_published",
           "blog_image",
           "blog_category",
           "updated_at"

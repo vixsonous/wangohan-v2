@@ -24,7 +24,7 @@ type CreateEditorFileUploadProps = {
     file: string
   }>
 }
-export default function CreateEditorFileUpload({control}: CreateEditorFileUploadProps) {
+export default function EditorFileUpload({control}: CreateEditorFileUploadProps) {
 
   const [_, setPopoverOpen] = useState(false);
 

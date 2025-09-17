@@ -7,12 +7,28 @@ export class BlogSchema {
     title: z.string(),
     editor_state: z.string(),
     is_deleted: z.boolean(),
+    is_published: z.boolean(),
     blog_image: z.string(),
     blog_category: z.string(),
     updated_at: z.date()
   });
 
   static BlogList = z.array(BlogSchema.Blog);
+
+  static PostBlog = z.object({
+    title: z.string().min(1, "Please provide the blog title!"),
+    category: z.string().min(1, "Please provide a valid blog category!"),
+    editor_state: z.string().min(1, "Please provide the blog content!"),
+    file: z.string().min(1, "Please provide the blog image!")
+  });
+
+  static PutBlog = z.object({
+    blog_id: z.number("Please provide the blog id!"),
+    title: z.string().min(1, "Please provide the blog title!"),
+    category: z.string().min(1, "Please provide a valid blog category!"),
+    editor_state: z.string().min(1, "Please provide the blog content!"),
+    file: z.string().min(1, "Please provide the blog image!")
+  })
 }
 
 export class BlogControllerSchema {
@@ -33,15 +49,6 @@ export class GetBlogSchema {
   static GetBlogList = z.object({
     blogs: BlogSchema.BlogList,
     total_blogs: z.number()
-  })
-}
-
-export class PostBlogSchema {
-  static PostBlog = z.object({
-    title: z.string().min(1, "Please provide the blog title!"),
-    category: z.string().min(1, "Please provide a valid blog category!"),
-    editor_state: z.string().min(1, "Please provide the blog content!"),
-    file: z.string().min(1, "Please provide the blog image!")
   })
 }
 

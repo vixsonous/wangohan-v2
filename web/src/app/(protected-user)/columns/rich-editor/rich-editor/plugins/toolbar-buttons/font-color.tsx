@@ -8,7 +8,7 @@ import {RootState} from "@/store/store";
 import {
   FORMAT_FONTBACKGROUNDCOLOR_COMMAND
 } from "@/app/(protected-user)/columns/rich-editor/nodes/FontBackgroundColorNode";
-import {setColors} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+import {setColors} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 
 export const DEFAULT_COLOR_VALUES = "#523636,#ffffff,#0000FF,#008000,#FF2C2C";
 export const DEFAULT_BACKGROUND_COLOR_VALUES = "#FFFAF0,#ffffff,#0000FF,#008000,#FF2C2C"

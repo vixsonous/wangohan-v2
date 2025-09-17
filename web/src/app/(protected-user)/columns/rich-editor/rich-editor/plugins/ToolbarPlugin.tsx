@@ -33,7 +33,7 @@ import {
   setColors, setFontFamily, setFontSize, setSelectedElementKey, setTextAlignment,
   setTextFormats,
   setToolbarActions
-} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 import {RootState} from "@/store/store";
 import Undo from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/undo";
 import Redo from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/toolbar-buttons/redo";

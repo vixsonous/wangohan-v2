@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {ApiResponse} from "@/server/utils/ApiUtils";
-import {BlogControllerSchema, PostBlogImageSchema, PostBlogSchema} from "@/server/Blog/blog-types";
+import {BlogControllerSchema, BlogSchema, PostBlogImageSchema} from "@/server/Blog/blog-types";
 import {BlogService} from "@/server/Blog/blog-service";
 import {getUserData} from "@/server/utils/server-utils";
 
@@ -42,7 +42,7 @@ export class BlogController {
       return;
     }
 
-    const postBlogParseResult = PostBlogSchema.PostBlog.safeParse(data);
+    const postBlogParseResult = BlogSchema.PostBlog.safeParse(data);
 
     if(!postBlogParseResult.success){
       ApiResponse.error(res, postBlogParseResult.error.issues[0].message);
@@ -124,5 +124,21 @@ export class BlogController {
     }
 
     ApiResponse.success(res, "Successfully posted the blog image!", blogImage);
+  }
+
+  static async updateBlog(req: Request, res: Response) {
+    const {blog_id, blog_title} = req.params;
+    const data = req.body;
+
+    const putBlogParseResult = BlogSchema.PutBlog.safeParse(data);
+
+    if(!putBlogParseResult.success){
+      ApiResponse.error(res, putBlogParseResult.error.issues[0].message);
+      return;
+    }
+
+    console.log(putBlogParseResult.data);
+
+    ApiResponse.success(res, "Successfully updated blog!", data);
   }
 }

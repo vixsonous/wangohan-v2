@@ -5,7 +5,7 @@ import useToolbarStates from "./plugins/toolbar-states";
 import { LexicalEditor } from "lexical";
 import { INSERT_IMAGE_COMMAND } from "./plugins/ImagePlugin";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {content} from "@/app/(protected-user)/columns/create/components/create-editor";
+import {content} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor";
 
 const useEditorHelper = () => {
 

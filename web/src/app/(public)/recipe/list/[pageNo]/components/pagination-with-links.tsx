@@ -29,7 +29,7 @@ export interface PaginationWithLinksProps {
   page: number;
   pageSearchParam?: string;
   /**
-   * Navigation mode: 'link' uses Next.js Link components, 'router' uses router.push with loading states
+   * Navigation mode: 'link' uses Next.js Link editor, 'router' uses router.push with loading states
    * @default 'link'
    */
   navigationMode?: "link" | "router";
