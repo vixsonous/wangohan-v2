@@ -3,10 +3,10 @@ import {RecipeController} from "./Recipes/recipe-controller";
 import { ImageController } from "./Images/image-controller";
 import { UserController } from "./User/user-controller";
 import multer from 'multer';
-import {PetController} from "@/server/Pet/pet-controller";
 import passport from "@/server/utils/passport";
 import {blogImagesRouter, blogRouter} from "@/server/Blog/blog-routes";
 import {eventRouter} from "@/server/Event/event-routes";
+import {petRouter} from "@/server/Pet/pet-routes";
 
 export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
@@ -46,8 +46,7 @@ router.post("/personal-info", upload.single('user_image'), UserController.regist
 router.put("/update-personal-info", upload.single('user_image'), UserController.updatePersonalInfo);
 
 // Pets
-router.post("/post-pet", upload.single('pet_image'), PetController.postPet);
-router.get("/birthday-pets", PetController.getBirthdayMonthPets);
+router.use("/pets", petRouter);
 
 // Events
 router.use("/events", eventRouter)
