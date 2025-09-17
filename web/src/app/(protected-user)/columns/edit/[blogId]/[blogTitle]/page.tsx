@@ -4,6 +4,7 @@ import z from "zod";
 import {BlogSchema, GetBlogImagesSchema} from "@/types/blog-types";
 import {isAuthenticated} from "@/server-actions/User/user";
 import LoginRequired from "@/app/(error)/log-in-required";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 type EditBlogProps = {
   params: Promise<{
@@ -12,12 +13,12 @@ type EditBlogProps = {
   }>
 }
 
-export default async function CreateBlog({params}: EditBlogProps) {
+export default async function EditBlog({params}: EditBlogProps) {
   const {blogId, blogTitle} = await params;
 
   const [blogImagesResponse, blogResponse, userData] = await Promise.all([
-    ServerApiService.get("/get-blog-images?page_no=1"),
-    ServerApiService.get("/get-blog?blog_id=" + blogId + "&blog_title=" + blogTitle),
+    ServerApiService.get(ENDPOINTS.BLOG_IMAGES + "?page_no=1"),
+    ServerApiService.get(ENDPOINTS.BLOG +"/" + blogId + "/" + blogTitle),
     isAuthenticated()
   ]);
 

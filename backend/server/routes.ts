@@ -6,8 +6,7 @@ import multer from 'multer';
 import {PetController} from "@/server/Pet/pet-controller";
 import passport from "@/server/utils/passport";
 import {EventController} from "@/server/Event/event-controller";
-import {BlogController} from "@/server/Blog/blog-controller";
-import {blogRouter} from "@/server/Blog/blog-routes";
+import {blogImagesRouter, blogRouter} from "@/server/Blog/blog-routes";
 
 export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
@@ -55,9 +54,5 @@ router.get("/recipe-events", RecipeController.recipeEvents);
 router.get("/set-user-notifications-read", EventController.setUserNotificationsRead);
 
 // Blogs
-router.get("/get-blogs", BlogController.getBlogs);
-
-router.get("/get-blog-images", BlogController.getBlogImages);
-router.post("/post-blog-image",upload.single('blog_image'), BlogController.postBlogImage);
-
 router.use("/blogs", blogRouter);
+router.use("/blog-images", blogImagesRouter);

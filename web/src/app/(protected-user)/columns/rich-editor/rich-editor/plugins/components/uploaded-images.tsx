@@ -24,6 +24,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {usePersonalForm} from "@/app/(auth)/signup/personal-info/personal-form-helper";
 import {Controller, FieldValues, useForm} from "react-hook-form";
 import Error from "@/components/Error";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export default function UploadedImages({action, children}: {action: (image: z.infer<typeof BlogImageSchema.BlogImage>) => void, children: React.ReactElement}) {
 
@@ -35,7 +36,7 @@ export default function UploadedImages({action, children}: {action: (image: z.in
   const {blog_images, total_blog_images} = useSelector((state: RootState) => state.editorState);
 
   const moreImagesMutation = useMutation({
-    mutationFn: (page: number) => ClientApiService.get("/get-blog-images?page_no=" + page),
+    mutationFn: (page: number) => ClientApiService.get(ENDPOINTS.BLOG_IMAGES + "?page_no=" + page),
     onSuccess: (response: AxiosResponse) => {
       const blogList = ClientApiResponseService.getAxiosResponseData<z.infer<typeof GetBlogImagesSchema.GetBlogImages>>(response);
       dispatch(addUploadedImages(blogList.blog_images));
@@ -50,7 +51,7 @@ export default function UploadedImages({action, children}: {action: (image: z.in
   });
 
   const uploadBlogImageMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.post("/post-blog-image", data, {
+    mutationFn: (data: FieldValues) => ClientApiService.post(ENDPOINTS.BLOG_IMAGES, data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -61,6 +62,7 @@ export default function UploadedImages({action, children}: {action: (image: z.in
       dispatch(prependUploadedImages([image]));
       toast.success("Successful!", {description: message});
       setImgDialogOpen(false);
+      setUploadImagePopover(false);
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosErrorMessage(error);

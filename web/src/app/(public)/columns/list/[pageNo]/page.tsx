@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import {BlogItem} from "@/app/(public)/columns/list/[pageNo]/components/blog-item";
 import {PaginationWithLinks} from "@/app/(public)/recipe/list/[pageNo]/components/pagination-with-links";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 type Props = {
   params: Promise<{
@@ -17,7 +18,7 @@ type Props = {
 export async function generateMetadata({params,searchParams }: Props): Promise<Metadata> {
   const {pageNo} = await params;
   const {category} = await searchParams;
-  const response = await ServerApiService.get("/get-blogs?page_no=" + pageNo + "&category=" + category);
+  const response = await ServerApiService.get(ENDPOINTS.BLOG + "?page_no=" + pageNo + "&category=" + category);
   const blogsResponse = await ServerApiResponseService.getResponseData<z.infer<typeof GetBlogSchema.GetBlogList>>(response);
 
   const title = `${category || ""}ブログ${pageNo}`;
@@ -54,7 +55,7 @@ export default async function Columns({params, searchParams}: Props) {
   const {pageNo} = await params;
   const {category} = await searchParams;
 
-  const response = await ServerApiService.get("/get-blogs?page_no=" + pageNo + "&category=" + category);
+  const response = await ServerApiService.get(ENDPOINTS.BLOG + "?page_no=" + pageNo + "&category=" + category);
 
   if(!response.ok) {
     return (

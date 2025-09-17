@@ -4,10 +4,11 @@ import z from "zod";
 import {GetBlogImagesSchema} from "@/types/blog-types";
 import {isAuthenticated} from "@/server-actions/User/user";
 import LoginRequired from "@/app/(error)/log-in-required";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 
 export default async function CreateBlog() {
-  const blogImagesResponse = await ServerApiService.get("/get-blog-images?page_no=1");
+  const blogImagesResponse = await ServerApiService.get(ENDPOINTS.BLOG_IMAGES + "?page_no=1");
 
   if(!blogImagesResponse.ok) {
     return (
