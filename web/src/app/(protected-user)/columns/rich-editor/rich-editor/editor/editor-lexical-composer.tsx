@@ -34,7 +34,8 @@ import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import InitEditor from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/components/init-editor";
 import {BlogSchema} from "@/types/blog-types";
-import UpdateButton from "@/app/(protected-user)/columns/edit/[blogId]/[blogTitle]/components/update-button";
+import UpdateBlogButton from "@/app/(protected-user)/columns/edit/[blogId]/[blogTitle]/components/update-blog-button";
+import CreateBlogButton from "@/app/(protected-user)/columns/create/components/create-blog-button";
 
 export type HandleSubmit = (onValid: SubmitHandler<{
   blog_id?: number | undefined,
@@ -79,22 +80,6 @@ export default function EditorLexicalComposer({handleSubmit, blog}: {
 }) {
 
   const editorState = useSelector((state: RootState) => state.editorState);
-  const router = useRouter();
-
-  const submitBlogMutation = useMutation({
-    mutationFn: ({data, publish} : {data: FieldValues, publish: boolean}) =>
-      ClientApiService.post("/post-blog?publish=" + publish, data),
-    onSuccess: (response: AxiosResponse) => {
-      const message = ClientApiResponseService.getAxiosResponseMessage(response);
-      toast.success("Successful!", {description: message});
-      router.push("/columns/list/1");
-      router.refresh();
-    },
-    onError: (err: AxiosError) => {
-      const message = ClientApiResponseService.getAxiosErrorMessage(err);
-      toast.error("Error!", {description: message});
-    }
-  });
 
   return (
     <LexicalComposer
@@ -135,16 +120,9 @@ export default function EditorLexicalComposer({handleSubmit, blog}: {
       </div>
       <div className="w-full flex justify-center gap-2 items-center mt-8">
         {blog === undefined ? (
-          <>
-            <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: true}))} type={"button"}>
-              {submitBlogMutation.isPending && <SpinLoader />} Post Blog
-            </Button>
-            <Button disabled={submitBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => submitBlogMutation.mutate({data, publish: false}))} type={"button"}>
-              {submitBlogMutation.isPending && <SpinLoader />} Save blog
-            </Button>
-          </>
+          <CreateBlogButton handleSubmit={handleSubmit} />
         ) : (
-          <UpdateButton handleSubmit={handleSubmit} />
+          <UpdateBlogButton handleSubmit={handleSubmit} />
         )}
       </div>
       <div

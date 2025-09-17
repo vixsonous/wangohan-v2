@@ -1,8 +1,8 @@
-import dynamic from "next/dynamic";
 import {ServerApiResponseService, ServerApiService} from "@/lib/server-utils";
 import {BlogSchema} from "@/types/blog-types";
 import z from "zod";
 import ColumnDisplay from "@/app/(public)/columns/show/[blogId]/[blogTitle]/components/column-display";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 type BlogProps = {
   params: Promise<{
@@ -13,7 +13,8 @@ type BlogProps = {
 export default async function Blog({params}: BlogProps) {
 
   const {blogId, blogTitle} = await params;
-  const blogResponse = await ServerApiService.get("/get-blog?blog_id=" + blogId + "&blog_title=" + blogTitle);
+
+  const blogResponse = await ServerApiService.get(ENDPOINTS.BLOG +"/" + blogId + "/" + blogTitle);
 
   if(!blogResponse.ok) {
     return (

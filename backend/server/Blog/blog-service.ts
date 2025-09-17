@@ -22,4 +22,8 @@ export class BlogService {
   static async postBlogImage(blog_image: Express.Multer.File, blog_image_title: string) {
     return BlogRepository.postBlogImage(blog_image, blog_image_title);
   }
+
+  static async putBlog(blog: z.infer<typeof BlogSchema.PutBlog>, blog_id: number) {
+    return BlogRepository.putBlog(blog, blog_id);
+  }
 }

@@ -30,7 +30,8 @@ export class PostBlogSchema {
     title: z.string().min(1, "Please provide the blog title!"),
     category: z.string("Please provide the blog category!"),
     editor_state: z.string(),
-    file: z.string("Please provide the blog image!")
+    file: z.string("Please provide the blog image!"),
+    is_published: z.boolean().optional(),
   }).refine(data => data.editor_state !== content, {
     message: "Please provide the content of your blog!",
     path: ["editor_state"]

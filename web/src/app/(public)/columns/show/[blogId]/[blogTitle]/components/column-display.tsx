@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "@/components/Image/client";
 import HomeSearchBar from "@/app/_root-components/home-search-bar";
 import useColumnDisplay from "@/app/(public)/columns/show/[blogId]/[blogTitle]/components/use-column";
+import {useEffect, useState} from "react";
 
 type ColumnDisplayProps = {
   blog_data: z.infer<typeof BlogSchema.Blog>;
@@ -30,13 +31,21 @@ const icons = {
 export default function ColumnDisplay({blog_data, related_blogs, popular_recipes}: ColumnDisplayProps) {
   const { htmlString } = useColumnDisplay(blog_data);
 
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    setDate(new Date(blog_data.updated_at).toDateString());
+
+    return () => setDate("");
+  }, []);
+
   return (
     <article className="grid lg:gap-4 grid-cols-12">
       <section className="col-span-12 max-h-max lg:col-span-8 mt-6 bg-secondary-bg p-10">
         <h1 className="text-xl mb-2">{blog_data.title}</h1>
         <p className="flex gap-2 items-center mb-6 text-sm text-gray-500">
-          {/*<CalendarPlus size={16} />*/}
-          {new Date(blog_data.updated_at).toDateString()}
+          <Image src={"/icons/svg/primary-calendar.svg"} height={20} width={20} alt={"calendar icon for the update date"}/>
+          {date || "XXX Mmm DD YYYY"}
           <span className="ml-4">{blog_data.blog_category}</span>
         </p>
         <Image

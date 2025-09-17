@@ -3,4 +3,6 @@ import {BlogController} from "@/server/Blog/blog-controller";
 
 export const blogRouter = Router();
 
-blogRouter.put("/:blog_id/:blog_title", BlogController.updateBlog);
+blogRouter.put("/:blog_id", BlogController.putBlog);
+blogRouter.post("/", BlogController.postBlog);
+blogRouter.get("/:blog_id/:blog_title", BlogController.getBlog);

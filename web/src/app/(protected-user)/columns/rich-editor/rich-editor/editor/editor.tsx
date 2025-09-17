@@ -47,6 +47,7 @@ export default function Editor({blog_images, user_data, blog}: CreateEditorWrapp
       editor_state: blog.editor_state,
       category: blog.blog_category,
       file: blog.blog_image,
+      is_published: blog.is_published
     } : undefined
   });
 

@@ -7,7 +7,7 @@ import {getUserData} from "@/server/utils/server-utils";
 export class BlogController {
 
   static async getBlog(req: Request, res: Response) {
-    const {blog_id, blog_title} = req.query;
+    const {blog_id, blog_title} = req.params;
 
     const submitData = {
       blog_id: Number(blog_id),
@@ -126,8 +126,8 @@ export class BlogController {
     ApiResponse.success(res, "Successfully posted the blog image!", blogImage);
   }
 
-  static async updateBlog(req: Request, res: Response) {
-    const {blog_id, blog_title} = req.params;
+  static async putBlog(req: Request, res: Response) {
+    const {blog_id} = req.params;
     const data = req.body;
 
     const putBlogParseResult = BlogSchema.PutBlog.safeParse(data);
@@ -137,8 +137,23 @@ export class BlogController {
       return;
     }
 
-    console.log(putBlogParseResult.data);
+    const putBlogControllerParseResult = BlogControllerSchema.PutBlog.safeParse({blog_id: Number(blog_id)});
 
-    ApiResponse.success(res, "Successfully updated blog!", data);
+    if(!putBlogControllerParseResult.success){
+      ApiResponse.error(res, putBlogControllerParseResult.error.issues[0].message);
+      return;
+    }
+
+    const blog = await BlogService.putBlog(
+      putBlogParseResult.data,
+      putBlogControllerParseResult.data.blog_id
+    );
+
+    if(blog === undefined) {
+      ApiResponse.error(res, "Error updating blog!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully updated blog!", blog);
   }
 }

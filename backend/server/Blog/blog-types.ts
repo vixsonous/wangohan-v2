@@ -27,7 +27,8 @@ export class BlogSchema {
     title: z.string().min(1, "Please provide the blog title!"),
     category: z.string().min(1, "Please provide a valid blog category!"),
     editor_state: z.string().min(1, "Please provide the blog content!"),
-    file: z.string().min(1, "Please provide the blog image!")
+    file: z.string().min(1, "Please provide the blog image!"),
+    is_published: z.boolean()
   })
 }
 
@@ -43,6 +44,10 @@ export class BlogControllerSchema {
   });
 
   static GetBlogImages = z.number("Please provide a valid page number!");
+
+  static PutBlog = z.object({
+    blog_id: z.number("Please provide a valid blog id!"),
+  })
 }
 
 export class GetBlogSchema {

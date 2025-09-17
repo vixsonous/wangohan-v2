@@ -1,7 +1,7 @@
 import {log} from "@/server/utils/log";
 import {db} from "@/database/database";
 import z from "zod";
-import {BlogSchema, GetBlogImagesSchema, GetBlogSchema, PostBlogSchema} from "@/server/Blog/blog-types";
+import {BlogSchema, GetBlogImagesSchema, GetBlogSchema} from "@/server/Blog/blog-types";
 import {ImageProcess} from "@/server/Images/image-service";
 import {Image} from "@/server/Images/image";
 import {BlogImageInsert} from "@/database/types";
@@ -35,7 +35,7 @@ export class BlogRepository {
     }
   }
 
-  static async postBlog(blog: z.infer<typeof PostBlogSchema.PostBlog>, publish: boolean, user_id: number): Promise<boolean | undefined> {
+  static async postBlog(blog: z.infer<typeof BlogSchema.PostBlog>, publish: boolean, user_id: number): Promise<boolean | undefined> {
     try {
       await db.insertInto("blog_columns_table")
         .values({
@@ -54,6 +54,41 @@ export class BlogRepository {
       log("Successfully posted blog!");
       return true;
     } catch(e) {
+      log(e);
+      return undefined;
+    }
+  }
+
+  static async putBlog(blog: z.infer<typeof BlogSchema.PutBlog>, blog_id: number): Promise<z.infer<typeof BlogSchema.Blog> | undefined> {
+    try {
+      const blogResult: z.infer<typeof BlogSchema.Blog> = await db.updateTable("blog_columns_table")
+        .set({
+          blog_id: blog.blog_id,
+          title: blog.title,
+          blog_image: blog.file,
+          editor_state: blog.editor_state,
+          is_published: blog.is_published
+        })
+        .returning([
+          "blog_id",
+          "user_id",
+          "title",
+          "editor_state",
+          "is_deleted",
+          "is_published",
+          "blog_image",
+          "blog_category",
+          "updated_at",
+        ])
+        .where(eb => eb.and({
+          blog_id: blog_id
+        }))
+        .executeTakeFirstOrThrow();
+
+      log("Successfully updated blog!");
+
+      return blogResult;
+    } catch (e) {
       log(e);
       return undefined;
     }
