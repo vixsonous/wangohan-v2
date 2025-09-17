@@ -12,13 +12,14 @@ import {RootState} from "@/store/store";
 import {useMutation} from "@tanstack/react-query";
 import {ClientApiService} from "@/lib/client-utils";
 import {displayNotification} from "@/app/_root-components/(root-header)/root-nav-user";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
 
   const notifications = useSelector((state: RootState) => state.notifications);
   const dispatch = useDispatch();
   const readAllNotificationsMutation = useMutation({
-    mutationFn: () => ClientApiService.get("/set-user-notifications-read"),
+    mutationFn: () => ClientApiService.get(ENDPOINTS.EVENT + "/read"),
     onSuccess: () => dispatch(readAllNotifications())
   });
 
@@ -26,7 +27,7 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
     if(!user_data.user_details) return;
     dispatch(setNotification(user_data.notifications));
 
-    const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + "/api/recipe-events?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
+    const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + "/api"+ENDPOINTS.EVENT+"?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
     event.onmessage = (event) => {
       const data: z.infer<typeof EventSchema.Event> = JSON.parse(event.data);
       let headerMsg = '';

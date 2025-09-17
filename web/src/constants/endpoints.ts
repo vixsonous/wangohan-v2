@@ -1,5 +1,6 @@
 
 export const ENDPOINTS = {
   BLOG: "/blogs",
-  BLOG_IMAGES: "/blog-images"
+  BLOG_IMAGES: "/blog-images",
+  EVENT: "/events"
 }
