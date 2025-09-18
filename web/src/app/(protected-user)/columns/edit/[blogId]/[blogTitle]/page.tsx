@@ -17,7 +17,7 @@ export default async function EditBlog({params}: EditBlogProps) {
   const {blogId, blogTitle} = await params;
 
   const [blogImagesResponse, blogResponse, userData] = await Promise.all([
-    ServerApiService.get(ENDPOINTS.BLOG_IMAGES + "?page_no=1"),
+    ServerApiService.get(ENDPOINTS.BLOG + "/images?page_no=1"),
     ServerApiService.get(ENDPOINTS.BLOG +"/" + blogId + "/" + blogTitle),
     isAuthenticated()
   ]);
@@ -27,6 +27,8 @@ export default async function EditBlog({params}: EditBlogProps) {
       <h1>There was an error!</h1>
     )
   }
+
+
 
   if(!blogImagesResponse.ok) {
     return (

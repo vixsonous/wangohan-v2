@@ -8,7 +8,7 @@ import {ENDPOINTS} from "@/constants/endpoints";
 
 
 export default async function CreateBlog() {
-  const blogImagesResponse = await ServerApiService.get(ENDPOINTS.BLOG_IMAGES + "?page_no=1");
+  const blogImagesResponse = await ServerApiService.get(ENDPOINTS.BLOG + "/images?page_no=1");
 
   if(!blogImagesResponse.ok) {
     return (

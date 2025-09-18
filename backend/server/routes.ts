@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {RecipeController} from "./Recipes/recipe-controller";
-import { ImageController } from "./Images/image-controller";
 import multer from 'multer';
-import {blogImagesRouter, blogRouter} from "@/server/Blog/blog-routes";
+import { blogRouter} from "@/server/Blog/blog-routes";
 import {eventRouter} from "@/server/Event/event-routes";
 import {petRouter} from "@/server/Pet/pet-routes";
 import {authRouter, googleRouter, userRouter} from "@/server/User/user-routes";
+import {imageRouter} from "@/server/Images/image-routes";
 
 export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
@@ -29,7 +29,7 @@ router.get("/get-owned-recipes", RecipeController.getOwnRecipes);
 router.get("/get-archived-recipes", RecipeController.getArchivedRecipes);
 
 // Images
-router.get("/transform-image", ImageController.transformImage);
+router.use("/images", imageRouter);
 
 // User
 router.use("/users", userRouter);
@@ -44,4 +44,3 @@ router.use("/events", eventRouter)
 
 // Blogs
 router.use("/blogs", blogRouter);
-router.use("/blog-images", blogImagesRouter);

@@ -36,7 +36,7 @@ export default function UploadedImages({action, children}: {action: (image: z.in
   const {blog_images, total_blog_images} = useSelector((state: RootState) => state.editorState);
 
   const moreImagesMutation = useMutation({
-    mutationFn: (page: number) => ClientApiService.get(ENDPOINTS.BLOG_IMAGES + "?page_no=" + page),
+    mutationFn: (page: number) => ClientApiService.get(ENDPOINTS.BLOG + "/images?page_no=" + page),
     onSuccess: (response: AxiosResponse) => {
       const blogList = ClientApiResponseService.getAxiosResponseData<z.infer<typeof GetBlogImagesSchema.GetBlogImages>>(response);
       dispatch(addUploadedImages(blogList.blog_images));
@@ -51,7 +51,7 @@ export default function UploadedImages({action, children}: {action: (image: z.in
   });
 
   const uploadBlogImageMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.post(ENDPOINTS.BLOG_IMAGES, data, {
+    mutationFn: (data: FieldValues) => ClientApiService.post(ENDPOINTS.BLOG + "/images", data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
