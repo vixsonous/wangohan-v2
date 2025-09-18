@@ -10,6 +10,7 @@ import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosError, AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {SheetClose} from "@/components/ui/sheet";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export default function SidebarMenu(
   {user_data}:
@@ -20,7 +21,7 @@ export default function SidebarMenu(
 
 
   const logoutMutation = useMutation({
-    mutationFn: () => ClientApiService.post("/logout", undefined),
+    mutationFn: () => ClientApiService.post(ENDPOINTS.AUTH + "/logout", undefined),
     onSuccess: (data: AxiosResponse) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(data);
       toast.success("Successful!",  {description: message});

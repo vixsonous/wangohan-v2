@@ -1,12 +1,11 @@
 import { Router } from "express";
 import {RecipeController} from "./Recipes/recipe-controller";
 import { ImageController } from "./Images/image-controller";
-import { UserController } from "./User/user-controller";
 import multer from 'multer';
-import passport from "@/server/utils/passport";
 import {blogImagesRouter, blogRouter} from "@/server/Blog/blog-routes";
 import {eventRouter} from "@/server/Event/event-routes";
 import {petRouter} from "@/server/Pet/pet-routes";
+import {authRouter, googleRouter, userRouter} from "@/server/User/user-routes";
 
 export const router = Router();
 const upload = multer({dest: 'uploads/', storage: multer.memoryStorage()});
@@ -33,17 +32,9 @@ router.get("/get-archived-recipes", RecipeController.getArchivedRecipes);
 router.get("/transform-image", ImageController.transformImage);
 
 // User
-router.get("/get-user", UserController.getUser);
-router.post("/login", UserController.login);
-router.get("/google", passport.authenticate("google", {
-  scope: ["profile", "email"]
-}));
-router.get("/google/redirect", UserController.googleLogin);
-router.post("/logout", UserController.logout);
-router.post("/register", UserController.register);
-router.get("/is-authenticated", UserController.isAuthenticated);
-router.post("/personal-info", upload.single('user_image'), UserController.registerPersonalInfo);
-router.put("/update-personal-info", upload.single('user_image'), UserController.updatePersonalInfo);
+router.use("/users", userRouter);
+router.use("/google", googleRouter);
+router.use("/auth", authRouter);
 
 // Pets
 router.use("/pets", petRouter);

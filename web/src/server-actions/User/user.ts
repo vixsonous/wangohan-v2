@@ -3,10 +3,11 @@ import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import {log} from "@/lib/log";
 import {UserDetailSchema} from "@/types/user-types.user-detail";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export const getUser = async (user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> => {
   try {
-    const response = await ServerApiService.get(`/get-user?user_id=${user_id}&user_codename=${user_codename}`);
+    const response = await ServerApiService.get(ENDPOINTS.USER + `?user_id=${user_id}&user_codename=${user_codename}`);
     return await ServerApiResponseService.getResponseData<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined>(response);
   } catch(e) {
     log(e);
@@ -16,7 +17,7 @@ export const getUser = async (user_id: number, user_codename: string): Promise<z
 
 export const isAuthenticated = async (): Promise<z.infer<typeof UserSchema.User> | undefined> => {
   try {
-    const isAuthenticated = await ServerApiService.get("/is-authenticated");
+    const isAuthenticated = await ServerApiService.get(ENDPOINTS.AUTH + "/status");
     const responseJson = await ServerApiResponseService.getResponseJson<z.infer<typeof UserSchema.User> | undefined>(isAuthenticated);
 
     if(responseJson === undefined) {
