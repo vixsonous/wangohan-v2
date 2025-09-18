@@ -3,6 +3,7 @@ import LikeRecipe from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/compo
 import {ServerApiResponseService, ServerApiService} from "@/lib/server-utils";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 type LikeRecipeButtonProps = {
   total_likes: number;
@@ -11,7 +12,7 @@ type LikeRecipeButtonProps = {
 }
 
 async function LikeRecipeButton({total_likes, recipe_id, recipe_name}: LikeRecipeButtonProps) {
-  const isLikedResponse = await ServerApiService.get("/is-liked?recipe_id=" + recipe_id);
+  const isLikedResponse = await ServerApiService.get(ENDPOINTS.RECIPE + "/" + recipe_id + "/status/liked");
   const isLiked = await ServerApiResponseService.getResponseData<{is_liked: boolean}>(isLikedResponse);
   return (
     <LikeRecipe total_likes={total_likes} recipe_id={recipe_id} is_liked={isLiked.is_liked} recipe_name={recipe_name}/>

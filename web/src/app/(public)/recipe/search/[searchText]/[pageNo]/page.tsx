@@ -6,6 +6,7 @@ import z from "zod";
 import {RecipeSchema} from "@/types/recipe-types";
 import Image from "@/components/Image/server";
 import {PaginationWithLinks} from "@/app/(public)/recipe/list/[pageNo]/components/pagination-with-links";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 type Props = {
   params: Promise<{
@@ -27,7 +28,7 @@ export default async function SearchPage({params}: Props) {
   const searchText = decodeURI((await params).searchText);
   const pageNo = Number((await params).pageNo);
 
-  const recipeListResponse = await ServerApiService.get("/get-search-recipe-list?page_no=" + (Number(pageNo) - 1) + "&search_text=" + searchText);
+  const recipeListResponse = await ServerApiService.get(ENDPOINTS.RECIPE + "/search?page_no=" + (Number(pageNo) - 1) + "&search_text=" + searchText);
   const recipeList = await ServerApiResponseService.getResponseData<z.infer<typeof RecipeSchema.SearchRecipeList>>(recipeListResponse);
 
   return (

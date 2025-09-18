@@ -6,5 +6,6 @@ export const ENDPOINTS = {
   USER: "/users",
   GOOGLE: "/google",
   AUTH: "/auth",
-  IMAGE: "/images"
+  IMAGE: "/images",
+  RECIPE: "/recipes",
 }

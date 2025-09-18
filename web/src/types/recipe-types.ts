@@ -84,7 +84,7 @@ export class RecipeSchema {
   });
 
   static Recipe = z.object({
-    recipe_id: z.string().optional(),
+    recipe_id: z.number().optional(),
     recipe_name: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
     recipe_description: z.string().min(1, "内容を入力してください"),
     recipe_instructions: z.array(RecipeSchema.RecipeInstruction).min(1, "Please input recipe instructions!"),

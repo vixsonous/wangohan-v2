@@ -10,11 +10,14 @@ import {useMutation} from "@tanstack/react-query";
 import heic2any from "heic2any";
 import {RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
 import {FileSchema} from "@/types/file-types";
+import {ENDPOINTS} from "@/constants/endpoints";
+import {useRouter} from "next/navigation";
 
 const MAX_FILES_LENGTH = 5;
 
 export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe>) => {
 
+  const router = useRouter();
   const {
     register, 
     unregister, 
@@ -146,7 +149,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   });
 
   const submitMutation = useMutation({
-    mutationFn: (data: z.infer<typeof RecipeSchema.PostRecipe>) => ClientApiService.post("/post-recipe", data, {
+    mutationFn: (data: z.infer<typeof RecipeSchema.PostRecipe>) => ClientApiService.post(ENDPOINTS.RECIPE + "/", data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -170,7 +173,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: z.infer<typeof RecipeSchema.UpdateRecipe>) => ClientApiService.post("/update-recipe", data, {
+    mutationFn: (data: z.infer<typeof RecipeSchema.UpdateRecipe>) => ClientApiService.put(ENDPOINTS.RECIPE + "/", data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -183,6 +186,8 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
       });
 
       reset();
+      router.refresh();
+
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(error.response as AxiosResponse);

@@ -5,6 +5,7 @@ import RecipeList from "@/app/(public)/recipe/list/[pageNo]/components/recipe-li
 import Image from "@/components/Image/server";
 import {ServerApiResponseService, ServerApiService} from "@/lib/server-utils";
 import {PaginationWithLinks} from "@/app/(public)/recipe/list/[pageNo]/components/pagination-with-links";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 type Props = {
   params: Promise<{
@@ -21,7 +22,7 @@ export default async function RecipeListPage({params}: Props) {
 
   const p = await params;
 
-  const recipeListResponse = await ServerApiService.get("/get-recipe-list?page_no=" + (Number(p.pageNo) - 1));
+  const recipeListResponse = await ServerApiService.get(ENDPOINTS.RECIPE + "?page_no=" + (Number(p.pageNo) - 1));
   const recipeList = await ServerApiResponseService.getResponseData<z.infer<typeof RecipeSchema.RecipeList>>(recipeListResponse);
 
   return (

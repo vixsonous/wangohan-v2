@@ -27,7 +27,8 @@ export class RecipeController {
   }
   
   static async getRecipe(req: Request, res: Response) {
-    const {recipe_id, recipe_name, is_edit} = req.query;
+    const { is_edit} = req.query;
+    const {recipe_id, recipe_name} = req.params;
 
     const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
 
@@ -121,7 +122,7 @@ export class RecipeController {
       recipe_ingredients: formData.recipe_ingredients.map( (i: z.infer<typeof RecipeSchema.RecipeIngredient>) =>
           ({...i, recipe_ingredient_id: i.recipe_ingredient_id ? Number(i.recipe_ingredient_id) : undefined})
         ),
-      user_id: formData.user_id,
+      user_id: Number(formData.user_id),
       checkbox_size: formData.checkbox_size,
       checkbox_age: formData.checkbox_age,
       checkbox_event: formData.checkbox_event,
@@ -330,7 +331,7 @@ export class RecipeController {
   }
 
   static async viewedRecipe(req: Request, res: Response) {
-    const {recipe_id} = req.query;
+    const {recipe_id} = req.params;
 
     const recipeIdParse = z.number().safeParse(Number(recipe_id));
     if(!recipeIdParse.success) {
@@ -349,7 +350,8 @@ export class RecipeController {
   }
 
   static async isLikedRecipe(req: Request, res: Response) {
-    const {recipe_id} = req.query;
+    const {recipe_id} = req.params;
+    console.log("is liekd recipe")
 
     const user = getUserData(req);
 
@@ -379,7 +381,8 @@ export class RecipeController {
   }
 
   static async likeRecipe(req: Request, res: Response) {
-    const {recipe_id, is_liked, recipe_name, notification_date} = req.query;
+    const {recipe_id} = req.params;
+    const { is_liked, recipe_name, notification_date} = req.body;
 
     const user = getUserData(req);
 
