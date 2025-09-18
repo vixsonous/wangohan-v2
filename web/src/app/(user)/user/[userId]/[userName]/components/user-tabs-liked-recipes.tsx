@@ -11,6 +11,7 @@ import {useState} from "react";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosResponse} from "axios";
 import {toast} from "sonner";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export default function LikedRecipes(
   {liked_recipes, user_id, user_codename, user_data, total_liked}: {
@@ -26,7 +27,7 @@ export default function LikedRecipes(
   const [page, setPage] = useState(1);
 
   const getMoreLikedRecipesMutation = useMutation({
-    mutationFn: () => ClientApiService.get(`/get-liked-recipes?user_id=${user_id}&page=${page}`),
+    mutationFn: () => ClientApiService.get(ENDPOINTS.USER + `/${user_id}/liked?page=${page}`),
     onSuccess: (data: AxiosResponse) => {
       const dt: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>>(data);
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);

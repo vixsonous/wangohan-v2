@@ -7,7 +7,7 @@ import {ENDPOINTS} from "@/constants/endpoints";
 export const getRecipe = async (recipe_id: number, recipe_name: string, is_edit: boolean):
   Promise<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | z.infer<typeof RecipeSchema.UpdateRecipe> | undefined> => {
   try {
-    const response = await ServerApiService.get(ENDPOINTS.RECIPE + `/${recipe_id}/${recipe_name}?is_edit=${is_edit}`);
+    const response = await ServerApiService.get(ENDPOINTS.RECIPE + `/${recipe_id}?recipe_name=${recipe_name}&is_edit=${is_edit}`);
 
     return await ServerApiResponseService.getResponseData<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | z.infer<typeof RecipeSchema.UpdateRecipe> | undefined>(response);
   } catch(e) {
@@ -22,8 +22,8 @@ export const getSliderRecipes = async (): Promise<{
   try {
 
     const [weeklyRecipes, popularRecipes] = await Promise.all([
-      await ServerApiService.get("/get-weekly-recipes"),
-      await ServerApiService.get("/get-popular-recipes")
+      await ServerApiService.get(ENDPOINTS.RECIPE + "/slider/weekly"),
+      await ServerApiService.get(ENDPOINTS.RECIPE + "/slider/popular")
     ])
 
     return {

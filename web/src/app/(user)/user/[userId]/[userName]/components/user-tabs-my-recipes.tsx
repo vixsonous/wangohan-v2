@@ -12,6 +12,7 @@ import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {Button} from "@/components/ui/button";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export default function MyRecipes(
   {my_recipes, user_id, user_codename, user_data, total_recipes}: {
@@ -27,7 +28,7 @@ export default function MyRecipes(
   const [page, setPage] = useState(1);
 
   const getMoreOwnedRecipesMutation = useMutation({
-    mutationFn: () => ClientApiService.get(`/get-owned-recipes?user_id=${user_id}&page=${page}`),
+    mutationFn: () => ClientApiService.get(ENDPOINTS.USER + `/${user_id}/owned?page=${page}`),
     onSuccess: (data: AxiosResponse) => {
       const dt: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>>(data);
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);

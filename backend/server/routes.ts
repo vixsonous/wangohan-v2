@@ -11,13 +11,6 @@ export const router = Router();
 
 router.post("/post-comment", RecipeController.postComment);
 router.get("/get-comments", RecipeController.getComments);
-router.delete("/archive-recipe", RecipeController.archiveRecipe);
-router.delete("/hard-delete-recipe", RecipeController.hardDeleteRecipe);
-router.get("/get-weekly-recipes", RecipeController.getWeeklyRecipes);
-router.get("/get-popular-recipes", RecipeController.getPopularRecipes);
-router.get("/get-liked-recipes", RecipeController.getLikedRecipes);
-router.get("/get-owned-recipes", RecipeController.getOwnRecipes);
-router.get("/get-archived-recipes", RecipeController.getArchivedRecipes);
 
 router.use("/recipes", recipeRouter);
 

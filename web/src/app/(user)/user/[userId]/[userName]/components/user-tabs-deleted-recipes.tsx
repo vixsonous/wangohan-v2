@@ -11,6 +11,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export function DeletedRecipes(
   {deleted_recipes, user_id, total_deleted}: {
@@ -26,7 +27,7 @@ export function DeletedRecipes(
   const router = useRouter();
 
   const getMoreArchivedRecipesMutation = useMutation({
-    mutationFn: () => ClientApiService.get(`/get-archived-recipes?user_id=${user_id}&page=${page}`),
+    mutationFn: () => ClientApiService.get(ENDPOINTS.USER + `/${user_id}/archived?page=${page}`),
     onSuccess: (data: AxiosResponse) => {
       const dt: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>>(data);
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);
@@ -49,7 +50,7 @@ export function DeletedRecipes(
       recipe_id: number,
       recipe_name: string,
       user_id: number
-    }) => ClientApiService.delete(`/archive-recipe?recipe_id=${data.recipe_id}&recipe_name=${data.recipe_name}&recipe_user_id=${data.user_id}&is_archive=false`),
+    }) => ClientApiService.patch(ENDPOINTS.RECIPE + `/${data.recipe_id}/archive?recipe_name=${data.recipe_name}&recipe_user_id=${data.user_id}&is_archive=false`),
     onSuccess: (data: AxiosResponse) => {
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);
       toast.success('Successful!', {description: message});
@@ -66,7 +67,7 @@ export function DeletedRecipes(
       recipe_id: number,
       recipe_name: string,
       user_id: number
-    }) => ClientApiService.delete(`/hard-delete-recipe?recipe_id=${data.recipe_id}&recipe_name=${data.recipe_name}&recipe_user_id=${data.user_id}`),
+    }) => ClientApiService.delete(ENDPOINTS.RECIPE + `/${data.recipe_id}?recipe_name=${data.recipe_name}&recipe_user_id=${data.user_id}`),
     onSuccess: (data: AxiosResponse) => {
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);
       toast.success('Successful!', {description: message});
