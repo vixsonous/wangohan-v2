@@ -9,6 +9,7 @@ import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosError, AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {ENDPOINTS} from "@/constants/endpoints";
+import {ROUTES} from "@/constants/routes";
 
 type CreateButtonProps = {
   handleSubmit: HandleSubmit;
@@ -24,7 +25,7 @@ export default function CreateBlogButton({handleSubmit}: CreateButtonProps) {
     onSuccess: (response: AxiosResponse) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(response);
       toast.success("Successful!", {description: message});
-      router.push("/columns/list/1");
+      router.push(ROUTES.COLUMNS);
       router.refresh();
     },
     onError: (err: AxiosError) => {

@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import Image from "@/components/Image/client";
 import InputField from "@/components/Input";
 import TextareaField from "@/components/Textarea";
-import React from "react";
+import React, {Dispatch, SetStateAction} from "react";
 import {Control, Controller, FieldPath, useController} from 'react-hook-form';
 import { useRecipeForm } from "./helper";
 import Error from "@/components/Error";
@@ -70,10 +70,11 @@ function Checkbox({label, control, name, checked}: CheckboxProps) {
 }
 
 interface RecipeFormProps {
-  recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe> | undefined
+  recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe> | undefined,
+  setOpen?: Dispatch<SetStateAction<boolean>> | undefined;
 }
 
-export default function RecipeForm({recipe_data}: RecipeFormProps) {
+export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
   const {
     onSubmit,
     fileOnChange,
@@ -89,7 +90,7 @@ export default function RecipeForm({recipe_data}: RecipeFormProps) {
     submitMutation,
     removeInstructions,
     removeIngredients
-  } = useRecipeForm(recipe_data);
+  } = useRecipeForm(recipe_data, setOpen);
 
   const title = watch("recipe_name");
 

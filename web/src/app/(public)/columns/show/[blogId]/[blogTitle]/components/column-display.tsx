@@ -7,6 +7,7 @@ import Image from "@/components/Image/client";
 import HomeSearchBar from "@/app/_root-components/home-search-bar";
 import useColumnDisplay from "@/app/(public)/columns/show/[blogId]/[blogTitle]/components/use-column";
 import {useEffect, useState} from "react";
+import {ROUTES} from "@/constants/routes";
 
 type ColumnDisplayProps = {
   blog_data: z.infer<typeof BlogSchema.Blog>;
@@ -15,10 +16,10 @@ type ColumnDisplayProps = {
 }
 
 const blogCategories = [
-  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for all"}/>,text: "全て", url: "/columns/list/1?category=全て"}, //pawprint
-  {icon: <Image src={"/icons/svg/primary-fork-knife.svg"} width={16} height={16} alt={"icon for special feature"}/>,text: "レシピ特集", url: "/columns/list/1?category=レシピ特集"}, //fork knife
-  {icon: <Image src={"/icons/svg/primary-book.svg"} width={16} height={16} alt={"icon for basic knowledge"}/>,text: "基礎知識", url: "/columns/list/1?category=基礎知識"}, // book
-  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for others"}/>,text: "その他", url: "/columns/list/1?category=その他"}, // pawprint
+  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for all"}/>,text: "全て", url: ROUTES.COLUMNS + "?category=全て"}, //pawprint
+  {icon: <Image src={"/icons/svg/primary-fork-knife.svg"} width={16} height={16} alt={"icon for special feature"}/>,text: "レシピ特集", url: ROUTES.COLUMNS + "?category=レシピ特集"}, //fork knife
+  {icon: <Image src={"/icons/svg/primary-book.svg"} width={16} height={16} alt={"icon for basic knowledge"}/>,text: "基礎知識", url: ROUTES.COLUMNS + "?category=基礎知識"}, // book
+  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for others"}/>,text: "その他", url: ROUTES.COLUMNS + "?category=その他"}, // pawprint
 ]
 
 const icons = {

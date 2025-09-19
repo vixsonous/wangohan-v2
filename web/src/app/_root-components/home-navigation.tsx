@@ -1,5 +1,6 @@
 import Link from "next/link";
 import GotoSearchCategoriesBtn from "./goto-search-categories-btn";
+import {ROUTES} from "@/constants/routes";
 
 export default function HomeNavigation() {
   return (
@@ -22,7 +23,7 @@ export default function HomeNavigation() {
       </Link>
       <span className="select-none opacity-0 md:opacity-100">|</span>
       <Link
-        href={"/columns/list/1"}
+        href={ROUTES.COLUMNS}
         className="text-primary-text font-semibold hover:text-[#9ba3af]"
       >
         犬と食に関するコラム

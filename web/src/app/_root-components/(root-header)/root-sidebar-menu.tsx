@@ -11,6 +11,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {SheetClose} from "@/components/ui/sheet";
 import {ENDPOINTS} from "@/constants/endpoints";
+import {ROUTES} from "@/constants/routes";
 
 export default function SidebarMenu(
   {user_data}:
@@ -18,7 +19,6 @@ export default function SidebarMenu(
 ) {
   const pathname = usePathname();
   const router = useRouter();
-
 
   const logoutMutation = useMutation({
     mutationFn: () => ClientApiService.post(ENDPOINTS.AUTH + "/logout", undefined),
@@ -39,8 +39,9 @@ export default function SidebarMenu(
     {text: "マイページ", show: user_data !== undefined, condition: pathname.includes("/user/") || pathname.includes("/signup/personal-info"), href: user_data?.user_details !== null ? `/user/${user_data?.user_id}/${user_data?.user_details?.user_codename}`: `/signup/personal-info`, src: "/icons/svg/primary-user.svg", alt: "an icon for user", type: "link"},
     {text: "レシピを探す", show: true, condition: false, href: "/", src: "/icons/svg/white-magnifying-glass.svg", alt: "an icon for search recipe", type: "button"},
     {text: "レシピ図鑑", show: true, condition: pathname.includes("/recipe/list"), href: "/recipe/list/1", src: "/icons/svg/white-book.svg", alt: "an icon for recipe list", type: "link"},
-    {text: "犬と食に関するコラム", show: true, condition: pathname.includes("/columns") , href: "/columns", src: "/icons/svg/white-paw-print.svg", alt: "an icon for columns/blog", type: "link"},
+    {text: "犬と食に関するコラム", show: true, condition: pathname.includes("/columns/list") , href: ROUTES.COLUMNS, src: "/icons/svg/white-paw-print.svg", alt: "an icon for columns/blog", type: "link"},
     {text: "愛犬登録", show: true, condition: pathname.includes("/user/settings/"), href: user_data === undefined ? "/login" : `/user/${user_data?.user_id}/${user_data?.user_details?.user_codename}?register_pet=true`, src: "/icons/svg/white-paw-print.svg", alt: "an icon for pet registration", type: "link"},
+    {text: "Create Blog", show: user_data?.user_lvl === 2, condition: pathname.includes("/columns/create"), href: "/columns/create", src: "/icons/svg/white-paw-print.svg", alt: "an icon for blog creation", type: "link"},
     {text: "ログアウト", function: () => logoutMutation.mutate(), show: user_data !== undefined, condition: false, href: `/`, src: "/icons/svg/primary-sign-out.svg", alt: "sign out icon", type: "button"},
   ]
 
@@ -84,56 +85,6 @@ export default function SidebarMenu(
           }
         })
       }
-
-      {/* {
-        user.user_id !== 0 && (
-          <Link onClick={openSettings} className={`${active.user ? 'bg-primary-text text-secondary-bg py-2' : 'hover:opacity-75 py-1'} w-full px-4 py-1 rounded-full`} href={`/user/${user.user_id}`}>
-            <div className="w-full text-sm flex justify-between items-center">
-                <User size={20}/>
-                マイページ
-            </div>
-          </Link>
-        )
-      } */}
-
-      {/* <Button className={`hover:opacity-75 w-full px-4 py-1 rounded-full text-sm flex justify-between items-center`}>
-        <Image src={"/icons/svg/magnifying-glass.svg"} alt="an icon for search recipe"/>
-        レシピを探す
-      </Button>
-
-      <Link 
-        className={`${pathname.includes("/recipe/list") ? 'bg-primary-text text-secondary-bg py-2' : 'hover:opacity-75 py-1'} 
-          w-full px-4 py-1 rounded-full text-sm flex justify-between items-center`} 
-        href="/recipe/list/1"
-      >
-        <Image src={"/icons/svg/white-book.svg"} alt="an icon for recipe list"/>
-        レシピ図鑑
-      </Link>
-
-      <Link href={"/columns"} className="w-full hover:opacity-75 px-4 py-1 rounded-full">
-        <div className="w-full text-sm flex justify-between items-center">
-            <Image src={"/icons/svg/white-paw-print.svg"} alt="an icon for columns/blog"/>
-            犬と食に関するコラム
-        </div>
-      </Link>
-
-      <Link className={`hover:opacity-75 w-full px-4 py-1 rounded-full`} href={`/user/settings/${1}?=#register-pet`}>
-        <div className="w-full text-sm flex justify-between items-center">
-          <Image src={"/icons/svg/white-paw-print.svg"} alt="an icon for pet registration"/>
-          愛犬登録
-        </div>
-      </Link> */}
-
-      {/* {
-        user.user_id !== 0 && (
-          <Button onClick={logout}>
-            <div  className="w-full hover:opacity-75 text-sm flex justify-between items-center px-4 py-1 rounded-full">
-              <SignOut />
-              ログアウト
-            </div>
-          </Button>
-        )
-      } */}
     </nav>
   )
 }

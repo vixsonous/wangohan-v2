@@ -9,6 +9,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import {toast} from "sonner";
 import {ENDPOINTS} from "@/constants/endpoints";
 import {useRouter} from "next/navigation";
+import {ROUTES} from "@/constants/routes";
 
 type UpdateBlogButtonProps = {
   handleSubmit: HandleSubmit;
@@ -24,7 +25,7 @@ export default function UpdateBlogButton({handleSubmit}: UpdateBlogButtonProps) 
     onSuccess: (response: AxiosResponse) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(response);
       toast.success("Successful!", {description: message});
-      router.push("/columns/list/1");
+      router.push(ROUTES.COLUMNS);
       router.refresh();
     },
     onError: (err: AxiosError) => {

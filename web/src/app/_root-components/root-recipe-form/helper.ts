@@ -2,7 +2,7 @@
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {AxiosError, AxiosResponse} from "axios";
-import React, {useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -15,7 +15,7 @@ import {useRouter} from "next/navigation";
 
 const MAX_FILES_LENGTH = 5;
 
-export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe>) => {
+export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe>, setOpen?: Dispatch<SetStateAction<boolean>> | undefined) => {
 
   const router = useRouter();
   const {
@@ -162,6 +162,11 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
       });
 
       reset();
+      router.refresh();
+
+      if(setOpen) {
+        setOpen(false);
+      }
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(error.response as AxiosResponse);

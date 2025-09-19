@@ -290,6 +290,7 @@ export class UserRepository {
         .select(eb => [
           "user_id",
           "email",
+          "user_lvl",
           jsonObjectFrom(
             eb.selectFrom("user_details_table")
               .select([
@@ -345,6 +346,7 @@ export class UserRepository {
         .select(eb => [
           "user_id",
           "email",
+          "user_lvl",
           jsonObjectFrom(
             eb.selectFrom("user_details_table")
               .select([

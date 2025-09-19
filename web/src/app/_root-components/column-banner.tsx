@@ -1,5 +1,6 @@
 import Image from "@/components/Image/server";
 import Link from "next/link";
+import {ROUTES} from "@/constants/routes";
 
 export default async function ColumnBanner() {
   return (
@@ -8,7 +9,7 @@ export default async function ColumnBanner() {
         役立つコラムはこちら
       </h1>
       <nav className="absolute flex justify-center w-full top-14 lg:top-24">
-        <Link href={"/columns"} className=" bg-primary-text rounded-md text-xs text-white py-2 px-4">
+        <Link href={ROUTES.COLUMNS} className=" bg-primary-text rounded-md text-xs text-white py-2 px-4">
           Column
         </Link>
       </nav>
