@@ -1,7 +1,6 @@
 import {
   ElementNode,
   SerializedElementNode,
-  SerializedLexicalNode,
 } from "lexical";
 
 export interface SerializedIndentationNode extends SerializedElementNode {

@@ -38,7 +38,7 @@ export default function ColumnDisplay({blog_data, related_blogs, popular_recipes
     setDate(new Date(blog_data.updated_at).toDateString());
 
     return () => setDate("");
-  }, []);
+  }, [blog_data.updated_at]);
 
   return (
     <article className="grid lg:gap-4 grid-cols-12">
@@ -51,6 +51,7 @@ export default function ColumnDisplay({blog_data, related_blogs, popular_recipes
         </p>
         <Image
           src={blog_data.blog_image}
+          alt={blog_data.title}
           width={1280}
           fit="cover"
         />

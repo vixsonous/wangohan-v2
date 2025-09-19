@@ -2,7 +2,7 @@
 
 import {Control, Controller} from "react-hook-form";
 import {Button as ButtonUI} from "@/components/ui/button";
-import React, {useState} from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 
 const UploadedImages = dynamic(() => import("@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/components/uploaded-images"),
@@ -11,6 +11,7 @@ const UploadedImages = dynamic(() => import("@/app/(protected-user)/columns/rich
     </ButtonUI>}
 )
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 type CreateEditorFileUploadProps = {
   control: Control<{
     title: string
@@ -26,14 +27,12 @@ type CreateEditorFileUploadProps = {
 }
 export default function EditorFileUpload({control}: CreateEditorFileUploadProps) {
 
-  const [_, setPopoverOpen] = useState(false);
 
   return (
     <Controller
       render={({field}) => (
         <UploadedImages action={(i) => {
           field.onChange(i.blog_image_url);
-          setPopoverOpen(false);
         }}>
           <ButtonUI className={"self-center"}>
             {field.value ? field.value : "Filename"}

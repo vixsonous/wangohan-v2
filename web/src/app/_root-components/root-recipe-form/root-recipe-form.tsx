@@ -103,9 +103,6 @@ export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
           <InputField {...register("user_id", {valueAsNumber: true})} hidden={true} value={recipe_data.user_id} />
         </>
       }
-      {Object.keys(errors).map(err => (
-        <span>{err}{errors[err as keyof typeof errors]?.message}</span>
-      ))}
       <div className="first-section--container grid grid-cols-6 md:grid-cols-12 w-full gap-8">
         <div className="col-span-6 flex flex-col gap-4">
           <p className="flex flex-col gap-2">

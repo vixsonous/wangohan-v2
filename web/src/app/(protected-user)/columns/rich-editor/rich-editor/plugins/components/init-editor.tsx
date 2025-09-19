@@ -15,6 +15,6 @@ export default function InitEditor({blog}: {blog?: z.infer<typeof BlogSchema.Blo
       })
     }
 
-  }, [blog]);
+  }, [blog, editor]);
   return null;
 }

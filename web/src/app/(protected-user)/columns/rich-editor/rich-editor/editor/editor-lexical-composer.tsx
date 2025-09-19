@@ -13,7 +13,6 @@ import {FontBackgroundColorNodePlugin} from "@/app/(protected-user)/columns/rich
 import {FontFamilyPlugin} from "@/app/(protected-user)/columns/rich-editor/nodes/FontNode";
 import {LexicalComposer} from "@lexical/react/LexicalComposer";
 import React, {memo, useEffect } from "react";
-import {Button} from "@/components/ui/button";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {customGenerateHtmlFromNodes} from "@/app/(protected-user)/columns/rich-editor/lib/GenerateHtml";
 import {useDispatch, useSelector} from "react-redux";
@@ -25,13 +24,8 @@ import {
 import dynamic from "next/dynamic";
 import SpinLoader from "@/components/SpinLoader";
 import "@/app/(protected-user)/columns/rich-editor/rich-editor/style.css";
-import {FieldValues, SubmitErrorHandler, SubmitHandler} from "react-hook-form";
+import { SubmitErrorHandler, SubmitHandler} from "react-hook-form";
 import z from "zod";
-import {useMutation} from "@tanstack/react-query";
-import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
-import {AxiosError, AxiosResponse} from "axios";
-import {toast} from "sonner";
-import {useRouter} from "next/navigation";
 import InitEditor from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/components/init-editor";
 import {BlogSchema} from "@/types/blog-types";
 import UpdateBlogButton from "@/app/(protected-user)/columns/edit/[blogId]/[blogTitle]/components/update-blog-button";
@@ -69,7 +63,7 @@ const OnChangePlugin = memo(function OnChangePlugin() {
         sessionStorage.setItem("editor", JSON.stringify(jsonState));
       });
     });
-  }, [editor]);
+  }, [editor, dispatch]);
   return null;
 });
 

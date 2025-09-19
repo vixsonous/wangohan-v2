@@ -24,7 +24,7 @@ export default function AddPetsDialog({user_id}: {user_id: number}) {
       setOpen(true);
       router.replace(window.location.pathname);
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild={true}>

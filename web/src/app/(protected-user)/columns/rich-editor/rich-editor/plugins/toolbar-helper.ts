@@ -41,17 +41,17 @@ const useToolbarHelper = (
         states.setFontBackgroundColor(t.value);
       },
 
-      resetFontBackgroundColor(e: React.MouseEvent<HTMLButtonElement>) {
+      resetFontBackgroundColor() {
         editor.dispatchCommand(FORMAT_FONTBACKGROUNDCOLOR_COMMAND, String(""));
         states.setFontBackgroundColor("#FFE9C9");
       },
 
-      resetFontColor(e: React.MouseEvent<HTMLButtonElement>) {
+      resetFontColor() {
         editor.dispatchCommand(FORMAT_FONTCOLOR_COMMAND, String("#523636"));
         states.setFontBackgroundColor("#523636");
       },
     }),
-    [editor]
+    [editor, states]
   );
 
   return actions;

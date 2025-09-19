@@ -15,7 +15,6 @@ import {BlogSchema} from "@/types/blog-types";
 
 export default function useColumnDisplay(blogData: z.infer<typeof BlogSchema.Blog>) {
   const [htmlString, setHtmlString] = useState("");
-  const [state, setState] = useState<z.infer<typeof BlogSchema.Blog>>({ ...blogData });
   const router = useRouter();
 
   useEffect(() => {
@@ -60,10 +59,9 @@ export default function useColumnDisplay(blogData: z.infer<typeof BlogSchema.Blo
       const html = customGenerateHtmlFromNodes(editor);
       setHtmlString(html);
     });
-  }, []);
+  }, [blogData, router]);
 
   return {
     htmlString,
-    state,
   };
 }

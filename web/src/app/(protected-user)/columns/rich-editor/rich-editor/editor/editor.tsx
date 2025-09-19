@@ -55,16 +55,16 @@ export default function Editor({blog_images, user_data, blog}: CreateEditorWrapp
 
   useEffect(() => {
     setValue("editor_state", editorState.editorState);
-  }, [editorState.editorState]);
+  }, [editorState.editorState, setValue]);
 
   useEffect(() => {
     dispatch(setUploadedImages(blog_images.blog_images));
     dispatch(setTotalBlogImages(blog_images.total_blog_images));
-  }, [blog_images.blog_images]);
+  }, [blog_images.blog_images, dispatch, blog_images.total_blog_images]);
 
   useEffect(() => {
     dispatch(setUser(user_data));
-  }, [user_data]);
+  }, [user_data, dispatch]);
   return (
     <form className="mt-6">
       {Object.keys(errors).map((err, idx) => {

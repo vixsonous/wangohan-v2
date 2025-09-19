@@ -84,8 +84,10 @@ export default function UploadedImages({action, children}: {action: (image: z.in
       <DialogContent className={"sm:max-w-5xl px-2 sm:px-4"}>
         <DialogTitle className={"text-primary-text flex items-center gap-2"}>
           Uploaded Images
-          {Object.keys(errors).map((err) => (
-            <Error>{errors[err as keyof typeof errors]?.message}</Error>
+          {Object.keys(errors).map((err, idx) => (
+            <React.Fragment key={idx}>
+              <Error>{errors[err as keyof typeof errors]?.message}</Error>
+            </React.Fragment>
           ))}
           <form>
             <Controller

@@ -51,7 +51,7 @@ const useTextHeadingHelper = () => {
         }
       },
     }),
-    [editor]
+    [editor, dispatch, state.block_type]
   );
 };
 

@@ -17,7 +17,7 @@ import { $isHeadingNode } from "@lexical/rich-text";
 import { $isListNode, ListNode } from "@lexical/list";
 import { $isCodeNode, getDefaultCodeLanguage } from "@lexical/code";
 
-import React, { useEffect, useRef } from "react";
+import React, {useCallback, useEffect, useRef} from "react";
 import useToolbarStates from "./toolbar-states";
 import JustifyGroup from "./toolbar-groups/justify-group";
 import ImageYoutube from "./toolbar-groups/image-youtube";
@@ -87,7 +87,7 @@ export default function ToolbarPlugin() {
   const states = useToolbarStates();
   const tbHelper = useToolbarHelper(editor, states);
 
-  const $updateToolbar = () => {
+  const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       // Update text format
@@ -179,7 +179,7 @@ export default function ToolbarPlugin() {
         dispatch(setTextFormats({field: "link", value: false}));
       }
     }
-  };
+  }, [dispatch, editor, tbHelper]);
 
   useEffect(() => {
     return mergeRegister(
@@ -190,7 +190,7 @@ export default function ToolbarPlugin() {
       }),
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
-        (_payload, _newEditor) => {
+        () => {
           $updateToolbar();
           return false;
         },
@@ -198,7 +198,7 @@ export default function ToolbarPlugin() {
       ),
       editor.registerCommand(
         FORMAT_FONTSIZE_COMMAND,
-        (_payload, _newEditor) => {
+        () => {
           $updateToolbar();
           return false;
         },
@@ -233,7 +233,7 @@ export default function ToolbarPlugin() {
         COMMAND_PRIORITY_EDITOR
       )
     );
-  }, [editor, $updateToolbar, state.font.size]);
+  }, [editor, $updateToolbar, state.font.size, dispatch]);
 
   return (
     <div className="toolbar bg-secondary-bg flex flex-wrap gap-2 items-center" ref={toolbarRef}>

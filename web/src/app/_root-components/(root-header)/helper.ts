@@ -60,7 +60,7 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
     return () => {
       event.onmessage = null;
     }
-  }, [user_data]);
+  }, [user_data, dispatch]);
 
   const unread_notifications = notifications.filter(notification => !notification.is_read).length;
   const combinedNotifications = notifications.reduce((acc: Array<z.infer<typeof EventSchema.Event>>, curNotification) => {

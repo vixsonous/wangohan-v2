@@ -1,4 +1,4 @@
-export default {
+const Theme = {
     code: 'editor-code',
     heading: {
       h1: 'editor-heading-h1',
@@ -44,4 +44,5 @@ export default {
     tableSelected: 'theme__tableSelected',
     tableSelection: 'theme__tableSelection',
   };
-  
+
+export default Theme;
