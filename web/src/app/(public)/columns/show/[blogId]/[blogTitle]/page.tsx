@@ -26,14 +26,18 @@ export default async function Blog({params}: BlogProps) {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "Blog",
-    name: blog.title,
-    description: blog.title,
-    image: blog.blog_image || "",
-    author: {
+    "@type": "Article",
+    "name": blog.title,
+    "description": blog.title,
+    "image": blog.blog_image || "https://wangohanjp.com/logo-v2.png",
+    "author": {
       "@type": "Person",
-      name: blog.user_id,
+      "name": "わんごはん公式"
     },
+    "keywords": ["ブログ",
+      "わんごはん",
+      "犬用手作りごはん",
+      "ペットレシピサイト", blog.title, blog.blog_category],
   };
 
   return (

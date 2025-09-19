@@ -37,9 +37,9 @@ export async function generateMetadata({params,searchParams }: Props): Promise<M
       url: 'https://wangohanjp.com', // Your website URL
       type: "article",
       images: [
-        { url: blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
+        { url: blogsResponse.blogs.length > 0 ? blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
             process.env.NEXT_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
-            blogsResponse.blogs[0].blog_image, width: 500, height: 500, alt: blogsResponse.blogs[0].title }
+            blogsResponse.blogs[0].blog_image : "https://wangohanjp.com/logo-v2.png", width: 500, height: 500, alt: blogsResponse.blogs.length > 0 ? blogsResponse.blogs[0].title : 'Wangohan' }
       ]
     },
     robots: {
@@ -108,7 +108,7 @@ export default async function Columns({params, searchParams}: Props) {
           </li>
         ))}
       </ul>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+      <div className="relative grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {blogsResponse.blogs.length > 0 ? (
           blogsResponse.blogs.map((blog, idx) => {
             return (
@@ -122,7 +122,7 @@ export default async function Columns({params, searchParams}: Props) {
             );
           })
         ) : (
-          <div>No blogs!</div>
+          <div className={"absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-full h-24 flex justify-center items-center"}>No blogs!</div>
         )}
       </div>
       <PaginationWithLinks totalCount={blogsResponse.total_blogs} pageSize={6} page={Number(pageNo)} />
