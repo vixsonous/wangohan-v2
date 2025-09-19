@@ -13,6 +13,7 @@ import {toast} from "sonner";
 import {useDispatch, useSelector} from "react-redux";
 import {addComments, setComments} from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/components/comments-slice";
 import {RootState} from "@/store/store";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 type ShowRecipeCommentsProps = {
   comments: Array<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>>;
@@ -33,7 +34,7 @@ export default function ShowRecipeComments({comments, total_comments, recipe_id}
   }, [comments, dispatch]);
 
   const getMoreCommentsMutation = useMutation({
-    mutationFn: ({recipe_id, page}: {recipe_id: number, page: number}) => ClientApiService.get("/get-comments?recipe_id=" + recipe_id + "&page=" + page),
+    mutationFn: ({recipe_id, page}: {recipe_id: number, page: number}) => ClientApiService.get(ENDPOINTS.COMMENT + "/?recipe_id=" + recipe_id + "&page=" + page),
     onSuccess: (response: AxiosResponse) => {
       const data = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplayComments>>>(response);
       dispatch(addComments(data));

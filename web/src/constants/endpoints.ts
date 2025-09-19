@@ -8,4 +8,5 @@ export const ENDPOINTS = {
   AUTH: "/auth",
   IMAGE: "/images",
   RECIPE: "/recipes",
+  COMMENT: "/comments",
 }

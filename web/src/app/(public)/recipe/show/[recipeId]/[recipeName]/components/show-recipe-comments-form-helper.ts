@@ -8,6 +8,7 @@ import {toast} from "sonner";
 import z from "zod";
 import {useDispatch} from "react-redux";
 import {addComments} from "@/app/(public)/recipe/show/[recipeId]/[recipeName]/components/comments-slice";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export const useShowRecipeCommentsForm = () => {
   const { register, handleSubmit, formState: {errors}, control, reset } = useForm({
@@ -18,7 +19,7 @@ export const useShowRecipeCommentsForm = () => {
   const dispatch = useDispatch();
 
   const commentSubmitMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.post("/post-comment", {
+    mutationFn: (data: FieldValues) => ClientApiService.post(ENDPOINTS.COMMENT + "/", {
       ...data,
       created_at: new Date().toLocaleString()
     }),
