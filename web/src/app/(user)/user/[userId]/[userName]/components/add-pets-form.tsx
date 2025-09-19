@@ -23,7 +23,7 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
           control={petForm.control}
           render={({field}) => (
             <label htmlFor="pet_image" className="col-span-1 flex flex-col justify-center relative items-center">
-              <Image src={'/banner/3dogs.webp'}  className="-top-8 md:-top-4 z-10 absolute h-[auto] w-24 max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
+              <Image src={'/banner/3dogs.webp'}  className="-top-8 md:-top-4 z-10 absolute h-[auto] rounded-[25px]" width={100}  alt="website banner" />
               {
                 uploadFileMutation.isPending && (
                   <div className="absolute z-10 flex justify-center gap-2 items-center">

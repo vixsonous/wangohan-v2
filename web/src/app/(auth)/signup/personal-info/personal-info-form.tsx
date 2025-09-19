@@ -44,7 +44,7 @@ export default function PersonalInfoForm({user_id, is_edit, user_details, setOpe
             control={control}
             render={({field}) => (
               <label htmlFor="user_image" className="flex flex-col relative items-center justify-center">
-                <Image src={'/banner/3dogs.webp'} className="-top-10 z-10 absolute h-[auto] w-[20%] sm:w-[40%] max-w-none rounded-[25px]" width={100} height={100}  alt="website banner" />
+                <Image src={'/banner/3dogs.webp'} className="-top-10 z-10 absolute h-[auto] rounded-[25px]" width={100}  alt="3dogs icon" />
                 {
                   uploadFileMutation.isPending && (
                     <div className="absolute z-10 flex justify-center gap-2 items-center">

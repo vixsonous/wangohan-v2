@@ -11,7 +11,7 @@ import {queryClient} from "@/lib/tanstack-query";
 import {
   DeletedRecipes
 } from "@/app/(user)/user/[userId]/[userName]/components/user-tabs-deleted-recipes";
-import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import dynamic from "next/dynamic";
 import {useState} from "react";
 
@@ -63,9 +63,12 @@ export default function UserTabs(
                   </DialogTrigger>
                   <DialogContent className={"w-256 sm:max-w-3xl"}>
                     <DialogTitle>
-                      Edit your profile
+                      {user_codename}のプロフィール
                     </DialogTitle>
                     <PersonalInfoForm setOpen={setOpen} user_id={user_data?.user_id || -1} is_edit={true} user_details={user_data} />
+                    <DialogDescription aria-label={"description"} aria-labelledby={"description"} className={"flex justify-center"}>
+                      プロフィールを編集する
+                    </DialogDescription>
                   </DialogContent>
                 </Dialog>
               </TabsTrigger>
