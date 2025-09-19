@@ -19,7 +19,7 @@ export default async function RootSidebar(
           <CreateRecipe user_data={user_data} />
         </SheetTitle>
         <SheetDescription>
-          description
+          わんごはんのメニュー
         </SheetDescription>
         <RootSidebarMenuWrapper user_data={user_data} />
       </SheetContent>

@@ -4,6 +4,7 @@ import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carouse
 import Autoplay from "embla-carousel-autoplay";
 import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
+import Link from "next/link";
 
 export default function BannerCarousel({recipes}: {recipes: Array<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>}) {
 
@@ -18,7 +19,9 @@ export default function BannerCarousel({recipes}: {recipes: Array<z.infer<typeof
           recipes.map((i, x) => {
             return (
               <CarouselItem key={x}>
-                <Image className="h-full w-full" src={i.recipe_images[0].recipe_image} alt={i.recipe_images[0].recipe_image_title} width={768} height={400}/>
+                <Link href={`/recipe/show/${i.recipe_id}/${i.recipe_name}`}>
+                  <Image className="h-full w-full" src={i.recipe_images[0].recipe_image} alt={i.recipe_images[0].recipe_image_title} width={768} height={400}/>
+                </Link>
               </CarouselItem>
             )
           })

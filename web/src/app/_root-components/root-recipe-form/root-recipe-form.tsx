@@ -89,7 +89,8 @@ export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
     deleteFiles,
     submitMutation,
     removeInstructions,
-    removeIngredients
+    removeIngredients,
+    uploadFileMutation
   } = useRecipeForm(recipe_data, setOpen);
 
   const title = watch("recipe_name");
@@ -150,15 +151,21 @@ export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
                 <label htmlFor="recipe_images" className="absolute z-10 -top-22 left-38">
                   <Image  width={211} height={120} src={"/banner/3dogs.webp"} alt="3 dogs image background for image upload"/>
                 </label>
-                <label htmlFor="recipe_images" className="w-full cursor-pointer">
-                  <span className="relative flex h-full  after:content-[''] after:transition-all after:duration-300 after:absolute after:top-0 after:left-0 after:w-full after:h-full hover:after:bg-black/10">
+                <label htmlFor="recipe_images" className={`w-full ${uploadFileMutation.isPending ? '' : 'cursor-pointer'}`}>
+                  <span className={`relative flex h-full  after:content-[''] after:transition-all after:duration-300 after:absolute after:top-0 after:left-0 after:w-full after:h-full ${uploadFileMutation.isPending ? 'after:bg-black/10' : 'hover:after:bg-black/10'}`}>
                     <Image className="rounded-md w-full" width={200} height={50} src={"/banner/empty-bg.webp"} alt="empty background for image upload"/>
                     <span className="absolute tracking-tight w-full leading-8 text-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                      料理の画像をアップロード <br /> （横長or正方形推奨）
+                      {!uploadFileMutation.isPending && <>料理の画像をアップロード <br /> （横長or正方形推奨）</>}
                     </span>
+                    {uploadFileMutation.isPending && (
+                      <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10 flex justify-center gap-2 items-center">
+                        <Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"}/>
+                        <span>アップロード中...</span>
+                      </div>
+                    )}
                   </span>
                 </label>
-                <InputField accept="images/*" onChange={fileOnChange} multiple className="hidden" id="recipe_images" type="file"/>
+                <InputField disabled={uploadFileMutation.isPending} accept="images/*" onChange={fileOnChange} multiple className="hidden" id="recipe_images" type="file"/>
               </DialogTitle>
               <DialogDescription className="grid grid-cols-5 gap-1 w-full h-full">
                 {files.map((f, idx) => (

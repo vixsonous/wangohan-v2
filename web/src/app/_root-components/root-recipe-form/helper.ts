@@ -86,6 +86,27 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     }
   }, [recipe_data]);
 
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File): Promise<File> => new Promise(async (resolve) => {
+      let retFile = file;
+      const fileExt = file.name.substring(file.name.lastIndexOf(".") + 1);
+
+      if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
+        const image = await heic2any({
+          blob: file,
+          toType: "image/webp",
+          quality: 0.8,
+
+        });
+
+        const img = !Array.isArray(image) ? [image] : image;
+        retFile = new File(img, file.name);
+      }
+
+      resolve(retFile);
+    })
+  })
+
   const fileOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const targetFiles = e.currentTarget.files;
@@ -95,27 +116,29 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     const temp = structuredClone(files);
     for(let i = 0; i < targetFiles.length && temp.length < MAX_FILES_LENGTH; i++) {
 
-      const fileExt = targetFiles[i].name.substring(targetFiles[i].name.lastIndexOf(".") + 1);
+      const file = await uploadFileMutation.mutateAsync(targetFiles[i]);
 
-      if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
-        const image = await heic2any({
-          blob: targetFiles[i],
-          toType: "image/webp",
-          quality: 0.8
-        });
+      temp.push({
+        file: file,
+        preview_url: URL.createObjectURL(file)
+      });
 
-        const img = !Array.isArray(image) ? [image] : image;
-        const file = new File(img, targetFiles[i].name);
-        temp.push({
-          file: file,
-          preview_url: URL.createObjectURL(targetFiles[i])
-        });
-      } else {
-        temp.push({
-          file: targetFiles[i] as File,
-          preview_url: URL.createObjectURL(targetFiles[i])
-        });
-      }
+      // if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
+      //   const image = await heic2any({
+      //     blob: targetFiles[i],
+      //     toType: "image/webp",
+      //     quality: 0.8
+      //   });
+      //
+      //   const img = !Array.isArray(image) ? [image] : image;
+      //   const file = new File(img, targetFiles[i].name);
+      //
+      // } else {
+      //   temp.push({
+      //     file: targetFiles[i] as File,
+      //     preview_url: URL.createObjectURL(targetFiles[i])
+      //   });
+      // }
 
     }
     setFiles(structuredClone(temp));
@@ -269,6 +292,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     watch,
     submitMutation,
     removeIngredients,
-    removeInstructions
+    removeInstructions,
+    uploadFileMutation
   }
 }
