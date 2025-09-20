@@ -286,26 +286,56 @@ export class RecipeController {
   }
 
   static async getRecipeList(req: Request, res: Response) {
-    const {page_no} = req.query;
+    const {page_no, search_text} = req.query;
 
-    const pageParse = z.number().safeParse(Number(page_no));
+    if(search_text !== undefined) {
+      const searchRecipeParse = RecipeControllerValidationSchema.SearchRecipeList.safeParse({
+        page_no: Number(page_no),
+        search_text: search_text
+      });
 
-    if(!pageParse.success) {
-      ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
+      if(!searchRecipeParse.success) {
+        ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
+        return;
+      }
+
+      const searchRecipeList = await CacheUtil.get<
+        z.infer<typeof RecipeSchema.RecipeList>,
+        typeof RecipeService.getSearchRecipeList
+      >(RecipeCacheKey.GET_SEARCH_RECIPE_LIST(
+        searchRecipeParse.data.page_no,
+        searchRecipeParse.data.search_text
+      ), RecipeService.getSearchRecipeList, 60, searchRecipeParse.data.page_no, searchRecipeParse.data.search_text);
+
+      if(searchRecipeList === undefined) {
+        ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
+        return;
+      }
+
+      ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, searchRecipeList);
+      return;
+    } else {
+
+      const pageParse = z.number().safeParse(Number(page_no));
+
+      if(!pageParse.success) {
+        ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
+        return;
+      }
+
+      const recipeList = await CacheUtil.get<
+        z.infer<typeof RecipeSchema.RecipeList>,
+        typeof RecipeService.getRecipeList
+      >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
+
+      if(recipeList === undefined) {
+        ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
+        return;
+      }
+
+      ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, recipeList);
       return;
     }
-
-    const recipeList = await CacheUtil.get<
-      z.infer<typeof RecipeSchema.RecipeList>,
-      typeof RecipeService.getRecipeList
-    >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
-
-    if(recipeList === undefined) {
-      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
-      return;
-    }
-
-    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, recipeList);
   }
 
   static async getSearchRecipeList(req: Request, res: Response) {

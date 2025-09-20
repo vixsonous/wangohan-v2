@@ -15,7 +15,6 @@ recipeRouter.get("/", RecipeController.getRecipeList);
 recipeRouter.post("/", upload.array('recipe_images[]'), RecipeController.uploadRecipe);
 recipeRouter.put("/", upload.array("recipe_images[]"), RecipeController.updateRecipe);
 recipeRouter.get("/:recipe_id", RecipeController.getRecipe);
-recipeRouter.get("/search", RecipeController.getSearchRecipeList);
 recipeRouter.patch("/:recipe_id/views", RecipeController.viewedRecipe);
 recipeRouter.post("/:recipe_id/likes", RecipeController.likeRecipe);
 recipeRouter.get("/:recipe_id/status/liked", RecipeController.isLikedRecipe);

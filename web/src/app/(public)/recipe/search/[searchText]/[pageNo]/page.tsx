@@ -28,7 +28,7 @@ export default async function SearchPage({params}: Props) {
   const searchText = decodeURI((await params).searchText);
   const pageNo = Number((await params).pageNo);
 
-  const recipeListResponse = await ServerApiService.get(ENDPOINTS.RECIPE + "/search?page_no=" + (Number(pageNo) - 1) + "&search_text=" + searchText);
+  const recipeListResponse = await ServerApiService.get(ENDPOINTS.RECIPE + "/?page_no=" + (Number(pageNo) - 1) + "&search_text=" + searchText);
   const recipeList = await ServerApiResponseService.getResponseData<z.infer<typeof RecipeSchema.SearchRecipeList>>(recipeListResponse);
 
   return (
