@@ -1,7 +1,7 @@
-export default function LoginRequired() {
+export default function Forbidden() {
   return (
     <div className={"w-full h-full flex justify-center items-center"}>
-      <h1>Please log in!</h1>
+      <h1>Forbidden!</h1>
     </div>
   )
 }

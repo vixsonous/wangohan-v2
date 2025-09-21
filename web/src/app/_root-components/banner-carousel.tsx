@@ -13,14 +13,14 @@ export default function BannerCarousel({recipes}: {recipes: Array<z.infer<typeof
       Autoplay({
         delay: 5000
       })
-    ]} className="w-full h-[400px] col-span-3">
+    ]} className="w-full h-52 md:h-full col-span-3">
       <CarouselContent hfull>
         {
           recipes.map((i, x) => {
             return (
               <CarouselItem key={x}>
                 <Link href={`/recipe/show/${i.recipe_id}/${i.recipe_name}`}>
-                  <Image className="h-full w-full" src={i.recipe_images[0].recipe_image} alt={i.recipe_images[0].recipe_image_title} width={768} height={400}/>
+                  <Image className="h-full w-full object-cover aspect-video" fit={"cover"} src={i.recipe_images[0].recipe_image} alt={i.recipe_images[0].recipe_image_title} width={1024} height={768}/>
                 </Link>
               </CarouselItem>
             )

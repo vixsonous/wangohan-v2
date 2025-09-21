@@ -29,7 +29,7 @@ export class RecipeDisplaySchema {
     total_views: z.number(),
     recipe_images: Array<typeof RecipeDisplaySchema.RecipeImageDisplay>,
     recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
-    user_id: z.number(),
+    user: UserSchema.UserDisplay,
     created_at: z.date(),
   });
 

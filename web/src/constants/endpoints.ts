@@ -9,4 +9,5 @@ export const ENDPOINTS = {
   IMAGE: "/images",
   RECIPE: "/recipes",
   COMMENT: "/comments",
+  ADMIN: "/admin",
 }

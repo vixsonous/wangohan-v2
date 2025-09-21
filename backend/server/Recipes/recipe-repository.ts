@@ -42,7 +42,14 @@ export class RecipeRepository {
           "recipe_event_tag",
           "recipe_size_tag",
           "recipe_description",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
           "recipes_table.created_at",
           "total_likes",
           "total_views",
@@ -98,7 +105,14 @@ export class RecipeRepository {
           "recipe_event_tag",
           "recipe_size_tag",
           "recipe_description",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
           "created_at",
           "total_likes",
           "total_views",
@@ -675,7 +689,14 @@ export class RecipeRepository {
           "recipe_event_tag",
           "recipe_size_tag",
           "recipe_description",
-          "user_id",
+          jsonObjectFrom(
+            lteb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
           "created_at",
           "total_likes",
           "total_views",
@@ -1030,6 +1051,66 @@ export class RecipeRepository {
     } catch (e) {
       log(e);
       return undefined;
+    }
+  }
+
+  static async getAllRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
+    try {
+
+      const recipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[] = await db
+        .selectFrom("recipes_table")
+        .select((eb) => [
+          "recipe_name",
+          "recipe_id",
+          "recipe_category",
+          "recipe_age_tag",
+          "recipe_event_tag",
+          "recipe_size_tag",
+          "recipe_description",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
+          "recipes_table.created_at",
+          "total_likes",
+          "total_views",
+          jsonArrayFrom(
+            eb.selectFrom("recipe_images_table")
+              .select([
+                "recipe_image_id",
+                "recipe_image_title",
+                "recipe_image_subtext",
+                "recipe_image",
+                "recipe_id",
+              ])
+              .whereRef("recipe_images_table.recipe_id","=","recipes_table.recipe_id")
+          ).as("recipe_images"),
+          jsonObjectFrom(
+            eb.selectFrom("recipe_comments_table")
+              .select(({ fn }) => [
+                fn
+                  .count<number>("recipe_comment_id")
+                  .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                  .as("total_rating"),
+                fn
+                  .avg<number>("recipe_comment_rating")
+                  .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
+                  .as("avg_rating"),
+              ])
+          ).as("recipe_rating_data")
+        ])
+        .execute();
+
+      log("Successfully retrieved all recipes!");
+      return recipes;
+    } catch (error) {
+      log("There was an error retrieving all recipes!");
+      console.error(error);
+      return [];
     }
   }
 }

@@ -6,6 +6,7 @@ import {authRouter, googleRouter, userRouter} from "@/server/User/user-routes";
 import {imageRouter} from "@/server/Images/image-routes";
 import {recipeRouter} from "@/server/Recipes/recipe-routes";
 import {commentRouter} from "@/server/Recipes/comment-routes";
+import {adminRouter} from "@/server/Admin/admin-routes";
 
 export const router = Router();
 
@@ -18,3 +19,4 @@ router.use("/auth", authRouter);
 router.use("/pets", petRouter);
 router.use("/events", eventRouter)
 router.use("/blogs", blogRouter);
+router.use("/admin", adminRouter);
