@@ -156,3 +156,18 @@ export class RecipeSchema {
     total_recipes: z.number(),
   })
 }
+
+export class AdminRecipeSchema {
+  static Recipe = z.object({
+    recipe_name: z.string(),
+    recipe_description: z.string(),
+    recipe_id: z.number(),
+    total_likes: z.number(),
+    total_views: z.number(),
+    recipe_images: Array<typeof RecipeDisplaySchema.RecipeImageDisplay>,
+    recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
+    is_published: z.boolean(),
+    user: UserSchema.UserDisplay,
+    created_at: z.date(),
+  })
+}

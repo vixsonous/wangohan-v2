@@ -7,7 +7,7 @@ import {FORBIDDEN, UNAUTHORIZED} from "@/constants/http-status";
 import LoginRequired from "@/app/(error)/log-in-required";
 import Forbidden from "@/app/(error)/forbidden";
 import z from "zod";
-import {RecipeDisplaySchema} from "@/types/recipe-types";
+import {AdminRecipeSchema, RecipeDisplaySchema} from "@/types/recipe-types";
 
 export default async function Dashboard() {
 
@@ -21,7 +21,7 @@ export default async function Dashboard() {
     return <Forbidden />
   }
 
-  const recipes = await ServerApiResponseService.getResponseData<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]>(recipesResponse);
+  const recipes = await ServerApiResponseService.getResponseData<z.infer<typeof AdminRecipeSchema.Recipe>[]>(recipesResponse);
 
   return (
     <div className={"w-full"}>

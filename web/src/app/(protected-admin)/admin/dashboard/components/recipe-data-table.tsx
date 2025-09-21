@@ -18,12 +18,12 @@ import {
 } from "@tanstack/react-table";
 import {arrayMove, SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import z from "zod";
-import {RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
+import {AdminRecipeSchema, RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
 import {Checkbox} from "@/components/ui/checkbox";
 import {Badge} from "@/components/ui/badge";
 import {
   IconChevronDown,
-  IconChevronLeft, IconChevronsRight, IconCircleCheckFilled,
+  IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCircleCheckFilled,
   IconDotsVertical,
   IconGripVertical, IconLayoutColumns, IconLoader, IconPlus,
 } from "@tabler/icons-react";
@@ -64,7 +64,7 @@ function DragHandle({ id }: { id: number }) {
   )
 }
 
-const columns: ColumnDef<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>[] = [
+const columns: ColumnDef<z.infer<typeof AdminRecipeSchema.Recipe>>[] = [
   {
     id: "drag",
     header: () => null,
@@ -126,25 +126,25 @@ const columns: ColumnDef<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>[
       </div>
     ),
   },
-  // {
-  //   accessorKey: "status",
-  //   header: "Status",
-  //   cell: ({ row }) => (
-  //     <Badge variant="outline" className="text-muted-foreground px-1.5">
-  //       {row.original.status === "Done" ? (
-  //         <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-  //       ) : (
-  //         <IconLoader />
-  //       )}
-  //       {row.original.status}
-  //     </Badge>
-  //   ),
-  // },
+  {
+    accessorKey: "is_published",
+    header: "Published Status",
+    cell: ({ row }) => (
+      <Badge variant="outline" className="text-muted-foreground px-1.5">
+        {row.original.is_published ? (
+          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+        ) : (
+          <IconLoader />
+        )}
+        {row.original.is_published ? "Published": "Unpublished"}
+      </Badge>
+    ),
+  },
   {
     accessorKey: "user",
-    header: () => <div className="w-full text-center">User</div>,
+    header: () => <div className="w-full text-left">User</div>,
     cell: ({ row }) => (
-      <Link href={`/user/${row.original.user?.user_id}/${row.original.user?.user_codename}`} className={"w-full flex justify-center gap-2"}>
+      <Link href={`/user/${row.original.user?.user_id}/${row.original.user?.user_codename}`} className={"w-full flex justify-start gap-2"}>
         <Avatar>
           <AvatarImage src={`${process.env.NEXT_PUBLIC_ORIGIN}/api${ENDPOINTS.IMAGE}/transform?src=${(row.original.user && row.original.user.user_image)}&w=32&h=32`} />
         </Avatar>
@@ -240,7 +240,7 @@ const columns: ColumnDef<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>[
 ]
 
 type RecipeDataTableProps = {
-  initialData: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]
+  initialData: z.infer<typeof AdminRecipeSchema.Recipe>[]
 }
 export default function RecipeDataTable({initialData}: RecipeDataTableProps) {
 
@@ -438,7 +438,7 @@ export default function RecipeDataTable({initialData}: RecipeDataTableProps) {
               disabled={!table.getCanPreviousPage()}
             >
               <span className="sr-only">Go to first page</span>
-              <IconChevronLeft />
+              <IconChevronsLeft />
             </Button>
             <Button
               variant="outline"
@@ -458,7 +458,7 @@ export default function RecipeDataTable({initialData}: RecipeDataTableProps) {
               disabled={!table.getCanNextPage()}
             >
               <span className="sr-only">Go to next page</span>
-              <IconChevronsRight />
+              <IconChevronRight />
             </Button>
             <Button
               variant="outline"

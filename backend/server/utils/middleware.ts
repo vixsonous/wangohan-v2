@@ -17,9 +17,6 @@ export class Middleware {
       return;
     }
 
-    console.log("user here!asd asd ");
-    console.log(user);
-
     next();
   }
 

@@ -104,6 +104,7 @@ export interface RecipesTable {
   total_views: number;
   user_id: number;
   is_deleted: boolean;
+  is_published: boolean;
   updated_at: Date;
   created_at: Date;
 }

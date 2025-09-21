@@ -1,6 +1,6 @@
 "use client";
 
-import {RecipeDisplaySchema} from "@/types/recipe-types";
+import {AdminRecipeSchema, RecipeDisplaySchema} from "@/types/recipe-types";
 import z from "zod";
 import {useIsMobile} from "@/hooks/use-mobile";
 import {
@@ -41,7 +41,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function RecipeTableCellViewer({ item }: { item: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay> }) {
+export default function RecipeTableCellViewer({ item }: { item: z.infer<typeof AdminRecipeSchema.Recipe> }) {
   const isMobile = useIsMobile()
 
   return (

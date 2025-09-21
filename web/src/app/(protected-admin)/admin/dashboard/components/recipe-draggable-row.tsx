@@ -2,12 +2,12 @@
 
 import {flexRender, Row} from "@tanstack/react-table";
 import z from "zod";
-import {RecipeDisplaySchema} from "@/types/recipe-types";
+import {AdminRecipeSchema, RecipeDisplaySchema} from "@/types/recipe-types";
 import {useSortable} from "@dnd-kit/sortable";
 import {TableCell, TableRow} from "@/components/ui/table";
 import { CSS } from "@dnd-kit/utilities";
 
-export default function RecipeDraggableRow({ row }: { row: Row<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>> }) {
+export default function RecipeDraggableRow({ row }: { row: Row<z.infer<typeof AdminRecipeSchema.Recipe>> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.recipe_id,
   })

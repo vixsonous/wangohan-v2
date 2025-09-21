@@ -106,7 +106,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import RecipeDataTable from "@/app/(protected-admin)/admin/dashboard/components/recipe-data-table";
-import {RecipeDisplaySchema} from "@/types/recipe-types";
+import {AdminRecipeSchema, RecipeDisplaySchema} from "@/types/recipe-types";
 
 export const schema = z.object({
   id: z.number(),
@@ -318,7 +318,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
 export function DataTable({
   recipes
 }: {
-  recipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]
+  recipes: z.infer<typeof AdminRecipeSchema.Recipe>[]
 }) {
 
   return (

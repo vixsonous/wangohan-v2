@@ -8,7 +8,7 @@ import {
   RecipeUpdate
 } from "@/database/types";
 import { log } from "../utils/log";
-import { RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
+import {AdminRecipeSchema, RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import {ImageProcess} from "../Images/image-service";
 import {Image} from "../Images/image";
@@ -313,6 +313,7 @@ export class RecipeRepository {
         total_likes: 0,
         total_views: 0,
         is_deleted: false,
+        is_published: false,
         updated_at: new Date(),
         created_at: new Date()
       } satisfies RecipeInsert;
@@ -1054,18 +1055,14 @@ export class RecipeRepository {
     }
   }
 
-  static async getAllRecipes(): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
+  static async getAllRecipes(): Promise<z.infer<typeof AdminRecipeSchema.Recipe>[]> {
     try {
 
-      const recipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[] = await db
+      const recipes: z.infer<typeof AdminRecipeSchema.Recipe>[] = await db
         .selectFrom("recipes_table")
         .select((eb) => [
           "recipe_name",
           "recipe_id",
-          "recipe_category",
-          "recipe_age_tag",
-          "recipe_event_tag",
-          "recipe_size_tag",
           "recipe_description",
           jsonObjectFrom(
             eb.selectFrom("user_details_table")
@@ -1078,6 +1075,7 @@ export class RecipeRepository {
           "recipes_table.created_at",
           "total_likes",
           "total_views",
+          "is_published",
           jsonArrayFrom(
             eb.selectFrom("recipe_images_table")
               .select([
