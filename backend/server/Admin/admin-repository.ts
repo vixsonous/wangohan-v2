@@ -5,6 +5,7 @@ import {AdminUserSchema} from "@/server/types/user-types.user";
 import {db} from "@/database/database";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import {log} from "@/server/utils/log";
+import {AdminControllerSchema} from "@/server/Admin/admin-controller";
 
 export class AdminRepository {
   static async getAdminData(): Promise<{
@@ -83,6 +84,24 @@ export class AdminRepository {
       log("There was an error retrieving all recipes!");
       console.error(error);
       return undefined;
+    }
+  }
+
+  static async publishRecipe(data: z.infer<typeof AdminControllerSchema.PublishRecipe>) {
+    try {
+      await db.updateTable("recipes_table")
+        .set({
+          is_published: data.is_published
+        })
+        .returningAll()
+        .where("recipe_id", "=", data.recipe_id)
+        .executeTakeFirstOrThrow();
+
+      log(`Successfully ${data.is_published ? 'published' : 'unpublished'} the recipe!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
     }
   }
 }

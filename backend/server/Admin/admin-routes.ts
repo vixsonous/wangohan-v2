@@ -5,3 +5,4 @@ import {Middleware} from "@/server/utils/middleware";
 export const adminRouter = Router();
 
 adminRouter.get("/data", Middleware.superAdmin , AdminController.getAdminData);
+adminRouter.patch("/recipes/status/publish", Middleware.superAdmin, AdminController.publishRecipe);

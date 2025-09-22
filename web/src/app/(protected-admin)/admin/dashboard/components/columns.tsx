@@ -25,6 +25,8 @@ import {AdminBlogSchema, BlogSchema} from "@/types/blog-types";
 import {AdminUserSchema, UserSchema} from "@/types/user-types.user";
 import {useDispatch} from "react-redux";
 import {setPublish} from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
+import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
+import {AxiosError, AxiosResponse} from "axios";
 
 export const useColumns = () => {
   const dispatch = useDispatch();
@@ -136,13 +138,16 @@ export const useColumns = () => {
       header: "Published Status",
       cell: ({ row }) => {
         const publishMutation = useMutation({
-          mutationFn: ({id, publish}: {id: number, publish: boolean}) => new Promise(res => {
-            console.log("dispatched")
-            dispatch(setPublish({id, publish}));
-            res("Hello")
-          }),
-          onSuccess: () => {
-            toast.success("Successful!", {description: "Suc"});
+          mutationFn: (data: {id: number, publish: boolean}) => ClientApiService.patch(ENDPOINTS.ADMIN + "/recipes/status/publish", data),
+          onSuccess: (response: AxiosResponse) => {
+            const message = ClientApiResponseService.getAxiosResponseMessage(response);
+            const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+            toast.success("Successful!", {description: message});
+            dispatch(setPublish(data));
+          },
+          onError: (error: AxiosError) => {
+            const message = ClientApiResponseService.getAxiosErrorMessage(error);
+            toast.error("Error!", {description: message});
           }
         })
 
