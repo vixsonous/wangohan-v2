@@ -7,11 +7,13 @@ import {FORBIDDEN, UNAUTHORIZED} from "@/constants/http-status";
 import LoginRequired from "@/app/(error)/log-in-required";
 import Forbidden from "@/app/(error)/forbidden";
 import z from "zod";
-import {AdminRecipeSchema, RecipeDisplaySchema} from "@/types/recipe-types";
+import {AdminRecipeSchema} from "@/types/recipe-types";
+import {AdminBlogSchema} from "@/types/blog-types";
+import {AdminUserSchema} from "@/types/user-types.user";
 
 export default async function Dashboard() {
 
-  const recipesResponse = await ServerApiService.get(ENDPOINTS.ADMIN + "/recipes");
+  const recipesResponse = await ServerApiService.get(ENDPOINTS.ADMIN + "/data");
 
   if(recipesResponse.status === UNAUTHORIZED) {
     return <LoginRequired />
@@ -21,7 +23,15 @@ export default async function Dashboard() {
     return <Forbidden />
   }
 
-  const recipes = await ServerApiResponseService.getResponseData<z.infer<typeof AdminRecipeSchema.Recipe>[]>(recipesResponse);
+  const data = await ServerApiResponseService.getResponseData<{
+    recipes: z.infer<typeof AdminRecipeSchema.Recipe>[],
+    blogs: z.infer<typeof AdminBlogSchema.Blog>[],
+    users: z.infer<typeof AdminUserSchema.User>[],
+  } | undefined>(recipesResponse);
+
+  if(data === undefined) {
+    return <Forbidden />
+  }
 
   return (
     <div className={"w-full"}>
@@ -34,7 +44,7 @@ export default async function Dashboard() {
               <ChartAreaInteractive />
             </div>
             {/*<DataTable data={data} />*/}
-            <DataTable recipes={recipes}/>
+            <DataTable recipes={data.recipes} users={data.users} blogs={data.blogs} />
           </div>
         </div>
       </div>

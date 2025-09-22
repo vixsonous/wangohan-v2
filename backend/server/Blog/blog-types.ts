@@ -77,3 +77,11 @@ export class PostBlogImageSchema {
     blog_image: z.custom<Express.Multer.File>().nonoptional(),
   })
 }
+
+export class AdminBlogSchema {
+  static Blog = z.object({
+    blog_id: z.number(),
+    title: z.string(),
+    is_published: z.boolean(),
+  })
+}

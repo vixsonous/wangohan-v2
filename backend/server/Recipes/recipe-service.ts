@@ -84,7 +84,7 @@ export class RecipeService {
     return await RecipeRepository.getComments(recipe_id, page);
   }
 
-  static async getAllRecipes() {
-    return await RecipeRepository.getAllRecipes();
+  static async getAdminData() {
+    return await RecipeRepository.getAdminData();
   }
 }

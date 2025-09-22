@@ -1,12 +1,12 @@
 import {Request, Response} from 'express';
 import {ApiResponse} from "@/server/utils/ApiUtils";
-import {RecipeService} from "@/server/Recipes/recipe-service";
+import {AdminService} from "@/server/Admin/admin-service";
 
 export class AdminController {
-  static async getAllRecipes(req: Request, res: Response) {
+  static async getAdminData(req: Request, res: Response) {
 
-    const recipes = await RecipeService.getAllRecipes();
+    const data = await AdminService.getAdminData();
 
-    ApiResponse.success(res, "Successfully retrieved all recipes", recipes);
+    ApiResponse.success(res, "Successfully retrieved admin data!", data);
   }
 }

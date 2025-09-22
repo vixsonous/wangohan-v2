@@ -4,4 +4,4 @@ import {Middleware} from "@/server/utils/middleware";
 
 export const adminRouter = Router();
 
-adminRouter.get("/recipes", Middleware.superAdmin , AdminController.getAllRecipes);
+adminRouter.get("/data", Middleware.superAdmin , AdminController.getAdminData);

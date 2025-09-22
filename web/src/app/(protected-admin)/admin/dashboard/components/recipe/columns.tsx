@@ -21,8 +21,8 @@ import {Button} from "@/components/ui/button";
 import {IconDotsVertical, IconGripVertical} from "@tabler/icons-react";
 import * as React from "react";
 import {useSortable} from "@dnd-kit/sortable";
-import {BlogSchema} from "@/types/blog-types";
-import {UserSchema} from "@/types/user-types.user";
+import {AdminBlogSchema, BlogSchema} from "@/types/blog-types";
+import {AdminUserSchema, UserSchema} from "@/types/user-types.user";
 
 // Create a separate component for the drag handle
 function DragHandle({ id }: { id: number }) {
@@ -199,7 +199,7 @@ export const recipeColumns: ColumnDef<z.infer<typeof AdminRecipeSchema.Recipe>>[
   },
 ]
 
-export const blogColumns: ColumnDef<z.infer<typeof BlogSchema.Blog>>[] = [
+export const blogColumns: ColumnDef<z.infer<typeof AdminBlogSchema.Blog>>[] = [
   {
     id: "drag",
     header: () => null,
@@ -298,7 +298,7 @@ export const blogColumns: ColumnDef<z.infer<typeof BlogSchema.Blog>>[] = [
   },
 ]
 
-export const userColumns: ColumnDef<z.infer<typeof UserSchema.User>>[] = [
+export const userColumns: ColumnDef<z.infer<typeof AdminUserSchema.User>>[] = [
   {
     id: "drag",
     header: () => null,
@@ -331,7 +331,7 @@ export const userColumns: ColumnDef<z.infer<typeof UserSchema.User>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "user_details",
+    accessorKey: "user_codename",
     header: "User",
     cell: ({ row }) => {
       return <TableCellViewer item={row.original} />

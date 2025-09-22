@@ -18,3 +18,12 @@ export class UserSchema {
   });
 
 }
+
+export class AdminUserSchema {
+  static User = z.object({
+    user_id: z.number(),
+    user_codename: z.string(),
+    user_lvl: z.number(),
+    user_image: z.string()
+  })
+}

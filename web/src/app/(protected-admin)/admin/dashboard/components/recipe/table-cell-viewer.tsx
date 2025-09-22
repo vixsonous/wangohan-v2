@@ -49,7 +49,7 @@ const chartConfig = {
 export default memo(function TableCellViewer<T>({ item }: { item: T }) {
   const isMobile = useIsMobile()
 
-  const title = isRecipe(item) ? (item as Recipe).recipe_name : isBlog(item) ? (item as Blog).title : (item as User).user_details?.user_codename || "Not registered";
+  const title = isRecipe(item) ? (item as Recipe).recipe_name : isBlog(item) ? (item as Blog).title : (item as User).user_codename || "Not registered";
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>

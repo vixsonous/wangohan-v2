@@ -32,14 +32,14 @@ import {
 import {Button} from "@/components/ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import DraggableRow from "@/app/(protected-admin)/admin/dashboard/components/recipe/draggable-row";
-import {BlogSchema} from "@/types/blog-types";
-import {UserSchema} from "@/types/user-types.user";
+import {AdminBlogSchema, BlogSchema} from "@/types/blog-types";
+import {AdminUserSchema, UserSchema} from "@/types/user-types.user";
 import {useMemo} from "react";
 
 
 export type Recipe = z.infer<typeof AdminRecipeSchema.Recipe>;
-export type Blog = z.infer<typeof BlogSchema.Blog>;
-export type User = z.infer<typeof UserSchema.User>;
+export type Blog = z.infer<typeof AdminBlogSchema.Blog>;
+export type User = z.infer<typeof AdminUserSchema.User>;
 
 export function isRecipe(dt: any): dt is Recipe {
   return 'recipe_id' in dt;

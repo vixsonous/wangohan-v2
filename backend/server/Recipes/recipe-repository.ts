@@ -14,7 +14,8 @@ import {ImageProcess} from "../Images/image-service";
 import {Image} from "../Images/image";
 import {RecipeCacheUtil} from "@/server/utils/redis";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
-import {UserSchema} from "@/server/types/user-types.user";
+import {AdminUserSchema, UserSchema} from "@/server/types/user-types.user";
+import {AdminBlogSchema} from "@/server/Blog/blog-types";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -1052,63 +1053,6 @@ export class RecipeRepository {
     } catch (e) {
       log(e);
       return undefined;
-    }
-  }
-
-  static async getAllRecipes(): Promise<z.infer<typeof AdminRecipeSchema.Recipe>[]> {
-    try {
-
-      const recipes: z.infer<typeof AdminRecipeSchema.Recipe>[] = await db
-        .selectFrom("recipes_table")
-        .select((eb) => [
-          "recipe_name",
-          "recipe_id",
-          "recipe_description",
-          jsonObjectFrom(
-            eb.selectFrom("user_details_table")
-              .select([
-                "user_codename",
-                "user_id",
-                "user_image"
-              ]).whereRef("user_id", "=", "recipes_table.user_id")
-          ).as("user"),
-          "recipes_table.created_at",
-          "total_likes",
-          "total_views",
-          "is_published",
-          jsonArrayFrom(
-            eb.selectFrom("recipe_images_table")
-              .select([
-                "recipe_image_id",
-                "recipe_image_title",
-                "recipe_image_subtext",
-                "recipe_image",
-                "recipe_id",
-              ])
-              .whereRef("recipe_images_table.recipe_id","=","recipes_table.recipe_id")
-          ).as("recipe_images"),
-          jsonObjectFrom(
-            eb.selectFrom("recipe_comments_table")
-              .select(({ fn }) => [
-                fn
-                  .count<number>("recipe_comment_id")
-                  .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
-                  .as("total_rating"),
-                fn
-                  .avg<number>("recipe_comment_rating")
-                  .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
-                  .as("avg_rating"),
-              ])
-          ).as("recipe_rating_data")
-        ])
-        .execute();
-
-      log("Successfully retrieved all recipes!");
-      return recipes;
-    } catch (error) {
-      log("There was an error retrieving all recipes!");
-      console.error(error);
-      return [];
     }
   }
 }

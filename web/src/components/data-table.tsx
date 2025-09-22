@@ -19,18 +19,28 @@ import {
 } from "@/components/ui/tabs"
 import {
   Blog,
-  Recipe
+  Recipe, User
 } from "@/app/(protected-admin)/admin/dashboard/components/recipe/generic-data-table";
 import {AdminRecipeSchema} from "@/types/recipe-types";
-import {blogColumns, recipeColumns} from "@/app/(protected-admin)/admin/dashboard/components/recipe/columns";
+import {
+  blogColumns,
+  recipeColumns,
+  userColumns
+} from "@/app/(protected-admin)/admin/dashboard/components/recipe/columns";
 import GenericDataTable from "@/app/(protected-admin)/admin/dashboard/components/recipe/generic-data-table";
 import {QueryClientProvider} from "@tanstack/react-query";
 import {queryClient} from "@/lib/tanstack-query";
+import {AdminBlogSchema} from "@/types/blog-types";
+import {AdminUserSchema} from "@/types/user-types.user";
 
 export function DataTable({
-  recipes
+  recipes,
+  blogs,
+  users,
 }: {
-  recipes: z.infer<typeof AdminRecipeSchema.Recipe>[]
+  recipes: z.infer<typeof AdminRecipeSchema.Recipe>[],
+  blogs: z.infer<typeof AdminBlogSchema.Blog>[],
+  users: z.infer<typeof AdminUserSchema.User>[]
 }) {
 
   return (
@@ -54,8 +64,7 @@ export function DataTable({
             <SelectContent>
               <SelectItem value="recipes">Recipes</SelectItem>
               <SelectItem value="blogs">Blogs</SelectItem>
-              <SelectItem value="key-personnel">Key Personnel</SelectItem>
-              <SelectItem value="focus-documents">Focus Documents</SelectItem>
+              <SelectItem value="users">Users</SelectItem>
             </SelectContent>
           </Select>
           <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
@@ -63,10 +72,9 @@ export function DataTable({
             <TabsTrigger value="blogs">
               Blogs
             </TabsTrigger>
-            <TabsTrigger value="key-personnel">
-              Key Personnel <Badge variant="secondary">2</Badge>
+            <TabsTrigger value="users">
+              Users
             </TabsTrigger>
-            <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent
@@ -81,16 +89,14 @@ export function DataTable({
           className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 data-[state=inactive]:hidden"
           forceMount={true}
         >
-          <GenericDataTable<Blog> initialData={[]} columns={blogColumns} />
-        </TabsContent>
-        <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
-          <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+          <GenericDataTable<Blog> initialData={blogs} columns={blogColumns} />
         </TabsContent>
         <TabsContent
-          value="focus-documents"
-          className="flex flex-col px-4 lg:px-6"
+          value="users"
+          className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 data-[state=inactive]:hidden"
+          forceMount={true}
         >
-          <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+          <GenericDataTable<User> initialData={users} columns={userColumns} />
         </TabsContent>
       </Tabs>
     </QueryClientProvider>

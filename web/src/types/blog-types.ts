@@ -61,3 +61,11 @@ export class PostBlogImageSchema {
     blog_image: z.file("Please provide the image!"),
   })
 }
+
+export class AdminBlogSchema {
+  static Blog = z.object({
+    blog_id: z.number(),
+    title: z.string(),
+    is_published: z.boolean(),
+  })
+}
