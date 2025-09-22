@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import DraggableRow from "@/app/(protected-admin)/admin/dashboard/components/recipe/draggable-row";
+import DraggableRow from "@/app/(protected-admin)/admin/dashboard/components/draggable-row";
 import {AdminBlogSchema, BlogSchema} from "@/types/blog-types";
 import {AdminUserSchema, UserSchema} from "@/types/user-types.user";
 import {useMemo} from "react";
@@ -63,7 +63,7 @@ export default function GenericDataTable<T>({initialData, columns}: DataTablePro
   const dt = useMemo(() => initialData, [initialData]);
   const cols = useMemo(() => columns, []);
 
-  const [data, setData] = React.useState<T[]>(() => dt)
+  const [data, setData] = React.useState<T[]>(dt)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -94,7 +94,7 @@ export default function GenericDataTable<T>({initialData, columns}: DataTablePro
   )
 
   const table = useReactTable({
-    data,
+    data: initialData,
     columns: cols,
     state: {
       sorting,

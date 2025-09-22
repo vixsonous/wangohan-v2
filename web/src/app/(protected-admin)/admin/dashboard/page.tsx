@@ -1,6 +1,5 @@
 import {SiteHeader} from "@/components/site-header";
 import {ChartAreaInteractive} from "@/components/chart-area-interactive";
-import {DataTable} from "@/components/data-table";
 import {ServerApiResponseService, ServerApiService} from "@/lib/server-utils";
 import {ENDPOINTS} from "@/constants/endpoints";
 import {FORBIDDEN, UNAUTHORIZED} from "@/constants/http-status";
@@ -10,6 +9,7 @@ import z from "zod";
 import {AdminRecipeSchema} from "@/types/recipe-types";
 import {AdminBlogSchema} from "@/types/blog-types";
 import {AdminUserSchema} from "@/types/user-types.user";
+import DataTable from "@/components/data-table";
 
 export default async function Dashboard() {
 

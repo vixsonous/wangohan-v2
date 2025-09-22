@@ -23,7 +23,7 @@ import {
   isBlog,
   isRecipe,
   Recipe, User
-} from "@/app/(protected-admin)/admin/dashboard/components/recipe/generic-data-table";
+} from "@/app/(protected-admin)/admin/dashboard/components/generic-data-table";
 import {memo} from "react";
 
 const chartData = [

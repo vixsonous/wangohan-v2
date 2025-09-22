@@ -4,7 +4,7 @@ import {flexRender, Row} from "@tanstack/react-table";
 import {useSortable} from "@dnd-kit/sortable";
 import {TableCell, TableRow} from "@/components/ui/table";
 import { CSS } from "@dnd-kit/utilities";
-import {isBlog, isRecipe, isUser} from "@/app/(protected-admin)/admin/dashboard/components/recipe/generic-data-table";
+import {isBlog, isRecipe, isUser} from "@/app/(protected-admin)/admin/dashboard/components/generic-data-table";
 import {memo} from "react";
 
 export default memo(function DraggableRow<T>({ row }: { row: Row<T> }) {
