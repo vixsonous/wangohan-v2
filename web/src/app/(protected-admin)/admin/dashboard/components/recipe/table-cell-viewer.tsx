@@ -1,7 +1,5 @@
 "use client";
 
-import {AdminRecipeSchema, RecipeDisplaySchema} from "@/types/recipe-types";
-import z from "zod";
 import {useIsMobile} from "@/hooks/use-mobile";
 import {
   Drawer, DrawerClose,
@@ -20,6 +18,13 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import * as React from "react";
+import {
+  Blog,
+  isBlog,
+  isRecipe,
+  Recipe, User
+} from "@/app/(protected-admin)/admin/dashboard/components/recipe/generic-data-table";
+import {memo} from "react";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -41,19 +46,20 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function RecipeTableCellViewer({ item }: { item: z.infer<typeof AdminRecipeSchema.Recipe> }) {
+export default memo(function TableCellViewer<T>({ item }: { item: T }) {
   const isMobile = useIsMobile()
 
+  const title = isRecipe(item) ? (item as Recipe).recipe_name : isBlog(item) ? (item as Blog).title : (item as User).user_details?.user_codename || "Not registered";
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
         <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          {item.recipe_name}
+          {title}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>{item.recipe_name}</DrawerTitle>
+          <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>
             Showing total visitors for the last 6 months
           </DrawerDescription>
@@ -119,12 +125,12 @@ export default function RecipeTableCellViewer({ item }: { item: z.infer<typeof A
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Header</Label>
-              <Input id="header" defaultValue={item.recipe_name} />
+              <Input id="header" defaultValue={title} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="type">Type</Label>
-                <Select defaultValue={item.recipe_name}>
+                <Select defaultValue={title}>
                   <SelectTrigger id="type" className="w-full">
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
@@ -150,7 +156,7 @@ export default function RecipeTableCellViewer({ item }: { item: z.infer<typeof A
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.recipe_name}>
+                <Select defaultValue={title}>
                   <SelectTrigger id="status" className="w-full">
                     <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
@@ -165,16 +171,16 @@ export default function RecipeTableCellViewer({ item }: { item: z.infer<typeof A
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="target">Target</Label>
-                <Input id="target" defaultValue={item.recipe_name} />
+                <Input id="target" defaultValue={title} />
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="limit">Limit</Label>
-                <Input id="limit" defaultValue={item.recipe_name} />
+                <Input id="limit" defaultValue={title} />
               </div>
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="reviewer">Reviewer</Label>
-              <Select defaultValue={item.recipe_name}>
+              <Select defaultValue={title}>
                 <SelectTrigger id="reviewer" className="w-full">
                   <SelectValue placeholder="Select a reviewer" />
                 </SelectTrigger>
@@ -198,4 +204,4 @@ export default function RecipeTableCellViewer({ item }: { item: z.infer<typeof A
       </DrawerContent>
     </Drawer>
   )
-}
+});

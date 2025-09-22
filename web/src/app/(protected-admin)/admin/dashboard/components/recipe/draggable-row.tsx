@@ -1,15 +1,15 @@
 "use client";
 
 import {flexRender, Row} from "@tanstack/react-table";
-import z from "zod";
-import {AdminRecipeSchema, RecipeDisplaySchema} from "@/types/recipe-types";
 import {useSortable} from "@dnd-kit/sortable";
 import {TableCell, TableRow} from "@/components/ui/table";
 import { CSS } from "@dnd-kit/utilities";
+import {isBlog, isRecipe, isUser} from "@/app/(protected-admin)/admin/dashboard/components/recipe/generic-data-table";
+import {memo} from "react";
 
-export default function RecipeDraggableRow({ row }: { row: Row<z.infer<typeof AdminRecipeSchema.Recipe>> }) {
+export default memo(function DraggableRow<T>({ row }: { row: Row<T> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.recipe_id,
+    id: isRecipe(row.original) ? row.original.recipe_id : isBlog(row.original) ? row.original.blog_id : isUser(row.original) ? row.original.user_id : -1,
   })
 
   return (
@@ -30,4 +30,4 @@ export default function RecipeDraggableRow({ row }: { row: Row<z.infer<typeof Ad
       ))}
     </TableRow>
   )
-}
+});

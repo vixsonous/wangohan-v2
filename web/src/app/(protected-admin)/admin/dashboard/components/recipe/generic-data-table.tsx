@@ -1,5 +1,4 @@
 "use client";
-
 import {
   closestCenter,
   DndContext, type DragEndEvent, KeyboardSensor, MouseSensor, TouchSensor, type UniqueIdentifier, useSensor, useSensors,
@@ -16,235 +15,55 @@ import {
   useReactTable,
   VisibilityState
 } from "@tanstack/react-table";
-import {arrayMove, SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
+import {arrayMove, SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import z from "zod";
-import {AdminRecipeSchema, RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
-import {Checkbox} from "@/components/ui/checkbox";
-import {Badge} from "@/components/ui/badge";
+import {AdminRecipeSchema} from "@/types/recipe-types";
 import {
   IconChevronDown,
-  IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCircleCheckFilled,
-  IconDotsVertical,
-  IconGripVertical, IconLayoutColumns, IconLoader, IconPlus,
+  IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconLayoutColumns, IconPlus,
 } from "@tabler/icons-react";
 import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {
   DropdownMenu, DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import RecipeTableCellViewer from "@/app/(protected-admin)/admin/dashboard/components/recipe-table-cell-viewer";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import RecipeDraggableRow from "@/app/(protected-admin)/admin/dashboard/components/recipe-draggable-row";
-import {Avatar, AvatarImage} from "@/components/ui/avatar";
-import {ENDPOINTS} from "@/constants/endpoints";
-import Link from "next/link";
+import DraggableRow from "@/app/(protected-admin)/admin/dashboard/components/recipe/draggable-row";
+import {BlogSchema} from "@/types/blog-types";
+import {UserSchema} from "@/types/user-types.user";
+import {useMemo} from "react";
 
-// Create a separate component for the drag handle
-function DragHandle({ id }: { id: number }) {
-  const { attributes, listeners } = useSortable({
-    id,
-  })
 
-  return (
-    <Button
-      {...attributes}
-      {...listeners}
-      variant="ghost"
-      size="icon"
-      className="text-muted-foreground size-7 hover:bg-transparent"
-    >
-      <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Drag to reorder</span>
-    </Button>
-  )
+export type Recipe = z.infer<typeof AdminRecipeSchema.Recipe>;
+export type Blog = z.infer<typeof BlogSchema.Blog>;
+export type User = z.infer<typeof UserSchema.User>;
+
+export function isRecipe(dt: any): dt is Recipe {
+  return 'recipe_id' in dt;
 }
 
-const columns: ColumnDef<z.infer<typeof AdminRecipeSchema.Recipe>>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.recipe_id} />,
-  },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "recipe_name",
-    header: "Recipe Name",
-    cell: ({ row }) => {
-      return <RecipeTableCellViewer item={row.original} />
-    },
-    enableHiding: false,
-  },
-  {
-    accessorKey: "total_likes",
-    header: () => <div className="w-full text-center">Total Likes</div>,
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Badge variant="outline" className="text-muted-foreground px-1.5 text-center">
-          {row.original.total_likes}
-        </Badge>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "total_views",
-    header: () => <div className="w-full text-center">Total Views</div>,
-    cell: ({ row }) => (
-      <div className={"w-full flex items-center justify-center"}>
-        <Badge variant="outline" className="text-muted-foreground px-1.5 text-center">
-          {row.original.total_views}
-        </Badge>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "is_published",
-    header: "Published Status",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.is_published ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : (
-          <IconLoader />
-        )}
-        {row.original.is_published ? "Published": "Unpublished"}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "user",
-    header: () => <div className="w-full text-left">User</div>,
-    cell: ({ row }) => (
-      <Link href={`/user/${row.original.user?.user_id}/${row.original.user?.user_codename}`} className={"w-full flex justify-start gap-2"}>
-        <Avatar>
-          <AvatarImage src={`${process.env.NEXT_PUBLIC_ORIGIN}/api${ENDPOINTS.IMAGE}/transform?src=${(row.original.user && row.original.user.user_image)}&w=32&h=32`} />
-        </Avatar>
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.user && row.original.user.user_codename}
-        </Badge>
-      </Link>
-    ),
-  },
-  // {
-  //   accessorKey: "limit",
-  //   header: () => <div className="w-full text-right">Limit</div>,
-  //   cell: ({ row }) => (
-  //     <form
-  //       onSubmit={(e) => {
-  //         e.preventDefault()
-  //         toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-  //           loading: `Saving ${row.original.header}`,
-  //           success: "Done",
-  //           error: "Error",
-  //         })
-  //       }}
-  //     >
-  //       <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-  //         Limit
-  //       </Label>
-  //       <Input
-  //         className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-  //         defaultValue={row.original.limit}
-  //         id={`${row.original.id}-limit`}
-  //       />
-  //     </form>
-  //   ),
-  // },
-  // {
-  //   accessorKey: "reviewer",
-  //   header: "Reviewer",
-  //   cell: ({ row }) => {
-  //     const isAssigned = row.original.reviewer !== "Assign reviewer"
-  //
-  //     if (isAssigned) {
-  //       return row.original.reviewer
-  //     }
-  //
-  //     return (
-  //       <>
-  //         <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-  //           Reviewer
-  //         </Label>
-  //         <Select>
-  //           <SelectTrigger
-  //             className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-  //             size="sm"
-  //             id={`${row.original.id}-reviewer`}
-  //           >
-  //             <SelectValue placeholder="Assign reviewer" />
-  //           </SelectTrigger>
-  //           <SelectContent align="end">
-  //             <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-  //             <SelectItem value="Jamik Tashpulatov">
-  //               Jamik Tashpulatov
-  //             </SelectItem>
-  //           </SelectContent>
-  //         </Select>
-  //       </>
-  //     )
-  //   },
-  // },
-  {
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
-
-type RecipeDataTableProps = {
-  initialData: z.infer<typeof AdminRecipeSchema.Recipe>[]
+export function isBlog(dt: any): dt is Blog {
+  return 'blog_id' in dt;
 }
-export default function RecipeDataTable({initialData}: RecipeDataTableProps) {
 
-  const [data, setData] = React.useState(() => initialData)
+export function isUser(dt: any): dt is User {
+  return 'user_lvl' in dt;
+}
+
+
+type DataTableProps<T> = {
+  initialData: T[];
+  columns:  ColumnDef<T>[];
+}
+export default function GenericDataTable<T>({initialData, columns}: DataTableProps<T>) {
+
+  const dt = useMemo(() => initialData, [initialData]);
+  const cols = useMemo(() => columns, []);
+
+  const [data, setData] = React.useState<T[]>(() => dt)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -264,13 +83,19 @@ export default function RecipeDataTable({initialData}: RecipeDataTableProps) {
   )
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ recipe_id }) => recipe_id) || [],
+    () => data?.map((dt) => {
+      if(isRecipe(dt)) return dt.recipe_id;
+      if(isBlog(dt)) return dt.blog_id;
+      if(isUser(dt)) return dt.user_id;
+
+      return -1;
+    }) || [],
     [data]
   )
 
   const table = useReactTable({
     data,
-    columns,
+    columns: cols,
     state: {
       sorting,
       columnVisibility,
@@ -278,7 +103,12 @@ export default function RecipeDataTable({initialData}: RecipeDataTableProps) {
       columnFilters,
       pagination,
     },
-    getRowId: (row) => row.recipe_id.toString(),
+    getRowId: (row) => {
+      if(isRecipe(row)) return row.recipe_id.toString();
+      if(isBlog(row)) return row.blog_id.toString();
+      if(isUser(row)) return row.user_id.toString();
+      return "-1";
+    },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -379,7 +209,7 @@ export default function RecipeDataTable({initialData}: RecipeDataTableProps) {
                   strategy={verticalListSortingStrategy}
                 >
                   {table.getRowModel().rows.map((row) => (
-                    <RecipeDraggableRow key={row.id} row={row} />
+                    <DraggableRow key={row.id} row={row} />
                   ))}
                 </SortableContext>
               ) : (
