@@ -10,4 +10,8 @@ export class AdminService {
   static publishRecipe(data: z.infer<typeof AdminControllerSchema.PublishRecipe>) {
     return AdminRepository.publishRecipe(data);
   }
+
+  static publishBlog(data: z.infer<typeof AdminControllerSchema.PublishBlog>) {
+    return AdminRepository.publishBlog(data);
+  }
 }

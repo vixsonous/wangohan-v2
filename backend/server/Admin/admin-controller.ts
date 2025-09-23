@@ -7,6 +7,11 @@ export class AdminControllerSchema {
   static PublishRecipe = z.object({
     recipe_id: z.number("Please provide a valid recipe id!"),
     is_published: z.boolean("Please provide if published or not!"),
+  });
+
+  static PublishBlog = z.object({
+    blog_id: z.number("Please provide a valid blog id!"),
+    is_published: z.boolean("Please provide if published or not!"),
   })
 }
 
@@ -39,5 +44,28 @@ export class AdminController {
     }
 
     ApiResponse.success(res, "Successfully published recipe!", data);
+  }
+
+  static async publishBlog(req: Request, res: Response) {
+    const data = req.body;
+
+    const publishBlogParseResult = AdminControllerSchema.PublishBlog.safeParse({
+      blog_id: data.id,
+      is_published: data.publish,
+    });
+
+    if(!publishBlogParseResult.success) {
+      ApiResponse.error(res, publishBlogParseResult.error.issues[0].message);
+      return;
+    }
+
+    const result = await AdminService.publishBlog(publishBlogParseResult.data);
+
+    if(!result) {
+      ApiResponse.error(res,`There was an error ${data.published ? 'publishing' : 'unpublishing'} the blog!`);
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully published blog!", data);
   }
 }

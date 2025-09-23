@@ -261,15 +261,25 @@ export const useColumns = () => {
       cell: ({ row }) => {
 
         const publishMutation = useMutation({
-          mutationFn: () => new Promise(res => res("Hello")),
-          onSuccess: () => {
-            toast.success("Successful!", {description: "Suc"});
+          mutationFn: (data: {id: number, publish: boolean}) => ClientApiService.patch(ENDPOINTS.ADMIN + "/blogs/status/publish", data),
+          onSuccess: (response: AxiosResponse) => {
+            const message = ClientApiResponseService.getAxiosResponseMessage(response);
+            const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+            toast.success("Successful!", {description: message});
+            dispatch(setPublish(data));
+          },
+          onError: (error: AxiosError) => {
+            const message = ClientApiResponseService.getAxiosErrorMessage(error);
+            toast.error("Error!", {description: message});
           }
         })
 
         return (
           <>
-            <Select onValueChange={(value: string) => publishMutation.mutate()} defaultValue={row.original.is_published ? "publish" : "unpublish"}>
+            <Select
+              onValueChange={(value: string) => publishMutation.mutate({id: row.original.blog_id, publish: value === "publish"})}
+              defaultValue={row.original.is_published ? "publish" : "unpublish"}
+            >
               <SelectTrigger
                 className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
                 size="sm"

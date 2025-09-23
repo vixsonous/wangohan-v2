@@ -4,13 +4,15 @@ import NotificationReducer from "@/app/_root-components/(root-header)/notificati
 import EditorStateReducer from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 import UserReducer from "./slice/user-slice";
 import RecipeReducer from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
+import BlogReducer from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-slice";
 export const store = configureStore({
   reducer: {
     comments: CommentsReducer,
     notifications: NotificationReducer,
     editorState: EditorStateReducer,
     user: UserReducer,
-    recipeAdmin: RecipeReducer
+    recipeAdmin: RecipeReducer,
+    blogsAdmin: BlogReducer
   }
 });
 

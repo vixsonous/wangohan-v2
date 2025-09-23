@@ -26,7 +26,6 @@ export const recipeSlice = createSlice({
       const idx = state.findIndex(r => r.recipe_id === action.payload.id);
       if(idx < 0) return state;
       state[idx].is_published = action.payload.publish;
-      console.log(state);
     }
   }
 });

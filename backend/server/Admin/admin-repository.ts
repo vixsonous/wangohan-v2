@@ -58,10 +58,12 @@ export class AdminRepository {
               ])
           ).as("recipe_rating_data")
         ])
+        .orderBy("created_at", "desc")
         .execute();
 
       const blogs: z.infer<typeof AdminBlogSchema.Blog>[] = await db.selectFrom("blog_columns_table")
         .select(["blog_id", "title", "is_published"])
+        .orderBy("created_at", "desc")
         .execute();
 
       const users: z.infer<typeof AdminUserSchema.User>[] = await db.selectFrom("users_table")
@@ -72,6 +74,7 @@ export class AdminRepository {
           "user_codename",
           "user_lvl"
         ])
+        .orderBy("users_table.created_at", "desc")
         .execute();
 
       log("Successfully retrieved all recipes!");
@@ -98,6 +101,24 @@ export class AdminRepository {
         .executeTakeFirstOrThrow();
 
       log(`Successfully ${data.is_published ? 'published' : 'unpublished'} the recipe!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
+    }
+  }
+
+  static async publishBlog(data: z.infer<typeof AdminControllerSchema.PublishBlog>) {
+    try {
+      await db.updateTable("blog_columns_table")
+        .set({
+          is_published: data.is_published
+        })
+        .returningAll()
+        .where("blog_id", "=", data.blog_id)
+        .executeTakeFirstOrThrow();
+
+      log(`Successfully ${data.is_published ? 'published' : 'unpublished'} the blog!`);
       return true;
     } catch (e) {
       log(e);
