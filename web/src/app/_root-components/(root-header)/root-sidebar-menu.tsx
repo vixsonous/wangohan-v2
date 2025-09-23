@@ -42,6 +42,7 @@ export default function SidebarMenu(
     {text: "犬と食に関するコラム", show: true, condition: pathname.includes("/columns/list") , href: ROUTES.COLUMNS, src: "/icons/svg/white-article.svg", alt: "an icon for columns/blog", type: "link"},
     {text: "愛犬登録", show: true, condition: pathname.includes("/user/settings/"), href: user_data === undefined ? "/login" : `/user/${user_data?.user_id}/${user_data?.user_details?.user_codename}?register_pet=true`, src: "/icons/svg/white-paw-print.svg", alt: "an icon for pet registration", type: "link"},
     {text: "ブログを作成する", show: user_data?.user_lvl === 2, condition: pathname.includes("/columns/create"), href: "/columns/create", src: "/icons/svg/white-simple-pencil.svg", alt: "an icon for blog creation", type: "link"},
+    {text: "管理者", show: user_data?.user_lvl === 2, condition: pathname.includes("/admin/dashboard"), href: "/admin/dashboard", src: "/icons/svg/white-user-circle.svg", alt: "an icon for blog creation", type: "link"},
     {text: "ログアウト", function: () => logoutMutation.mutate(), show: user_data !== undefined, condition: false, href: `/`, src: "/icons/svg/primary-sign-out.svg", alt: "sign out icon", type: "button"},
   ]
 
