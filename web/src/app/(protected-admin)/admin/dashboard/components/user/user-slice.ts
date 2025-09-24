@@ -14,6 +14,11 @@ type UpdateUserLevelActionPayload = {
   type: string;
 }
 
+type DeleteUserActionPayload = {
+  payload: number;
+  type: string;
+}
+
 export const userSlice = createSlice({
   name: 'User Admin',
   initialState: [] as User[],
@@ -26,9 +31,15 @@ export const userSlice = createSlice({
       const idx = state.findIndex(r => r.user_id === action.payload.id);
       if(idx < 0) return state;
       state[idx].user_lvl = action.payload.level;
+    },
+
+    deleteUser(state, action: DeleteUserActionPayload) {
+      const idx = state.findIndex(r => r.user_id === action.payload);
+      if(idx < 0) return state;
+      state.splice(idx, 1);
     }
   }
 });
 
-export const {setUsers, updateUserLevel} = userSlice.actions;
+export const {setUsers, updateUserLevel, deleteUser} = userSlice.actions;
 export default userSlice.reducer;

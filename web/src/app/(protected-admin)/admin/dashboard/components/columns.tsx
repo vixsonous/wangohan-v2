@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/dialog";
 import SpinLoader from "@/components/SpinLoader";
 import {useRouter} from "next/navigation";
+import {deleteUser} from "@/app/(protected-admin)/admin/dashboard/components/user/user-slice";
 
 type PublishState = "published" | "unpublished" | "loading";
 type MutationTypes = "recipes" | "blogs" | "users";
@@ -253,14 +254,20 @@ export const useColumns = () => {
       accessorKey: "user",
       header: () => <div className="w-full text-left">User</div>,
       cell: ({ row }) => (
-        <Link href={`/user/${row.original.user?.user_id}/${row.original.user?.user_codename}`} className={"w-full flex justify-start gap-2"}>
-          <Avatar>
-            <AvatarImage src={`${process.env.NEXT_PUBLIC_ORIGIN}/api${ENDPOINTS.IMAGE}/transform?src=${(row.original.user && row.original.user.user_image)}&w=32&h=32`} />
-          </Avatar>
-          <Badge variant="outline" className="text-muted-foreground px-1.5">
-            {row.original.user && row.original.user.user_codename}
+        row.original.user ? (
+          <Link href={`/user/${row.original.user?.user_id}/${row.original.user?.user_codename}`} className={"w-full flex justify-start gap-2"}>
+            <Avatar>
+              <AvatarImage src={`${process.env.NEXT_PUBLIC_ORIGIN}/api${ENDPOINTS.IMAGE}/transform?src=${(row.original.user && row.original.user.user_image)}&w=32&h=32`} />
+            </Avatar>
+            <Badge variant="outline" className="text-muted-foreground px-1.5">
+              {row.original.user && row.original.user.user_codename}
+            </Badge>
+          </Link>
+        ) : (
+          <Badge variant={"outline"} className="text-muted-foreground px-1.5">
+            匿名
           </Badge>
-        </Link>
+        )
       ),
     },
     {
@@ -524,20 +531,24 @@ export const useColumns = () => {
       accessorKey: "user_lvl",
       header: "User Level",
       cell: ({ row }) => {
-
+        const [loading, setLoading] = React.useState(() => false);
         return (
           <>
-            <Select disabled={updateUserLevelMutation.isPending} onValueChange={(value: string) => updateUserLevelMutation.mutate({
-              id: row.original.user_id,
-              name: row.original.user_codename,
-              level: value
-            })} defaultValue={String(row.original.user_lvl)}>
+            <Select disabled={updateUserLevelMutation.isPending} onValueChange={async (value: string) => {
+              setLoading(true);
+              await updateUserLevelMutation.mutateAsync({
+                id: row.original.user_id,
+                name: row.original.user_codename,
+                level: value
+              });
+              setLoading(false);
+            }} defaultValue={String(row.original.user_lvl)}>
               <SelectTrigger
                 className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
                 size="sm"
                 id={`${row.original.user_lvl}-reviewer`}
               >
-                {updateUserLevelMutation.isPending && <IconLoader />} <SelectValue placeholder="Select User Level" />
+                {loading && <IconLoader />} <SelectValue placeholder="Select User Level" />
               </SelectTrigger>
               <SelectContent align="end">
                 <SelectItem value="0">Super Admin</SelectItem>
@@ -555,27 +566,65 @@ export const useColumns = () => {
     },
     {
       id: "actions",
-      cell: () => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Make a copy</DropdownMenuItem>
-            <DropdownMenuItem>Favorite</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({row}) => {
+
+        const [dpOpen, setDpOpen] = React.useState(false);
+        const [open , setOpen] = React.useState(false);
+
+        return (
+          <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem>Make a copy</DropdownMenuItem>
+              <DropdownMenuItem>Favorite</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant={"destructive"} asChild={true}>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild={true}>
+                    <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
+                      Delete
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Delete user?</DialogTitle>
+                    <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
+                    <DialogFooter>
+                      <Button
+                        variant={"destructive"}
+                        onClick={async () => {
+                          const response = await deleteMutation.mutateAsync({
+                            id: row.original.user_id,
+                            name: row.original.user_codename,
+                            type: "users"
+                          });
+                          const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
+                          dispatch(deleteUser(Number(data.id)));
+                          setOpen(false);
+                          setDpOpen(false);
+                        }}
+                        disabled={deleteMutation.isPending}
+                      >
+                        {deleteMutation.isPending && <SpinLoader />} Delete
+                      </Button>
+                      <DialogClose>Cancel</DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
     },
   ]
 

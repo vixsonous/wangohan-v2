@@ -197,4 +197,20 @@ export class AdminRepository {
       return false;
     }
   }
+
+  static async deleteUser(data: z.infer<typeof AdminControllerSchema.DeleteUser>) {
+    try {
+      await db.deleteFrom("user_details_table")
+        .where(lb => lb.and({
+          user_id: data.user_id
+        }))
+        .executeTakeFirstOrThrow();
+
+      log(`Successfully deleted the user!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
+    }
+  }
 }

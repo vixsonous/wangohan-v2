@@ -27,6 +27,10 @@ export class AdminControllerSchema {
   static UpdateUserLevel = z.object({
     user_id: z.number("Please provide a valid user id!"),
     user_level: z.enum(["2", "1", "0"], "Please provide a valid user level!"),
+  });
+
+  static DeleteUser = z.object({
+    user_id: z.number("Please provide a valid user id!"),
   })
 }
 
@@ -154,5 +158,26 @@ export class AdminController {
     }
 
     ApiResponse.success(res, "Successfully updated user level!", {id: user_id});
+  }
+
+  static async deleteUser(req: Request, res: Response) {
+    const user_id = req.params.user_id;
+    const deleteUserParseResult = AdminControllerSchema.DeleteUser.safeParse({
+      user_id: Number(user_id),
+    });
+
+    if(!deleteUserParseResult.success) {
+      ApiResponse.error(res, deleteUserParseResult.error.issues[0].message);
+      return;
+    }
+
+    const result = await AdminService.deleteUser(deleteUserParseResult.data);
+
+    if(!result) {
+      ApiResponse.error(res, "There was an error deleting the user!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully deleted the user!", {id: user_id});
   }
 }

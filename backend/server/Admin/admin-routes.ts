@@ -10,3 +10,4 @@ adminRouter.patch("/blogs/status/publish", Middleware.superAdmin, AdminControlle
 adminRouter.delete("/recipes/:recipe_id", Middleware.superAdmin, AdminController.deleteRecipe);
 adminRouter.delete("/blogs/:blog_id", Middleware.superAdmin, AdminController.deleteBlog);
 adminRouter.patch("/users/:user_id/level", Middleware.superAdmin, AdminController.updateUserLevel);
+adminRouter.delete("/users/:user_id", Middleware.superAdmin, AdminController.deleteUser);
