@@ -8,6 +8,7 @@ import Link from "next/link";
 import {BlogItem} from "@/app/(public)/columns/list/[pageNo]/components/blog-item";
 import {PaginationWithLinks} from "@/app/(public)/recipe/list/[pageNo]/components/pagination-with-links";
 import {ENDPOINTS} from "@/constants/endpoints";
+import {ROUTES} from "@/constants/routes";
 
 type Props = {
   params: Promise<{
@@ -99,8 +100,8 @@ export default async function Columns({params, searchParams}: Props) {
       <ul className="py-8 flex w-full text-xs md:text-sm justify-center gap-2">
         {["全て", "レシピ特集", "基礎知識", "その他"].map((item, idx) => (
           <li key={idx}>
-            <Link href={`/columns/list/${pageNo}?category=${item}`}>
-              <Button className={"bg-secondary-bg text-xs md:text-sm rounded-full text-primary-text border-2 border-primary-text hover:bg-secondary-bg/50"}>
+            <Link href={ROUTES.COLUMNS + `?category=${item}`}>
+              <Button className={`${(!category && item === "全て") || (category && category.includes(item)) ? "bg-primary-text text-secondary-bg hover:bg-primary-text/80" : "bg-secondary-bg text-primary-text hover:bg-secondary-bg/50"} text-xs md:text-sm rounded-full  border-2 border-primary-text `}>
                 <Image preload={true} width={16} height={16} src={"/icons/column/paw2.png"} alt={"category icon"}/>
                 <p>{item}</p>
               </Button>

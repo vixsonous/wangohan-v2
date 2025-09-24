@@ -290,13 +290,11 @@ export const useColumns = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem asChild={true}>
-                <Link href={`/recipe/edit/${row.original.recipe_id}/${row.original.recipe_name}`}>
+              <DropdownMenuItem>
+                <Link className={"w-full"} href={`/recipe/edit/${row.original.recipe_id}/${row.original.recipe_name}`}>
                   Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Make a copy</DropdownMenuItem>
-              <DropdownMenuItem variant={"destructive"}>Favorite</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant={"destructive"} asChild={true}>
                 <Dialog open={open} onOpenChange={setOpen}>
@@ -444,8 +442,6 @@ export const useColumns = () => {
                   Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Make a copy</DropdownMenuItem>
-              <DropdownMenuItem>Favorite</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant={"destructive"} asChild={true}>
                 <Dialog open={open} onOpenChange={setOpen}>
@@ -584,9 +580,7 @@ export const useColumns = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Make a copy</DropdownMenuItem>
-              <DropdownMenuItem>Favorite</DropdownMenuItem>
+              <DropdownMenuItem disabled={true}>Reset Password</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant={"destructive"} asChild={true}>
                 <Dialog open={open} onOpenChange={setOpen}>

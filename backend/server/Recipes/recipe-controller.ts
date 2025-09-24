@@ -459,7 +459,7 @@ export class RecipeController {
     const owner = await RecipeService.getRecipeOwner(likeRecipeParseResult.data.recipe_id);
 
     if(owner === undefined || owner === null) {
-      ApiResponse.error(res, RecipeErrorMessage.OWNER_DATA);
+      ApiResponse.success(res, likeRecipeParseResult.data.is_liked ? RecipeSuccessMessage.LIKE_RECIPE : RecipeSuccessMessage.UNLIKE_RECIPE);
       return;
     }
 
@@ -545,7 +545,7 @@ export class RecipeController {
     const owner = await RecipeService.getRecipeOwner(postCommentParseResult.data.recipe_id);
 
     if(owner === undefined || owner === null) {
-      ApiResponse.error(res, RecipeErrorMessage.OWNER_DATA);
+      ApiResponse.success(res, RecipeSuccessMessage.POST_COMMENT, submittedComment);
       return;
     }
 
