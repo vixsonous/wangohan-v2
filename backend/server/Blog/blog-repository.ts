@@ -2,8 +2,7 @@ import {log} from "@/server/utils/log";
 import {db} from "@/database/database";
 import z from "zod";
 import {BlogSchema, GetBlogImagesSchema, GetBlogSchema} from "@/server/Blog/blog-types";
-import {ImageProcess} from "@/server/Images/image-service";
-import {Image} from "@/server/Images/image";
+import {ImageProcess, ImageService} from "@/server/Images/image-service";
 import {BlogImageInsert} from "@/database/types";
 
 export class BlogRepository {
@@ -187,7 +186,7 @@ export class BlogRepository {
 
       const uploadImage = await image.result();
       const folder = `blog-uploads`;
-      const uploadDone = await Image.uploadToR2Public(folder, uploadImage, blog_image.originalname.split(".")[0], "webp", "images/webp");
+      const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, blog_image.originalname.split(".")[0], "webp", "images/webp");
 
       if(uploadDone.Key === undefined) {
         return undefined;

@@ -6,6 +6,7 @@ import {db} from "@/database/database";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import {log} from "@/server/utils/log";
 import {AdminControllerSchema} from "@/server/Admin/admin-controller";
+import {ImageService} from "@/server/Images/image-service";
 
 export class AdminRepository {
   static async getAdminData(): Promise<{
@@ -119,6 +120,41 @@ export class AdminRepository {
         .executeTakeFirstOrThrow();
 
       log(`Successfully ${data.is_published ? 'published' : 'unpublished'} the blog!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
+    }
+  }
+
+  static async deleteRecipe(data: z.infer<typeof AdminControllerSchema.DeleteRecipe>) {
+    try {
+      await db.deleteFrom("recipes_table")
+        .where(lb => lb.and({
+          recipe_id: data.recipe_id,
+          recipe_name: data.recipe_name
+        }))
+        .executeTakeFirstOrThrow();
+
+      log(`Successfully deleted the recipe!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
+    }
+  }
+
+  static async deleteRecipeImages(data: z.infer<typeof AdminControllerSchema.DeleteRecipe>) {
+    try {
+      const images = await db.deleteFrom("recipe_images_table")
+        .where(lb => lb.and({
+          recipe_id: data.recipe_id,
+        }))
+        .returning(["recipe_image"])
+        .execute();
+
+      await ImageService.deleteR2Public(images.map(i => i.recipe_image));
+      log(`Successfully deleted the recipe!`);
       return true;
     } catch (e) {
       log(e);

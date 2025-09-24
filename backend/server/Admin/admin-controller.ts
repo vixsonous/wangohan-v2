@@ -9,10 +9,15 @@ export class AdminControllerSchema {
     is_published: z.boolean("Please provide if published or not!"),
   });
 
+  static DeleteRecipe = z.object({
+    recipe_id: z.number("Please provide a valid recipe id!"),
+    recipe_name: z.string("Please provide a valid recipe name!"),
+  })
+
   static PublishBlog = z.object({
     blog_id: z.number("Please provide a valid blog id!"),
     is_published: z.boolean("Please provide if published or not!"),
-  })
+  });
 }
 
 export class AdminController {
@@ -44,6 +49,30 @@ export class AdminController {
     }
 
     ApiResponse.success(res, "Successfully published recipe!", data);
+  }
+
+  static async deleteRecipe(req: Request, res: Response) {
+    const recipe_id = req.params.recipe_id;
+    const {recipe_name} = req.query;
+
+    const deleteRecipeParseResult = AdminControllerSchema.DeleteRecipe.safeParse({
+      recipe_id: Number(recipe_id),
+      recipe_name: recipe_name,
+    });
+
+    if(!deleteRecipeParseResult.success) {
+      ApiResponse.error(res, deleteRecipeParseResult.error.issues[0].message);
+      return;
+    }
+
+    const result = await AdminService.deleteRecipe(deleteRecipeParseResult.data);
+
+    if(!result) {
+      ApiResponse.error(res, "There was an error deleting the recipe!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully deleted recipe!", {id: recipe_id});
   }
 
   static async publishBlog(req: Request, res: Response) {

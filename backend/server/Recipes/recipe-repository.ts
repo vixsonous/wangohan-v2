@@ -8,14 +8,13 @@ import {
   RecipeUpdate
 } from "@/database/types";
 import { log } from "../utils/log";
-import {AdminRecipeSchema, RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
+import { RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
-import {ImageProcess} from "../Images/image-service";
-import {Image} from "../Images/image";
+import {ImageProcess, ImageService} from "../Images/image-service";
 import {RecipeCacheUtil} from "@/server/utils/redis";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
-import {AdminUserSchema, UserSchema} from "@/server/types/user-types.user";
-import {AdminBlogSchema} from "@/server/Blog/blog-types";
+import { UserSchema} from "@/server/types/user-types.user";
+import {R2_FILE_PREFIX} from "@/server/utils/constants";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -363,7 +362,7 @@ export class RecipeRepository {
         const uploadImage = await image.result();
 
         const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe_id).padStart(8, "0")}`;
-        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
+        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
         return {key: uploadDone.Key, order: idx, filename: i.originalname};
       }));
 
@@ -424,11 +423,11 @@ export class RecipeRepository {
 
           let key = deleteImage.delete_image_key;
 
-          if(key.startsWith("r2://")) {
+          if(key.startsWith(R2_FILE_PREFIX)) {
             key = key.slice(5);
           }
 
-          return Image.deleteR2Public(key);
+          return ImageService.deleteR2Public(key);
         }));
 
         const deleteIds = rcImageDeleteIds.map(deleteImage => Number(deleteImage.delete_image_id));
@@ -458,7 +457,7 @@ export class RecipeRepository {
         const uploadImage = await imageProcess.result();
 
         const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe.recipe_id).padStart(8, "0")}`;
-        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, image.originalname.split(".")[0], "webp", "images/webp");
+        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, image.originalname.split(".")[0], "webp", "images/webp");
 
         return {key: uploadDone.Key, order: 0, filename: image.originalname};
       }));
@@ -893,8 +892,8 @@ export class RecipeRepository {
 
       // Delete images in the bucket
       await Promise.all(images.map(async image => {
-        const key = image.recipe_image.startsWith("r2://") ? image.recipe_image.split("r2://")[1] : image.recipe_image;
-        await Image.deleteR2Public(key);
+        const key = image.recipe_image.startsWith(R2_FILE_PREFIX) ? image.recipe_image.split(R2_FILE_PREFIX)[1] : image.recipe_image;
+        await ImageService.deleteR2Public(key);
       }));
 
       const res = await trx.deleteFrom("recipes_table")

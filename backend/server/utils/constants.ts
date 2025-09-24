@@ -1,0 +1,1 @@
+export const R2_FILE_PREFIX = "r2://"

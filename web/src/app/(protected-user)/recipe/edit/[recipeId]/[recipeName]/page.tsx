@@ -7,6 +7,7 @@ import {isAuthenticated} from "@/server-actions/User/user";
 import Unauthorized from "@/app/(error)/unauthorized";
 import RecipeNotFound from "@/app/(error)/recipe-not-found";
 import LoginRequired from "@/app/(error)/log-in-required";
+import {UserLevel} from "@/constants/user-levels";
 
 type Props = {
   params: Promise<{ recipeId: string, recipeName: string }>;
@@ -31,7 +32,7 @@ export default async function EditRecipe({params}: Props) {
     )
   }
 
-  if(userData.user_id !== recipe.user_id) {
+  if(userData.user_lvl !== UserLevel.super_admin || (userData.user_lvl === UserLevel.user && userData.user_id !== recipe.user_id)) {
     return (
       <Unauthorized />
     )

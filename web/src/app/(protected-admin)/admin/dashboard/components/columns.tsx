@@ -18,18 +18,71 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {IconDotsVertical, IconGripVertical} from "@tabler/icons-react";
+import {
+  IconCircleCheckFilled,
+  IconCircleXFilled,
+  IconDotsVertical,
+  IconGripVertical,
+  IconLoader
+} from "@tabler/icons-react";
 import * as React from "react";
 import {useSortable} from "@dnd-kit/sortable";
-import {AdminBlogSchema, BlogSchema} from "@/types/blog-types";
-import {AdminUserSchema, UserSchema} from "@/types/user-types.user";
+import {AdminBlogSchema} from "@/types/blog-types";
+import {AdminUserSchema} from "@/types/user-types.user";
 import {useDispatch} from "react-redux";
-import {setPublish} from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
+import {
+  deleteRecipe,
+  setPublishRecipe
+} from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
+import {setPublishBlog} from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-slice";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosError, AxiosResponse} from "axios";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import SpinLoader from "@/components/SpinLoader";
+import {useRouter} from "next/navigation";
+
+type PublishState = "published" | "unpublished" | "loading";
 
 export const useColumns = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
+
+  const deleteRecipeMutation = useMutation({
+    mutationFn: (data: {id: number, name: string}) => ClientApiService.delete(ENDPOINTS.ADMIN + "/recipes/" + data.id + "?recipe_name=" + data.name),
+    onSuccess: (response: AxiosResponse) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(response);
+      const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
+      toast.success("Successful!", {description: message});
+
+      dispatch(deleteRecipe(Number(data.id)));
+    },
+    onError: (error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
+    }
+  });
+
+  const publishMutation = useMutation({
+    mutationFn: (data: {id: number, publish: boolean, type: "recipes" | "blogs"}) => ClientApiService.patch(ENDPOINTS.ADMIN + "/"+data.type+"/status/publish", data),
+    onSuccess: (response: AxiosResponse) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(response);
+      const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+      toast.success("Successful!", {description: message});
+      return data;
+    },
+    onError: (error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
+    }
+  });
 
 // Create a separate component for the drag handle
   function DragHandle({ id }: { id: number }) {
@@ -137,31 +190,29 @@ export const useColumns = () => {
       accessorKey: "is_published",
       header: "Published Status",
       cell: ({ row }) => {
-        const publishMutation = useMutation({
-          mutationFn: (data: {id: number, publish: boolean}) => ClientApiService.patch(ENDPOINTS.ADMIN + "/recipes/status/publish", data),
-          onSuccess: (response: AxiosResponse) => {
-            const message = ClientApiResponseService.getAxiosResponseMessage(response);
-            const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
-            toast.success("Successful!", {description: message});
-            dispatch(setPublish(data));
-          },
-          onError: (error: AxiosError) => {
-            const message = ClientApiResponseService.getAxiosErrorMessage(error);
-            toast.error("Error!", {description: message});
-          }
-        })
-
+        const [isPublished, setIsPublished] = React.useState<PublishState>(() => row.original.is_published ? "published" : "unpublished");
         return (
           <>
-            <Select onValueChange={(value: string) => publishMutation.mutate({
-              id: row.original.recipe_id,
-              publish: value === "publish"
-            })} defaultValue={row.original.is_published ? "publish" : "unpublish"}>
+            <Select disabled={publishMutation.isPending} onValueChange={async (value: string) => {
+              setIsPublished("loading")
+              const response = await publishMutation.mutateAsync({
+                id: row.original.recipe_id,
+                publish: value === "publish",
+                type: "recipes"
+              });
+
+              const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+              dispatch(setPublishRecipe(data));
+              setIsPublished(data.publish ? "published" : "unpublished");
+            }} defaultValue={row.original.is_published ? "publish" : "unpublish"}>
               <SelectTrigger
                 className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
                 size="sm"
                 id={`${row.original.is_published}-reviewer`}
               >
+                {isPublished === "published" && <IconCircleCheckFilled className={"fill-green-500 dark:fill-green-400"} />}
+                {isPublished === "unpublished" && <IconCircleXFilled className={"fill-red-500 dark:fill-red-400"} />}
+                {isPublished === "loading" && <IconLoader className={"animate-spin"} />}
                 <SelectValue placeholder="Publish Recipe" />
               </SelectTrigger>
               <SelectContent align="end">
@@ -191,27 +242,66 @@ export const useColumns = () => {
     },
     {
       id: "actions",
-      cell: () => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Make a copy</DropdownMenuItem>
-            <DropdownMenuItem>Favorite</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({row}) => {
+
+        const [dpOpen, setDpOpen] = React.useState(false);
+        const [open , setOpen] = React.useState(false);
+
+        return (
+          <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem asChild={true}>
+                <Link href={`/recipe/edit/${row.original.recipe_id}/${row.original.recipe_name}`}>
+                  Edit
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>Make a copy</DropdownMenuItem>
+              <DropdownMenuItem variant={"destructive"}>Favorite</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant={"destructive"} asChild={true}>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild={true}>
+                    <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
+                      Delete
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Delete recipe?</DialogTitle>
+                    <DialogDescription>Are you sure you want to delete this recipe?</DialogDescription>
+                    <DialogFooter>
+                      <Button
+                        variant={"destructive"}
+                        onClick={async () => {
+                          await deleteRecipeMutation.mutateAsync({
+                            id: row.original.recipe_id,
+                            name: row.original.recipe_name,
+                          });
+                          setOpen(false);
+                          setDpOpen(false);
+                        }}
+                        disabled={deleteRecipeMutation.isPending}
+                      >
+                        {deleteRecipeMutation.isPending && <SpinLoader />} Delete
+                      </Button>
+                      <DialogClose>Cancel</DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
     },
   ]
 
@@ -259,25 +349,18 @@ export const useColumns = () => {
       accessorKey: "is_published",
       header: "Published Status",
       cell: ({ row }) => {
-
-        const publishMutation = useMutation({
-          mutationFn: (data: {id: number, publish: boolean}) => ClientApiService.patch(ENDPOINTS.ADMIN + "/blogs/status/publish", data),
-          onSuccess: (response: AxiosResponse) => {
-            const message = ClientApiResponseService.getAxiosResponseMessage(response);
-            const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
-            toast.success("Successful!", {description: message});
-            dispatch(setPublish(data));
-          },
-          onError: (error: AxiosError) => {
-            const message = ClientApiResponseService.getAxiosErrorMessage(error);
-            toast.error("Error!", {description: message});
-          }
-        })
-
+        const [isPublished, setIsPublished] = React.useState<PublishState>(() => row.original.is_published ? "published" : "unpublished");
         return (
           <>
             <Select
-              onValueChange={(value: string) => publishMutation.mutate({id: row.original.blog_id, publish: value === "publish"})}
+              disabled={publishMutation.isPending}
+              onValueChange={async (value: string) => {
+                setIsPublished("loading");
+                const response = await publishMutation.mutateAsync({id: row.original.blog_id, publish: value === "publish", type: "blogs"});
+                const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+                dispatch(setPublishBlog(data));
+                setIsPublished(data.publish ? "published" : "unpublished");
+              }}
               defaultValue={row.original.is_published ? "publish" : "unpublish"}
             >
               <SelectTrigger
@@ -285,10 +368,15 @@ export const useColumns = () => {
                 size="sm"
                 id={`${row.original.is_published}-reviewer`}
               >
+                {isPublished === "published" && <IconCircleCheckFilled className={"fill-green-500 dark:fill-green-400"} />}
+                {isPublished === "unpublished" && <IconCircleXFilled className={"fill-red-500 dark:fill-red-400"} />}
+                {isPublished === "loading" && <IconLoader className={"animate-spin"} />}
                 <SelectValue placeholder="Publish Recipe" />
               </SelectTrigger>
               <SelectContent align="end">
-                <SelectItem value="publish">Publish</SelectItem>
+                <SelectItem value="publish" className={"flex gap-2 items-center"}>
+                  Publish
+                </SelectItem>
                 <SelectItem value="unpublish">
                   Unpublish
                 </SelectItem>

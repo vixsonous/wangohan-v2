@@ -6,7 +6,7 @@ type SetBlogsActionPayload = {
   type: string;
 }
 
-type SetPublishedActionPayload = {
+type SetPublishBlogActionPayload = {
   payload: {
     id: number,
     publish: boolean;
@@ -22,7 +22,7 @@ export const blogSlice = createSlice({
       return action.payload;
     },
 
-    setPublished(state, action: SetPublishedActionPayload) {
+    setPublishBlog(state, action: SetPublishBlogActionPayload) {
       const idx = state.findIndex( b => b.blog_id === action.payload.id);
       if (idx < 0) return state;
       state[idx].is_published = action.payload.publish;
@@ -30,5 +30,5 @@ export const blogSlice = createSlice({
   }
 });
 
-export const {setBlogs, setPublished} = blogSlice.actions;
+export const {setBlogs, setPublishBlog} = blogSlice.actions;
 export default blogSlice.reducer;

@@ -4,6 +4,10 @@ import z from "zod";
 import {ImageSchema, ImageTypes} from "@/server/types/image-types.image";
 import {Request} from "express";
 import {log} from "@/server/utils/log";
+import {CompleteMultipartUploadCommandOutput, DeleteObjectCommand, DeleteObjectsCommand} from "@aws-sdk/client-s3";
+import {Upload} from "@aws-sdk/lib-storage";
+import {Bucket, s3} from "@/server/Images/image";
+import {R2_FILE_PREFIX} from "@/server/utils/constants";
 
 export type Formats = "webp" | "png" | "jpg" | "jpeg";
 
@@ -85,8 +89,8 @@ export class ImageService {
 
       if(String(src).startsWith("/")) {
         response = await fetch(process.env.BASE_WEB_INTERNAL_URL + "/" + src);
-      } else if(String(src).startsWith("r2://")) {
-        response = await fetch(process.env.BASE_PUBLIC_BUCKET_URL + "/" + String(src).split("r2://")[1]);
+      } else if(String(src).startsWith(R2_FILE_PREFIX)) {
+        response = await fetch(process.env.BASE_PUBLIC_BUCKET_URL + "/" + String(src).split(R2_FILE_PREFIX)[1]);
       } else {
         response = await fetch(src as string);
       }
@@ -131,5 +135,40 @@ export class ImageService {
       return undefined;
     }
 
+  }
+
+  static async uploadToR2Public(folder: string, file: Buffer, filename: string, file_extension: string, content_type: string): Promise<CompleteMultipartUploadCommandOutput> {
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: Bucket,
+        Body: file,
+        Key: `${folder}/${filename}.${file_extension}`,
+        ContentType: content_type,
+      },
+      leavePartsOnError: false,
+    });
+
+    upload.on("httpUploadProgress", progress =>  {
+      console.log(`Upload progress ${progress.loaded} of ${progress.total}`);
+    });
+
+    return await upload.done();
+  }
+
+  static async deleteR2Public(key: string | string[]) {
+    if(Array.isArray(key)) {
+      await s3.send(new DeleteObjectsCommand({
+        Bucket,
+        Delete: {
+          Objects: key.map( k => ({Key: k.startsWith(R2_FILE_PREFIX) ? k.split(R2_FILE_PREFIX)[1] : k}))
+        }
+      }))
+    } else {
+      await s3.send(new DeleteObjectCommand({
+        Bucket,
+        Key: key
+      }))
+    }
   }
 }

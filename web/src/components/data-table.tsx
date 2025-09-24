@@ -47,8 +47,8 @@ function DataTableCore({
 
   const dispatch = useDispatch();
   const [init, setInit] = useState(() => false);
-  const {recipeAdmin, blogsAdmin} = useSelector((state: RootState) => state);
-
+  const recipeAdmin = useSelector((state: RootState) => state.recipeAdmin);
+  const blogsAdmin = useSelector((state: RootState) => state.blogsAdmin);
   const {recipeColumns, userColumns, blogColumns} = useColumns();
 
   useEffect(() => {
