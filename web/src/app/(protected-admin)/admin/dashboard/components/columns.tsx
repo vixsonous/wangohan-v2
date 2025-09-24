@@ -51,6 +51,7 @@ import {useRouter} from "next/navigation";
 
 type PublishState = "published" | "unpublished" | "loading";
 type MutationTypes = "recipes" | "blogs" | "users";
+type UserLevels = "2" | "1" | "0";
 
 export const useColumns = () => {
   const dispatch = useDispatch();
@@ -82,6 +83,21 @@ export const useColumns = () => {
     onSuccess: (response: AxiosResponse) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(response);
       const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+      toast.success("Successful!", {description: message});
+      return data;
+    },
+    onError: (error: AxiosError) => {
+      const message = ClientApiResponseService.getAxiosErrorMessage(error);
+      toast.error("Error!", {description: message});
+    }
+  });
+
+  const updateUserLevelMutation = useMutation({
+    mutationFn: (data: {id: number, name: string, level: string}) =>
+      ClientApiService.patch(ENDPOINTS.ADMIN + `/users/${data.id}/level?user_codename=${data.name}&user_level=${data.level}`),
+    onSuccess: (response: AxiosResponse) => {
+      const message = ClientApiResponseService.getAxiosResponseMessage(response);
+      const data = ClientApiResponseService.getAxiosResponseData<{id: number, level: UserLevels}>(response);
       toast.success("Successful!", {description: message});
       return data;
     },
@@ -509,22 +525,19 @@ export const useColumns = () => {
       header: "User Level",
       cell: ({ row }) => {
 
-        const publishMutation = useMutation({
-          mutationFn: () => new Promise(res => res("Hello")),
-          onSuccess: () => {
-            toast.success("Successful!", {description: "Suc"});
-          }
-        })
-
         return (
           <>
-            <Select onValueChange={(value: string) => publishMutation.mutate()} defaultValue={String(row.original.user_lvl)}>
+            <Select disabled={updateUserLevelMutation.isPending} onValueChange={(value: string) => updateUserLevelMutation.mutate({
+              id: row.original.user_id,
+              name: row.original.user_codename,
+              level: value
+            })} defaultValue={String(row.original.user_lvl)}>
               <SelectTrigger
                 className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
                 size="sm"
                 id={`${row.original.user_lvl}-reviewer`}
               >
-                <SelectValue placeholder="Select User Level" />
+                {updateUserLevelMutation.isPending && <IconLoader />} <SelectValue placeholder="Select User Level" />
               </SelectTrigger>
               <SelectContent align="end">
                 <SelectItem value="0">Super Admin</SelectItem>

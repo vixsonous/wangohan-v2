@@ -22,6 +22,11 @@ export class AdminControllerSchema {
   static DeleteBlog = z.object({
     blog_id: z.number("Please provide a valid blog id!"),
     title: z.string("Please provide the blog title!")
+  });
+
+  static UpdateUserLevel = z.object({
+    user_id: z.number("Please provide a valid user id!"),
+    user_level: z.enum(["2", "1", "0"], "Please provide a valid user level!"),
   })
 }
 
@@ -125,5 +130,29 @@ export class AdminController {
     }
 
     ApiResponse.success(res, "Successfully deleted blog!", {id: deleteBlogParseResult.data.blog_id});
+  }
+
+  static async updateUserLevel(req: Request, res: Response) {
+    const user_id = req.params.user_id;
+    const {user_level} = req.query;
+
+    const updateUserLevelParseResult = AdminControllerSchema.UpdateUserLevel.safeParse({
+      user_id: Number(user_id),
+      user_level: user_level,
+    });
+
+    if(!updateUserLevelParseResult.success) {
+      ApiResponse.error(res, updateUserLevelParseResult.error.issues[0].message);
+      return;
+    }
+
+    const result = await AdminService.updateUserLevel(updateUserLevelParseResult.data);
+
+    if(!result) {
+      ApiResponse.error(res, "There was an error updating the user level!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully updated user level!", {id: user_id});
   }
 }

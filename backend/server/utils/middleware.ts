@@ -12,7 +12,7 @@ export class Middleware {
       return;
     }
 
-    if(user.user_lvl === UserLevel.super_admin) {
+    if(user.user_lvl !== UserLevel.super_admin) {
       ApiResponse.forbidden(res, "Unauthorized admin access!");
       return;
     }

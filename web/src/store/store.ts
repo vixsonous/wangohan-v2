@@ -5,6 +5,7 @@ import EditorStateReducer from "@/app/(protected-user)/columns/rich-editor/rich-
 import UserReducer from "./slice/user-slice";
 import RecipeReducer from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
 import BlogReducer from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-slice";
+import UserAdminReducer from "@/app/(protected-admin)/admin/dashboard/components/user/user-slice";
 export const store = configureStore({
   reducer: {
     comments: CommentsReducer,
@@ -12,7 +13,8 @@ export const store = configureStore({
     editorState: EditorStateReducer,
     user: UserReducer,
     recipeAdmin: RecipeReducer,
-    blogsAdmin: BlogReducer
+    blogsAdmin: BlogReducer,
+    usersAdmin: UserAdminReducer
   }
 });
 

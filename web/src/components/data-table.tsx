@@ -32,6 +32,7 @@ import {Provider, useDispatch, useSelector} from "react-redux";
 import {RootState, store} from "@/store/store";
 import {setRecipes} from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
 import {setBlogs} from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-slice";
+import {setUsers} from "@/app/(protected-admin)/admin/dashboard/components/user/user-slice";
 
 type DataTableProps = {
   recipes: z.infer<typeof AdminRecipeSchema.Recipe>[],
@@ -49,15 +50,21 @@ function DataTableCore({
   const [init, setInit] = useState(() => false);
   const recipeAdmin = useSelector((state: RootState) => state.recipeAdmin);
   const blogsAdmin = useSelector((state: RootState) => state.blogsAdmin);
+  const usersAdmin = useSelector((state: RootState) => state.usersAdmin);
+
   const {recipeColumns, userColumns, blogColumns} = useColumns();
 
   useEffect(() => {
-    if(!recipes || recipes.length !== 0) {
+    if(recipes && recipes.length !== 0) {
       dispatch(setRecipes(recipes));
     }
 
-    if(!blogs || blogs.length !== 0) {
+    if(blogs && blogs.length !== 0) {
       dispatch(setBlogs(blogs));
+    }
+
+    if(users && users.length !== 0) {
+      dispatch(setUsers(users));
     }
 
     setInit(true);
@@ -115,7 +122,7 @@ function DataTableCore({
         className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 data-[state=inactive]:hidden"
         forceMount={true}
       >
-        <GenericDataTable<User> initialData={users} columns={userColumns} />
+        <GenericDataTable<User> initialData={usersAdmin} columns={userColumns} />
       </TabsContent>
     </Tabs>
   )

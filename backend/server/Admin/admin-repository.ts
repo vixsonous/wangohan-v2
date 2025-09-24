@@ -178,4 +178,23 @@ export class AdminRepository {
       return false;
     }
   }
+
+  static async updateUserLevel(data: z.infer<typeof AdminControllerSchema.UpdateUserLevel>) {
+    try {
+      await db.updateTable("users_table")
+        .set({
+          user_lvl: Number(data.user_level)
+        })
+        .where(lb => lb.and({
+          user_id: data.user_id,
+        }))
+        .executeTakeFirstOrThrow();
+
+      log(`Successfully deleted the recipe!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
+    }
+  }
 }
