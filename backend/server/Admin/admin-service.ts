@@ -19,4 +19,8 @@ export class AdminService {
   static async publishBlog(data: z.infer<typeof AdminControllerSchema.PublishBlog>) {
     return AdminRepository.publishBlog(data);
   }
+
+  static async deleteBlog(data: z.infer<typeof AdminControllerSchema.DeleteBlog>) {
+    return AdminRepository.deleteBlog(data);
+  }
 }

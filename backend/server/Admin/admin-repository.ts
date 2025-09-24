@@ -161,4 +161,21 @@ export class AdminRepository {
       return false;
     }
   }
+
+  static async deleteBlog(data: z.infer<typeof AdminControllerSchema.DeleteBlog>) {
+    try {
+      await db.deleteFrom("blog_columns_table")
+        .where(lb => lb.and({
+          blog_id: data.blog_id,
+          title: data.title
+        }))
+        .executeTakeFirstOrThrow();
+
+      log(`Successfully deleted the recipe!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
+    }
+  }
 }

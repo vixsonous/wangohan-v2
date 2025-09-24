@@ -34,7 +34,7 @@ import {
   deleteRecipe,
   setPublishRecipe
 } from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
-import {setPublishBlog} from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-slice";
+import {deleteBlog, setPublishBlog} from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-slice";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosError, AxiosResponse} from "axios";
 import {
@@ -50,19 +50,26 @@ import SpinLoader from "@/components/SpinLoader";
 import {useRouter} from "next/navigation";
 
 type PublishState = "published" | "unpublished" | "loading";
+type MutationTypes = "recipes" | "blogs" | "users";
 
 export const useColumns = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const deleteRecipeMutation = useMutation({
-    mutationFn: (data: {id: number, name: string}) => ClientApiService.delete(ENDPOINTS.ADMIN + "/recipes/" + data.id + "?recipe_name=" + data.name),
+  const deleteMutation = useMutation({
+    mutationFn: (data: {id: number, name: string, type: MutationTypes}) =>
+      ClientApiService.delete(ENDPOINTS.ADMIN + `/${data.type}/${data.id}?` +
+        (
+          (data.type === "recipes" && `recipe_name=${data.name}`) ||
+          (data.type === "blogs" && `title=${data.name}`) ||
+          (data.type === "users" && `user_codename=${data.name}`)
+        )
+      ),
     onSuccess: (response: AxiosResponse) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(response);
-      const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
       toast.success("Successful!", {description: message});
 
-      dispatch(deleteRecipe(Number(data.id)));
+
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosErrorMessage(error);
@@ -282,16 +289,19 @@ export const useColumns = () => {
                       <Button
                         variant={"destructive"}
                         onClick={async () => {
-                          await deleteRecipeMutation.mutateAsync({
+                          const response = await deleteMutation.mutateAsync({
                             id: row.original.recipe_id,
                             name: row.original.recipe_name,
+                            type: "recipes"
                           });
+                          const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
+                          dispatch(deleteRecipe(Number(data.id)));
                           setOpen(false);
                           setDpOpen(false);
                         }}
-                        disabled={deleteRecipeMutation.isPending}
+                        disabled={deleteMutation.isPending}
                       >
-                        {deleteRecipeMutation.isPending && <SpinLoader />} Delete
+                        {deleteMutation.isPending && <SpinLoader />} Delete
                       </Button>
                       <DialogClose>Cancel</DialogClose>
                     </DialogFooter>
@@ -388,27 +398,69 @@ export const useColumns = () => {
     },
     {
       id: "actions",
-      cell: () => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Make a copy</DropdownMenuItem>
-            <DropdownMenuItem>Favorite</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({row}) => {
+
+        const [dpOpen, setDpOpen] = React.useState(false);
+        const [open , setOpen] = React.useState(false);
+
+        return (
+          <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem>
+                <Link className={"w-full"} href={`/columns/edit/${row.original.blog_id}/${row.original.title}`}>
+                  Edit
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>Make a copy</DropdownMenuItem>
+              <DropdownMenuItem>Favorite</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant={"destructive"} asChild={true}>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild={true}>
+                    <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
+                      Delete
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Delete blog?</DialogTitle>
+                    <DialogDescription>Are you sure you want to delete this blog?</DialogDescription>
+                    <DialogFooter>
+                      <Button
+                        variant={"destructive"}
+                        onClick={async () => {
+                          const response = await deleteMutation.mutateAsync({
+                            id: row.original.blog_id,
+                            name: row.original.title,
+                            type: "blogs"
+                          });
+                          const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
+                          dispatch(deleteBlog(Number(data.id)));
+                          setOpen(false);
+                          setDpOpen(false);
+                        }}
+                        disabled={deleteMutation.isPending}
+                      >
+                        {deleteMutation.isPending && <SpinLoader />} Delete
+                      </Button>
+                      <DialogClose>Cancel</DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
     },
   ]
 

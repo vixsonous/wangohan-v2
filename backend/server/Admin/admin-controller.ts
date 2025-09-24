@@ -18,6 +18,11 @@ export class AdminControllerSchema {
     blog_id: z.number("Please provide a valid blog id!"),
     is_published: z.boolean("Please provide if published or not!"),
   });
+
+  static DeleteBlog = z.object({
+    blog_id: z.number("Please provide a valid blog id!"),
+    title: z.string("Please provide the blog title!")
+  })
 }
 
 export class AdminController {
@@ -96,5 +101,29 @@ export class AdminController {
     }
 
     ApiResponse.success(res, "Successfully published blog!", data);
+  }
+
+  static async deleteBlog(req: Request, res: Response) {
+    const blog_id = req.params.blog_id;
+    const {title} = req.query;
+
+    const deleteBlogParseResult = AdminControllerSchema.DeleteBlog.safeParse({
+      blog_id: Number(blog_id),
+      title: title,
+    });
+
+    if(!deleteBlogParseResult.success) {
+      ApiResponse.error(res, deleteBlogParseResult.error.issues[0].message);
+      return;
+    }
+
+    const result = await AdminService.deleteBlog(deleteBlogParseResult.data);
+
+    if(!result) {
+      ApiResponse.error(res, "There was an error deleting the blog!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully deleted blog!", {id: deleteBlogParseResult.data.blog_id});
   }
 }
