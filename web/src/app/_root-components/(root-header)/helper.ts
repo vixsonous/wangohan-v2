@@ -3,7 +3,7 @@ import {UserSchema} from "@/types/user-types.user";
 import {useEffect} from "react";
 import {
   addNotification,
-  readAllNotifications,
+  readAllNotifications, readNotification,
   setNotification
 } from "@/app/_root-components/(root-header)/notifications-slice";
 import {EventSchema} from "@/types/event-types";
@@ -21,6 +21,14 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
   const readAllNotificationsMutation = useMutation({
     mutationFn: () => ClientApiService.get(ENDPOINTS.EVENT + "/read"),
     onSuccess: () => dispatch(readAllNotifications())
+  });
+
+  const readNotificationMutation = useMutation({
+    mutationFn: (notification_id: number): Promise<number> => new Promise(res => {
+      const p = ClientApiService.get(ENDPOINTS.EVENT + "/notifications/"+notification_id+"/status/read");
+      res(notification_id);
+    }),
+    onSuccess: (notification_id: number) => dispatch(readNotification(notification_id))
   });
 
   useEffect(() => {
@@ -83,6 +91,7 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
     notifications,
     readAllNotificationsMutation,
     combinedNotifications,
-    unread_notifications
+    unread_notifications,
+    readNotificationMutation
   }
 }

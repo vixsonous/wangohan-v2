@@ -12,6 +12,11 @@ type SetNotificationPayload = {
   type: string;
 }
 
+type ReadNotificationActionPayload = {
+  payload: number;
+  type: string;
+}
+
 export const notificationsSlice = createSlice({
   name: 'Notification',
   initialState: [] as Array<z.infer<typeof EventSchema.Event>>,
@@ -38,9 +43,15 @@ export const notificationsSlice = createSlice({
     },
     readAllNotifications(state) {
       return state.map(notification => ({...notification, is_read: true}));
+    },
+
+    readNotification(state, action) {
+      const idx = state.findIndex( n => n.notification_id === action.payload);
+      if(idx < 0) return state;
+      state[idx].is_read = true;
     }
   }
 })
 
-export const {addNotification, readAllNotifications, setNotification} = notificationsSlice.actions;
+export const {addNotification, readAllNotifications, setNotification, readNotification} = notificationsSlice.actions;
 export default notificationsSlice.reducer;

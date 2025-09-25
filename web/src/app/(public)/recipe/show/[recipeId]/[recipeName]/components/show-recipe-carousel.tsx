@@ -43,7 +43,7 @@ export default function ShowRecipeCarousel({recipe_images, recipe_id, recipe_nam
       <CarouselContent>
         {recipe_images.map(a => {
           return (
-            <CarouselItem className="h-[468px]" key={a.recipe_image_id}>
+            <CarouselItem className="h-auto" key={a.recipe_image_id}>
               <Card className="p-0 h-full bg-transparent border-0">
                 <CardContent className="relative bg-transparent w-full h-full flex items-center justify-center p-0 ">
                   <div className='absolute top-0 w-full h-full bg-primary-text opacity-10 -z-10'></div>

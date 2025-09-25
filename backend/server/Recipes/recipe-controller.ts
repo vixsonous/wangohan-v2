@@ -463,7 +463,25 @@ export class RecipeController {
       return;
     }
 
+    const notification = await EventService.postNotification(
+      owner.user_id,
+      user.user_details?.user_codename!,
+      user.user_details?.user_image!,
+      false,
+      "like",
+      likeRecipeParseResult.data.is_liked,
+      likeRecipeParseResult.data.recipe_id,
+      likeRecipeParseResult.data.recipe_name,
+      new Date(String(notification_date))
+    );
+
+    if(notification === undefined) {
+      ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
+      return;
+    }
+
     const sendData = {
+      notification_id: notification.notification_id,
       type: likeRecipeParseResult.data.is_liked ? "like" : "unlike",
       recipe_id: likeRecipeParseResult.data.recipe_id,
       recipe_name: likeRecipeParseResult.data.recipe_name,
@@ -473,7 +491,7 @@ export class RecipeController {
       notification_date: new Date(String(notification_date))
     };
 
-    const notificationSendDataParseResult = EventSchema.Event.safeParse(sendData);
+    const notificationSendDataParseResult = EventSchema.Event.safeParse(sendData)
 
     if(!notificationSendDataParseResult.success) {
       log("Invalid notification data to send: " + notificationSendDataParseResult.error.issues[0].message);
@@ -482,27 +500,9 @@ export class RecipeController {
     }
 
     recipeEvents.sendMessageToClient(
-      JSON.stringify(notificationSendDataParseResult.data),
+      JSON.stringify({...notificationSendDataParseResult.data, notification_id: notification.notification_id}),
       `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
     );
-
-    const notificationData = notificationSendDataParseResult.data;
-    const notification = await EventService.postNotification(
-      owner.user_id,
-      notificationData.user_codename,
-      notificationData.user_image,
-      false,
-      "like",
-      likeRecipeParseResult.data.is_liked,
-      notificationData.recipe_id,
-      notificationData.recipe_name,
-      notificationData.notification_date
-    );
-
-    if(notification === undefined) {
-      ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
-      return;
-    }
 
     ApiResponse.success(res, likeRecipeParseResult.data.is_liked ? RecipeSuccessMessage.LIKE_RECIPE : RecipeSuccessMessage.UNLIKE_RECIPE);
   }
@@ -549,18 +549,6 @@ export class RecipeController {
       return;
     }
 
-    recipeEvents.sendMessageToClient(
-      JSON.stringify({
-        type: "comment",
-        recipe_id: postCommentParseResult.data.recipe_id,
-        recipe_name: postCommentParseResult.data.recipe_name,
-        user_codename: user.user_details?.user_codename,
-        user_image: user.user_details?.user_image,
-        notification_date: new Date()
-      }),
-      `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
-    );
-
     const notification = await EventService.postNotification(
       owner.user_id,
       user.user_details.user_codename,
@@ -577,6 +565,19 @@ export class RecipeController {
       ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
       return;
     }
+
+    recipeEvents.sendMessageToClient(
+      JSON.stringify({
+        notification_id: notification.notification_id,
+        type: "comment",
+        recipe_id: postCommentParseResult.data.recipe_id,
+        recipe_name: postCommentParseResult.data.recipe_name,
+        user_codename: user.user_details?.user_codename,
+        user_image: user.user_details?.user_image,
+        notification_date: new Date()
+      }),
+      `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
+    );
 
     ApiResponse.success(res, RecipeSuccessMessage.POST_COMMENT, submittedComment);
   }

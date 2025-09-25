@@ -311,6 +311,7 @@ export class UserRepository {
               .innerJoin("user_details_table", "notifications_table.user_id", "user_details_table.user_id")
               .innerJoin("recipes_table", "recipes_table.recipe_id","notifications_table.recipe_id")
               .select([
+                "notifications_table.notification_id",
                 "notifications_table.recipe_id",
                 "notifications_table.recipe_name",
                 "is_read",
@@ -367,6 +368,7 @@ export class UserRepository {
               .innerJoin("user_details_table", "notifications_table.user_id", "user_details_table.user_id")
               .innerJoin("recipes_table", "recipes_table.recipe_id","notifications_table.recipe_id")
               .select([
+                "notifications_table.notification_id",
                 "notifications_table.recipe_id",
                 "notifications_table.recipe_name",
                 "is_read",

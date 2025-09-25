@@ -2,6 +2,7 @@ import z from "zod";
 
 export class EventSchema {
   static Event = z.object({
+    notification_id: z.number("Please provide the notification id!"),
     type: z.enum(["like", "comment", "unlike"], "Invalid event type!"),
     recipe_id: z.number("Please provide the recipe id!"),
     recipe_name: z.string().min(1, "Please provide the recipe name!"),

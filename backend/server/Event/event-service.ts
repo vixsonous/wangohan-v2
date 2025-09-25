@@ -5,6 +5,11 @@ export class EventService {
   static async setUserNotificationsRead(user_id: number) {
     return await EventRepository.setUserNotificationsRead(user_id);
   }
+
+  static async readNotification(notification_id: number) {
+    return await EventRepository.setUserNotificationRead(notification_id);
+  }
+
   static async postNotification(
     user_id: number,
     user_codename: string,

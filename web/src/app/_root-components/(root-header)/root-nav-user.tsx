@@ -15,6 +15,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {QueryClientProvider} from "@tanstack/react-query";
 import {queryClient} from "@/lib/tanstack-query";
 import {useHeader} from "@/app/_root-components/(root-header)/helper";
+import {getTimeAgo} from "@/lib/time";
 
 type RootNavigationUserProps = {
   user_data: z.infer<typeof UserSchema.User>;
@@ -43,7 +44,8 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
     notifications,
     readAllNotificationsMutation,
     combinedNotifications,
-    unread_notifications
+    unread_notifications,
+    readNotificationMutation
   } = useHeader(user_data);
 
   return (
@@ -64,6 +66,11 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
           {notifications.length > 0 ? (
             <>
               {combinedNotifications.map((notification, idx) => {
+
+                const timeDiff = new Date().getTime() - new Date(notification.notification_date).getTime();
+
+                const text = getTimeAgo(timeDiff);
+
                 let descriptionMsg = '';
                 switch (notification.type) {
                   case "like" :
@@ -76,14 +83,14 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
 
                 return (
                   (
-                    <Link href={"/recipe/show/" + notification.recipe_id + "/" + notification.recipe_name} key={idx} className="mb-2 grid grid-cols-[25px_1fr] items-start last:mb-0 last:pb-0">
+                    <Link onClick={() => readNotificationMutation.mutate(notification.notification_id)} href={"/recipe/show/" + notification.recipe_id + "/" + notification.recipe_name} key={idx} className="mb-2 relative grid grid-cols-[25px_1fr] items-start last:mb-0 last:pb-0">
                       {!notification.is_read ? (
-                        <span className="flex h-2 w-2 translate-y-1.5 rounded-full bg-primary-text" />
+                        <span className="flex h-2 w-2 relative top-2 translate-y-1.5 rounded-full bg-primary-text" />
                       ) : (
                         <span className="flex h-2 w-2 translate-y-1.5 rounded-full bg-transparent" />
                       )}
                       <div className="grid gap-1">
-                        <p className="text-sm flex gap-2 items-center font-medium">
+                        <div className="text-sm flex gap-2 items-center font-medium">
                           <Image
                             src={notification.user_image}
                             alt={`${notification.user_codename}'s user image`}
@@ -91,9 +98,9 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
                             width={30}
                             height={30}
                           />
-                          {descriptionMsg}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{5} min ago</p>
+                          <p>{descriptionMsg}</p>
+                        </div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{text}</p>
                       </div>
                     </Link>
                   )

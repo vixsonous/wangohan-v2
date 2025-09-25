@@ -19,6 +19,8 @@ export default function Image({src, dpr=1.5, width, height, fit, noprocess=false
   }
 
   return (
-    <img {...props} width={width} height={height} src={url} alt={alt || "undescribed image"} />
+    <span style={{backgroundImage: `url(process.env.NEXT_PUBLIC_ORIGIN + "/api" + ENDPOINTS.IMAGE + "/transform?src=" + src + "&w=20&h=20&fit=fill")`}} className={"relative"}>
+      <img {...props} width={width} height={height} src={url} alt={alt || "undescribed image"} />
+    </span>
   )
 }

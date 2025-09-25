@@ -6,3 +6,4 @@ export const eventRouter = Router();
 
 eventRouter.get("/", RecipeController.recipeEvents);
 eventRouter.get("/read", EventController.setUserNotificationsRead);
+eventRouter.get("/notifications/:notification_id/status/read", EventController.readNotification);
