@@ -128,9 +128,10 @@ export class BlogController {
 
   static async putBlog(req: Request, res: Response) {
     const {blog_id} = req.params;
+    const {publish} = req.query;
     const data = req.body;
 
-    const putBlogParseResult = BlogSchema.PutBlog.safeParse(data);
+    const putBlogParseResult = BlogSchema.PutBlog.safeParse({...data, is_published: publish === 'true'});
 
     if(!putBlogParseResult.success){
       ApiResponse.error(res, putBlogParseResult.error.issues[0].message);

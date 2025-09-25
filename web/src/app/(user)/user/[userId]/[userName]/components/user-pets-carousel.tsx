@@ -75,12 +75,12 @@ export default function UserPetsCarousel(
   }
 
   return (
-    <Carousel opts={{loop: true}} plugins={[
+    <Carousel opts={{loop: true, align: 'center'}} plugins={[
           Autoplay({
             delay: 5000
           })
         ]} setApi={setApi} className="max-w-xs">
-      <CarouselContent>
+      <CarouselContent className={`${pets.length > 1 ? '' : 'flex justify-center'}`}>
         {pets.map((a, idx) => {
           return (
             <Pet key={idx} pet={a} idx={idx} curSlide={curSlide} />

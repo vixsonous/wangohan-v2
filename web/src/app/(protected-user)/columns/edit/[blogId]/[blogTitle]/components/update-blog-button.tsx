@@ -10,12 +10,15 @@ import {toast} from "sonner";
 import {ENDPOINTS} from "@/constants/endpoints";
 import {useRouter} from "next/navigation";
 import {ROUTES} from "@/constants/routes";
+import z from "zod";
+import {BlogSchema} from "@/types/blog-types";
 
 type UpdateBlogButtonProps = {
   handleSubmit: HandleSubmit;
+  blog: z.infer<typeof BlogSchema.Blog>;
 };
 
-export default function UpdateBlogButton({handleSubmit}: UpdateBlogButtonProps) {
+export default function UpdateBlogButton({handleSubmit, blog}: UpdateBlogButtonProps) {
 
   const router = useRouter();
 
@@ -36,11 +39,11 @@ export default function UpdateBlogButton({handleSubmit}: UpdateBlogButtonProps) 
 
   return (
     <>
-      <Button disabled={updateBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => updateBlogMutation.mutate({data, publish: false}))} type={"button"}>
+      <Button disabled={updateBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => updateBlogMutation.mutate({data, publish: blog.is_published}))} type={"button"}>
         {updateBlogMutation.isPending && <SpinLoader />} Update blog
       </Button>
-      <Button disabled={updateBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => updateBlogMutation.mutate({data, publish: true}))} type={"button"}>
-        {updateBlogMutation.isPending && <SpinLoader />} Update & Publish blog
+      <Button disabled={updateBlogMutation.isPending} onClick={handleSubmit((data: FieldValues) => updateBlogMutation.mutate({data, publish: !blog.is_published}))} type={"button"}>
+        {updateBlogMutation.isPending && <SpinLoader />} Update & {blog.is_published ? "Unpublish" : "Publish"} blog
       </Button>
     </>
   )

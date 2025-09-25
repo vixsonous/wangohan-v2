@@ -107,7 +107,7 @@ function NavigationUser({user_data}: RootNavigationUserProps) {
                 )
               })}
               <ButtonX onClick={() => {readAllNotificationsMutation.mutate()}} disabled={readAllNotificationsMutation.isPending} variant="outline" className="mt-4">
-                {readAllNotificationsMutation.isPending && <Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} />} Mark All as Read
+                {readAllNotificationsMutation.isPending && <Image alt={"circle loading svg"} src={"/icons/svg/primary-loading.svg"} noprocess={true} className={"animate-spin"} />} すべての通知を読む
               </ButtonX>
             </>
           ) : (

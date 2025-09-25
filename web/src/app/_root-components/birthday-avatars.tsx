@@ -78,7 +78,7 @@ export default function BirthdayAvatars({birthday_pets}: {birthday_pets: Array<z
         delay: 5000
       })
     ]}>
-      <CarouselContent className="items-center h-[200px] lg:h-[250px]">
+      <CarouselContent className={`${birthday_pets.length < 5 && 'flex justify-center items-center'} h-[200px] lg:h-[250px]`}>
         {
           birthday_pets.map( (k, idx) => {
             return <CarouselItem className="lg:basis-1/5 md:basis-1/3" key={k.pet_id}>

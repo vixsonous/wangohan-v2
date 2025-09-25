@@ -116,7 +116,7 @@ export default function EditorLexicalComposer({handleSubmit, blog}: {
         {blog === undefined ? (
           <CreateBlogButton handleSubmit={handleSubmit} />
         ) : (
-          <UpdateBlogButton handleSubmit={handleSubmit} />
+          <UpdateBlogButton handleSubmit={handleSubmit} blog={blog} />
         )}
       </div>
       <div
