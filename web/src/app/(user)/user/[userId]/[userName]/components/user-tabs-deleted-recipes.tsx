@@ -87,9 +87,11 @@ export function DeletedRecipes(
           {recipes !== undefined && recipes.length > 0 ? (
             recipes.map((a, idx) => {
               return (
-                <section key={idx} className="w-full h-full min-h-51.5 group relative">
+                <section key={idx} className="w-full h-full aspect-square group relative">
                   <Image src={a.recipe_image} width={300} height={300} alt="liked recipe image"
-                         className="w-full rounded-md group-hover:brightness-50 transition-all duration-200 h-full object-cover aspect-square bg-gray-300"/>
+                         className={`w-full
+                          ${idx === 0 ? 'rounded-tl-md' : idx === 2 ? 'rounded-tr-md' : idx === 6 ? 'rounded-bl-md' : idx === 8 ? 'rounded-br-md' : ''}
+                          group-hover:brightness-50 transition-all duration-200 h-full object-cover aspect-square bg-gray-300`}/>
                   <h1
                     className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 top-1/2 -translate-y-1/2 -translate-x-1/2 left-1/2 text-white font-bold text-lg">
                     {a.recipe_name}

@@ -13,7 +13,8 @@ import {
 } from "@/app/(user)/user/[userId]/[userName]/components/user-tabs-deleted-recipes";
 import {Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import dynamic from "next/dynamic";
-import {useState} from "react";
+import React, {useState} from "react";
+import {ScrollArea} from "@/components/ui/scroll-area";
 
 const PersonalInfoForm = dynamic(() => import("@/app/(auth)/signup/personal-info/personal-info-form"), {ssr: false, loading: () => <span>Loading</span>});
 
@@ -37,7 +38,7 @@ export default function UserTabs(
   return (
     <QueryClientProvider client={queryClient}>
       <Tabs defaultValue="my-recipes">
-        <div className={"flex justify-between"}>
+        <div className={"flex justify-between flex-col md:flex-row gap-2"}>
           <TabsList className={"relative"}>
             <TabsTrigger className={"cursor-pointer"} value="my-recipes">自分のレシピ</TabsTrigger>
             <TabsTrigger className={"cursor-pointer"} value="liked-recipes">
@@ -58,17 +59,19 @@ export default function UserTabs(
             <TabsList>
               <TabsTrigger value={"edit"} asChild={true} onClick={() => alert(5)}>
                 <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger>
-                    Edit Profile
+                  <DialogTrigger className={"flex gap-2 px-2 justify-center items-center cursor-pointer"}>
+                    <Image src={"/icons/svg/primary-settings.svg"} alt={"image icon for editing profile"} width={20} height={20}/> プロフィールを編集
                   </DialogTrigger>
                   <DialogContent className={"w-256 sm:max-w-3xl"}>
                     <DialogTitle>
                       {user_codename}のプロフィール
                     </DialogTitle>
-                    <PersonalInfoForm setOpen={setOpen} user_id={user_data?.user_id || -1} is_edit={true} user_details={user_data} />
-                    <DialogDescription aria-label={"description"} aria-labelledby={"description"} className={"flex justify-center"}>
-                      プロフィールを編集する
-                    </DialogDescription>
+                    <ScrollArea className={"max-h-128"}>
+                      <PersonalInfoForm setOpen={setOpen} user_id={user_data?.user_id || -1} is_edit={true} user_details={user_data} />
+                      <DialogDescription aria-label={"description"} aria-labelledby={"description"} className={"flex justify-center"}>
+                        プロフィールを編集する
+                      </DialogDescription>
+                    </ScrollArea>
                   </DialogContent>
                 </Dialog>
               </TabsTrigger>

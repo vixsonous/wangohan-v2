@@ -4,6 +4,7 @@ import { CreateRecipe } from "../root-create-recipe";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import RootSidebarMenuWrapper from "@/app/_root-components/root-recipe-form/root-sidebar-menu-wrapper";
+import {Separator} from "@/components/ui/separator";
 
 export default async function RootSidebar(
   {user_data}:
@@ -18,8 +19,8 @@ export default async function RootSidebar(
         <SheetTitle className="mt-8">
           <CreateRecipe user_data={user_data} />
         </SheetTitle>
-        <SheetDescription>
-          わんごはんのメニュー
+        <SheetDescription asChild={true}>
+          <Separator />
         </SheetDescription>
         <RootSidebarMenuWrapper user_data={user_data} />
       </SheetContent>

@@ -17,7 +17,7 @@ function Pet({pet, idx, curSlide}: {
 }) {
 
   return (
-    <CarouselItem className="basis-2/3" key={idx}>
+    <CarouselItem className="basis-1/3 md:basis-1/3" key={idx}>
       <Dialog>
         <DialogTrigger asChild={true}>
           <Button>
@@ -25,14 +25,14 @@ function Pet({pet, idx, curSlide}: {
           </Button>
         </DialogTrigger>
         <DialogContent>
-          <div className={"relative"}>
+          <div className={"relative w-full"}>
             <DialogTitle className={"text-center z-10 relative -top-[200%]"}>
               {pet.pet_name}
             </DialogTitle>
-            <Image width={300} height={122} src={"/banner/ribbon.webp"} className={"absolute bg-primary-bg rounded-lg pt-4 -top-[400%] left-1/2 -translate-x-1/2"} alt="ribbon banner image"/>
+            <Image imgonly={true} width={300} height={122} src={"/banner/ribbon.webp"} className={"absolute bg-primary-bg rounded-lg pt-4 -top-[400%] left-1/2 -translate-x-1/2 w-[300px]"} alt="ribbon banner image"/>
           </div>
 
-          <DialogDescription className={"text-center"}>This is your pet</DialogDescription>
+          <DialogDescription className={"text-center"}>-</DialogDescription>
           <section className={"flex flex-col md:flex-row gap-4 relative"}>
             <div className={'w-full flex justify-center items-center md:w-auto md:block'}>
               <Image height={100} width={100} src={pet.pet_image} className={`border-4 max-h-48 max-w-48 border-primary-text duration-500 w-full h-full aspect-square object-cover`} alt={pet.pet_name} />
@@ -79,7 +79,7 @@ export default function UserPetsCarousel(
           Autoplay({
             delay: 5000
           })
-        ]} setApi={setApi} className="max-w-xs">
+        ]} setApi={setApi} className="max-w-md md:max-w-lg pb-8">
       <CarouselContent className={`${pets.length > 1 ? '' : 'flex justify-center'}`}>
         {pets.map((a, idx) => {
           return (
