@@ -127,7 +127,7 @@ export default function BannerCategoriesCarousel() {
   }, [api]);
 
   return (
-    <Carousel setApi={setApi} className="w-full">
+    <Carousel setApi={setApi} id={"category"} className="w-full">
       <CarouselContent hfull>
         <CarouselItem className="grid grid-cols-1 gap-4">
           {dogCategory.map( d => {

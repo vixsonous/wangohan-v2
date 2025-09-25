@@ -4,10 +4,10 @@ import Button from "@/components/Button";
 import React from "react";
 
 
-function scroll(id: string, duration: number) { 
+export function scroll(id: string, duration: number, offset?: number) {
   const el = document.querySelector(id);
   if(!el) return;
-  const elementY = (el.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - 65;
+  const elementY = (el.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - (offset || 65);
   const startingY = window.scrollY;
   const diff = elementY - startingY;
   let start = 0;
@@ -34,6 +34,7 @@ export default function GotoSearchCategoriesBtn() {
 
   const gotoCategories = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    alert(5);
     scroll("#category", 200);
   }
   return (

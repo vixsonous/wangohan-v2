@@ -13,6 +13,7 @@ import {SheetClose} from "@/components/ui/sheet";
 import {ENDPOINTS} from "@/constants/endpoints";
 import {ROUTES} from "@/constants/routes";
 import {UserLevel} from "@/constants/user-levels";
+import {scroll} from "@/app/_root-components/goto-search-categories-btn";
 
 export default function SidebarMenu(
   {user_data}:
@@ -38,7 +39,7 @@ export default function SidebarMenu(
   const links = [
     {text: "トップページ", show: true, condition: pathname === "/", href: "/", src: "/icons/svg/white-house.svg", alt: "an icon for home button", type: "link"},
     {text: "マイページ", show: user_data !== undefined, condition: pathname.includes("/user/") || pathname.includes("/signup/personal-info"), href: user_data?.user_details !== null ? `/user/${user_data?.user_id}/${user_data?.user_details?.user_codename}`: `/signup/personal-info`, src: "/icons/svg/primary-user.svg", alt: "an icon for user", type: "link"},
-    {text: "レシピを探す", show: true, condition: false, href: "/", src: "/icons/svg/white-magnifying-glass.svg", alt: "an icon for search recipe", type: "button"},
+    {text: "レシピを探す", function: () => scroll("#category", 200, 130), show: true, condition: false, href: "/", src: "/icons/svg/white-magnifying-glass.svg", alt: "an icon for search recipe", type: "button"},
     {text: "レシピ図鑑", show: true, condition: pathname.includes("/recipe/list"), href: "/recipe/list/1", src: "/icons/svg/white-book.svg", alt: "an icon for recipe list", type: "link"},
     {text: "犬と食に関するコラム", show: true, condition: pathname.includes("/columns/list") , href: ROUTES.COLUMNS, src: "/icons/svg/white-article.svg", alt: "an icon for columns/blog", type: "link"},
     {text: "愛犬登録", show: true, condition: pathname.includes("/user/settings/"), href: user_data === undefined ? "/login" : `/user/${user_data?.user_id}/${user_data?.user_details?.user_codename}?register_pet=true`, src: "/icons/svg/white-paw-print.svg", alt: "an icon for pet registration", type: "link"},
