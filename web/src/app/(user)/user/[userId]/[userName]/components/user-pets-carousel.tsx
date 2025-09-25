@@ -20,8 +20,8 @@ function Pet({pet, idx, curSlide}: {
     <CarouselItem className="basis-1/3 md:basis-1/3" key={idx}>
       <Dialog>
         <DialogTrigger asChild={true}>
-          <Button>
-            <Image src={pet.pet_image} className={`${curSlide === idx ? 'opacity-100 pointer-events-auto' : 'opacity-50 pointer-events-none'} transition-all border-4 border-primary-text duration-500 w-full h-full aspect-square object-cover`} style={{clipPath: curSlide === idx ? 'circle(70% at 50% 50%)': 'circle(50% at 50% 50%)'}} alt={pet.pet_name} />
+          <Button className={`${curSlide !== idx && 'pointer-events-none'}`}>
+            <Image src={pet.pet_image} className={`${curSlide === idx ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-50 pointer-events-none scale-50'} transition-all duration-500 w-full h-full aspect-square object-cover`} style={{clipPath: curSlide === idx ? 'circle(50% at 50% 50%)': 'circle(65% at 50% 50%)'}} alt={pet.pet_name} />
           </Button>
         </DialogTrigger>
         <DialogContent>

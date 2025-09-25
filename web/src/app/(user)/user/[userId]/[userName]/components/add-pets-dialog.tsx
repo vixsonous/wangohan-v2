@@ -35,10 +35,10 @@ export default function AddPetsDialog({user_id}: {user_id: number}) {
       </DialogTrigger>
       <DialogContent draggable={true} className={"sm:max-w-2xl p-0"}>
         <DialogHeader className={"pt-4"}>
-          <DialogTitle>
+          <DialogTitle className={"text-center"}>
             ペットを登録しましょう！
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className={"text-center"}>
             ここでペットを登録しましょう！
           </DialogDescription>
         </DialogHeader>
