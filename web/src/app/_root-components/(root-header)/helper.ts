@@ -3,7 +3,7 @@ import {UserSchema} from "@/types/user-types.user";
 import {useEffect} from "react";
 import {
   addNotification,
-  readAllNotifications,
+  readAllNotifications, readNotification,
   setNotification
 } from "@/app/_root-components/(root-header)/notifications-slice";
 import {EventSchema} from "@/types/event-types";
@@ -12,21 +12,31 @@ import {RootState} from "@/store/store";
 import {useMutation} from "@tanstack/react-query";
 import {ClientApiService} from "@/lib/client-utils";
 import {displayNotification} from "@/app/_root-components/(root-header)/root-nav-user";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
 
   const notifications = useSelector((state: RootState) => state.notifications);
   const dispatch = useDispatch();
   const readAllNotificationsMutation = useMutation({
-    mutationFn: () => ClientApiService.get("/set-user-notifications-read"),
+    mutationFn: () => ClientApiService.get(ENDPOINTS.EVENT + "/read"),
     onSuccess: () => dispatch(readAllNotifications())
+  });
+
+  const readNotificationMutation = useMutation({
+    mutationFn: (notification_id: number): Promise<number> => new Promise(res => {
+      const p = ClientApiService.get(ENDPOINTS.EVENT + "/notifications/"+notification_id+"/status/read");
+      res(notification_id);
+      return p;
+    }),
+    onSuccess: (notification_id: number) => dispatch(readNotification(notification_id))
   });
 
   useEffect(() => {
     if(!user_data.user_details) return;
     dispatch(setNotification(user_data.notifications));
 
-    const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + "/api/recipe-events?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
+    const event = new EventSource( process.env.NEXT_PUBLIC_ORIGIN + "/api"+ENDPOINTS.EVENT+"?user_id=" + user_data.user_id+ "&user_codename=" + user_data.user_details.user_codename, {withCredentials: true});
     event.onmessage = (event) => {
       const data: z.infer<typeof EventSchema.Event> = JSON.parse(event.data);
       let headerMsg = '';
@@ -59,7 +69,7 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
     return () => {
       event.onmessage = null;
     }
-  }, [user_data]);
+  }, [user_data, dispatch]);
 
   const unread_notifications = notifications.filter(notification => !notification.is_read).length;
   const combinedNotifications = notifications.reduce((acc: Array<z.infer<typeof EventSchema.Event>>, curNotification) => {
@@ -82,6 +92,7 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
     notifications,
     readAllNotificationsMutation,
     combinedNotifications,
-    unread_notifications
+    unread_notifications,
+    readNotificationMutation
   }
 }

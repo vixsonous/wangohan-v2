@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import z from "zod";
 import {BlogImageSchema} from "@/types/blog-types";
-import {content} from "@/app/(protected-user)/columns/create/components/create-editor";
+import {content} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor";
 import {ListNodeTagType} from "@lexical/list";
 
 type SetEditorStateAction = {
@@ -81,7 +81,7 @@ type SetTextAlignmentAction = {
   type: string;
 }
 
-export const createEditorSlice = createSlice({
+export const editorSlice = createSlice({
   name: 'Create Editor State',
   initialState: {
     editorState: content,
@@ -207,5 +207,5 @@ export const {
   setTextFormats,
   setToolbarActions,
   setColors
-} = createEditorSlice.actions;
-export default createEditorSlice.reducer;
+} = editorSlice.actions;
+export default editorSlice.reducer;

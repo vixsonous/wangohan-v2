@@ -7,6 +7,8 @@ import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import {BlogItem} from "@/app/(public)/columns/list/[pageNo]/components/blog-item";
 import {PaginationWithLinks} from "@/app/(public)/recipe/list/[pageNo]/components/pagination-with-links";
+import {ENDPOINTS} from "@/constants/endpoints";
+import {ROUTES} from "@/constants/routes";
 
 type Props = {
   params: Promise<{
@@ -17,7 +19,7 @@ type Props = {
 export async function generateMetadata({params,searchParams }: Props): Promise<Metadata> {
   const {pageNo} = await params;
   const {category} = await searchParams;
-  const response = await ServerApiService.get("/get-blogs?page_no=" + pageNo + "&category=" + category);
+  const response = await ServerApiService.get(ENDPOINTS.BLOG + "?page_no=" + pageNo + "&category=" + category);
   const blogsResponse = await ServerApiResponseService.getResponseData<z.infer<typeof GetBlogSchema.GetBlogList>>(response);
 
   const title = `${category || ""}ブログ${pageNo}`;
@@ -36,9 +38,9 @@ export async function generateMetadata({params,searchParams }: Props): Promise<M
       url: 'https://wangohanjp.com', // Your website URL
       type: "article",
       images: [
-        { url: blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
+        { url: blogsResponse.blogs.length > 0 ? blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
             process.env.NEXT_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
-            blogsResponse.blogs[0].blog_image, width: 500, height: 500, alt: blogsResponse.blogs[0].title }
+            blogsResponse.blogs[0].blog_image : "https://wangohanjp.com/logo-v2.png", width: 500, height: 500, alt: blogsResponse.blogs.length > 0 ? blogsResponse.blogs[0].title : 'Wangohan' }
       ]
     },
     robots: {
@@ -54,7 +56,7 @@ export default async function Columns({params, searchParams}: Props) {
   const {pageNo} = await params;
   const {category} = await searchParams;
 
-  const response = await ServerApiService.get("/get-blogs?page_no=" + pageNo + "&category=" + category);
+  const response = await ServerApiService.get(ENDPOINTS.BLOG + "?page_no=" + pageNo + "&category=" + category);
 
   if(!response.ok) {
     return (
@@ -63,15 +65,14 @@ export default async function Columns({params, searchParams}: Props) {
   }
 
   const blogsResponse = await ServerApiResponseService.getResponseData<z.infer<typeof GetBlogSchema.GetBlogList>>(response);
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
     "name": `${category || ""}ブログ${pageNo}`,
     "description": "わんごはん公式ブログ",
-    "image": blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
+    "image": blogsResponse.blogs.length > 0 ? blogsResponse.blogs[0].blog_image.startsWith("r2://") ?
       process.env.NEXT_PUBLIC_BUCKET_URL + blogsResponse.blogs[0].blog_image.split("r2://")[1] :
-      blogsResponse.blogs[0].blog_image,
+      blogsResponse.blogs[0].blog_image : "https://wangohanjp.com/logo-v2.png",
     "author": {
       "@type": "Person",
       "name": "わんごはん公式"
@@ -99,8 +100,8 @@ export default async function Columns({params, searchParams}: Props) {
       <ul className="py-8 flex w-full text-xs md:text-sm justify-center gap-2">
         {["全て", "レシピ特集", "基礎知識", "その他"].map((item, idx) => (
           <li key={idx}>
-            <Link href={`/columns/list/${pageNo}?category=${item}`}>
-              <Button className={"bg-secondary-bg text-xs md:text-sm rounded-full text-primary-text border-2 border-primary-text hover:bg-secondary-bg/50"}>
+            <Link href={ROUTES.COLUMNS + `?category=${item}`}>
+              <Button className={`${(!category && item === "全て") || (category && category.includes(item)) ? "bg-primary-text text-secondary-bg hover:bg-primary-text/80" : "bg-secondary-bg text-primary-text hover:bg-secondary-bg/50"} text-xs md:text-sm rounded-full  border-2 border-primary-text `}>
                 <Image preload={true} width={16} height={16} src={"/icons/column/paw2.png"} alt={"category icon"}/>
                 <p>{item}</p>
               </Button>
@@ -108,7 +109,7 @@ export default async function Columns({params, searchParams}: Props) {
           </li>
         ))}
       </ul>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+      <div className="relative grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {blogsResponse.blogs.length > 0 ? (
           blogsResponse.blogs.map((blog, idx) => {
             return (
@@ -122,7 +123,7 @@ export default async function Columns({params, searchParams}: Props) {
             );
           })
         ) : (
-          <div>No blogs!</div>
+          <div className={"absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-full h-24 flex justify-center items-center"}>No blogs!</div>
         )}
       </div>
       <PaginationWithLinks totalCount={blogsResponse.total_blogs} pageSize={6} page={Number(pageNo)} />

@@ -27,7 +27,7 @@ export default function RecipeCarousel({recipes}: RecipeCarouselProps) {
         {
           recipes.map( (recipe, idx) => {
             return (
-              <CarouselItem className="lg:basis-1/4" key={idx}>
+              <CarouselItem className="basis-1/2 md:basis-1/4" key={idx}>
                 <RecipeItem recipe={recipe}/>
               </CarouselItem>
             )

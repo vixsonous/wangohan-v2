@@ -10,12 +10,13 @@ import {UserSchema} from "@/types/user-types.user";
 import {useRouter} from "next/navigation";
 import {AxiosError} from "axios";
 import React from "react";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof UserSchema.User>, setOpen?: React.Dispatch<React.SetStateAction<boolean>> | undefined) => {
 
   const router = useRouter();
   const signupInfoMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.post("/personal-info", {
+    mutationFn: (data: FieldValues) => ClientApiService.post(ENDPOINTS.USER + "/me", {
       ...data,
       updated_at: new Date().toLocaleString(),
       created_at: new Date().toLocaleString(),
@@ -40,7 +41,7 @@ export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof
   });
 
   const updateInfoMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.put("/update-personal-info", {
+    mutationFn: (data: FieldValues) => ClientApiService.put(ENDPOINTS.USER + "/me", {
       ...data,
       updated_at: new Date().toLocaleString(),
     }, {
@@ -97,7 +98,7 @@ export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof
       user_image: undefined,
       user_gender: user_details.user_details?.user_gender,
       user_birthdate: user_details.user_details?.user_birthdate,
-      user_agreement: user_details.user_details?.user_agreement,
+      user_agreement: 1,
       user_occupation: user_details.user_details?.user_occupation,
       user_last_name: user_details.user_details?.user_last_name,
       user_first_name: user_details.user_details?.user_first_name,

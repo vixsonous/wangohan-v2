@@ -22,6 +22,23 @@ export class EventRepository {
       return undefined;
     }
   }
+
+  static async setUserNotificationRead(notification_id: number): Promise<boolean | undefined> {
+    try {
+      await db.updateTable("notifications_table")
+        .set({
+          is_read: true
+        })
+        .where("notification_id", "=", notification_id)
+        .executeTakeFirstOrThrow();
+
+      return true;
+    } catch (e) {
+      console.error("Error!");
+      log(e);
+      return undefined;
+    }
+  }
   static async postNotification(
     user_id: number,
     user_codename: string,
@@ -53,6 +70,7 @@ export class EventRepository {
         .onConflict(oc =>
           oc.columns(['user_id', 'recipe_id', 'type'])
             .doUpdateSet({liked: liked, notification_date: notification_date}))
+        .returning(["notification_id"])
         .executeTakeFirstOrThrow();
 
       log(EventMessageSuccess.INSERT_NOTIFICATION);
@@ -60,6 +78,7 @@ export class EventRepository {
       return notification;
     } catch (e) {
       log(EventMessageError.INSERT_NOTIFICATION);
+      console.log(e);
       log(e);
       return undefined;
     }

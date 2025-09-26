@@ -6,11 +6,12 @@ import heic2any from "heic2any";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {toast} from "sonner";
 import {AxiosError} from "axios";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export const useAddPet = () => {
 
   const postPetMutation = useMutation({
-    mutationFn: (data: FieldValues) => ClientApiService.post("/post-pet", {
+    mutationFn: (data: FieldValues) => ClientApiService.post(ENDPOINTS.PET, {
       ...data,
       updated_at: new Date().toLocaleString(),
       created_at: new Date().toLocaleString(),

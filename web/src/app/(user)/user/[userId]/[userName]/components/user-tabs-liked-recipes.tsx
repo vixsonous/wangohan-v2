@@ -11,6 +11,7 @@ import {useState} from "react";
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import {AxiosResponse} from "axios";
 import {toast} from "sonner";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export default function LikedRecipes(
   {liked_recipes, user_id, user_codename, user_data, total_liked}: {
@@ -26,7 +27,7 @@ export default function LikedRecipes(
   const [page, setPage] = useState(1);
 
   const getMoreLikedRecipesMutation = useMutation({
-    mutationFn: () => ClientApiService.get(`/get-liked-recipes?user_id=${user_id}&page=${page}`),
+    mutationFn: () => ClientApiService.get(ENDPOINTS.USER + `/${user_id}/liked?page=${page}`),
     onSuccess: (data: AxiosResponse) => {
       const dt: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> = ClientApiResponseService.getAxiosResponseData<Array<z.infer<typeof RecipeSchema.GetBasicRecipe>>>(data);
       const message: string = ClientApiResponseService.getAxiosResponseMessage(data);
@@ -48,12 +49,14 @@ export default function LikedRecipes(
     <>
       <Card className="bg-secondary-bg pb-0 rounded-b-none">
         <CardHeader><h1>{user_id === user_data?.user_id ? `My` : `${user_codename}'s`} Liked Recipes</h1></CardHeader>
-        <CardContent className="grid p-1 grid-cols-3 gap-1 grid-rows-3">
+        <CardContent className="grid p-0.5 grid-cols-3 gap-0.5 grid-rows-3">
           {recipes !== undefined && recipes.length > 0 ? (
             recipes.map( (a, idx) => {
               return (
-                <Link href={"/recipe/show/" + a.recipe_id + "/" + a.recipe_name} key={idx} className="w-full h-full min-h-51.5 group relative">
-                  <Image src={a.recipe_image} width={300} height={300} alt="liked recipe image" className="w-full rounded-md group-hover:brightness-50 transition-all duration-200 h-full object-cover aspect-square bg-gray-300" />
+                <Link href={"/recipe/show/" + a.recipe_id + "/" + a.recipe_name} key={idx} className="w-full h-full aspect-square group relative">
+                  <Image src={a.recipe_image} width={300} height={300} alt="liked recipe image" className={`w-full
+                   ${idx === 0 ? 'rounded-tl-md' : idx === 2 ? 'rounded-tr-md' : idx === 6 ? 'rounded-bl-md' : idx === 8 ? 'rounded-br-md' : ''}
+                   group-hover:brightness-50 transition-all duration-200 h-full object-cover aspect-square bg-gray-300`} />
                   <h1 className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 top-1/2 -translate-y-1/2 -translate-x-1/2 left-1/2 text-white font-bold text-lg">
                     {a.recipe_name}
                   </h1>

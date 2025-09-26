@@ -1,10 +1,11 @@
 import React from "react";
 import RecipeCarousel from "./this-week-recipe-carousel";
-import { RecipeDisplayDetails } from "@/server-actions/Recipe/recipe-types";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
 
 interface RecipeCarouselWrapperProps {
   title: string;
-  recipes: Array<RecipeDisplayDetails>;
+  recipes: Array<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>>;
 }
 export default async function RecipeCarouselWrapper({title, recipes}: RecipeCarouselWrapperProps) {
   return (

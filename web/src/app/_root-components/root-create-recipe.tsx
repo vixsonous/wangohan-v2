@@ -1,19 +1,22 @@
-import Image from "@/components/Image/server";
+"use client";
+import Image from "@/components/Image/client";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import RecipeFormWrapper from "@/app/_root-components/root-recipe-form/root-recipe-form-wrapper";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import Link from "next/link";
+import {useState} from "react";
 
-export async function CreateRecipe({user_data}: {user_data: z.infer<typeof UserSchema.User> | undefined}) {
+export function CreateRecipe({user_data}: {user_data: z.infer<typeof UserSchema.User> | undefined}) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Sheet >
+    <Sheet open={open} onOpenChange={setOpen}>
       {user_data ? (
         <SheetTrigger className={`cursor-pointer w-full rounded-md text-base relative active:scale-[1.075] md:hover:scale-[1.075] transition-all duration-250`}>
           <p className="absolute text-primary-text z-1 w-full top-1/2 left-0 font-bold">レシピを作成する</p>
           <Image src={'/icons/btn/recipe-button.webp'}
-             preload
              className="self-center rounded-md h-auto w-full relative top-0"
              width={234}
              alt="create recipe button"
@@ -23,7 +26,6 @@ export async function CreateRecipe({user_data}: {user_data: z.infer<typeof UserS
         <Link href={"/login"} className={`cursor-pointer w-full rounded-md text-base relative active:scale-[1.075] md:hover:scale-[1.075] transition-all duration-250`}>
           <p className="absolute text-primary-text z-1 w-full top-1/2 text-center left-0 font-bold">レシピを作成する</p>
           <Image src={'/icons/btn/recipe-button.webp'}
-             preload
              className="self-center rounded-md h-auto w-full relative top-0"
              width={234}
              alt="create recipe button"
@@ -38,7 +40,7 @@ export async function CreateRecipe({user_data}: {user_data: z.infer<typeof UserS
               <SheetTitle className="absolute top-[55px] font-semibold text-primary-text text-[2em]">レシピを書く</SheetTitle>
               <Image src={'/icons/btn/recipe-button.webp'} loading="lazy" className="max-w-none" width={300}  alt="ribbon" />
             </header>
-            <RecipeFormWrapper />
+            <RecipeFormWrapper setOpen={setOpen} />
             <SheetDescription className="text-sm mt-10">
               レシピを共有しましょう！
             </SheetDescription>

@@ -17,6 +17,10 @@ export class ClientApiService {
     return await axios.put(this.BACKEND_SERVER_URL + url, data, {...getConfig, withCredentials: true});
   }
 
+  static async patch<T>(url: string, data?: T, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return await axios.patch(this.BACKEND_SERVER_URL + url, data, {...getConfig, withCredentials: true});
+  }
+
   static async delete(url: string, getConfig?: AxiosRequestConfig): Promise<AxiosResponse> {
     return await axios.delete(this.BACKEND_SERVER_URL + url, {...getConfig, withCredentials: true});
   }

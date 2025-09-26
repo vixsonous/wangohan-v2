@@ -1,23 +1,18 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $addNodeStyle, $patchStyleText } from "@lexical/selection";
+import { $patchStyleText } from "@lexical/selection";
 import {
   $getSelection,
-  $getTextContent,
-  $insertNodes,
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   createCommand,
   EditorConfig,
   LexicalCommand,
-  LexicalEditor,
   NodeKey,
   SerializedLexicalNode,
-  SerializedTextNode,
   Spread,
   TextModeType,
   TextNode,
 } from "lexical";
-import { DEFAULT_SERIF_FONT } from "next/dist/shared/lib/constants";
 
 export class FontColorNode extends TextNode {
   __color: string;
@@ -35,16 +30,13 @@ export class FontColorNode extends TextNode {
     return new FontColorNode(node.__text, node.__color, node.__key);
   }
 
-  createDOM(config: EditorConfig, editor?: LexicalEditor): HTMLElement {
+  createDOM(config: EditorConfig): HTMLElement {
     const element = document.createElement("p");
     element.style.color = config.theme.color;
     return element;
   }
 
   updateDOM(
-    prevNode: TextNode,
-    dom: HTMLElement,
-    config: EditorConfig
   ): boolean {
     return false;
   }

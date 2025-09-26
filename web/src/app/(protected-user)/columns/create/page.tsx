@@ -1,13 +1,16 @@
-import CreateEditorWrapper from "@/app/(protected-user)/columns/create/components/create-editor-wrapper";
+import EditorWrapper from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-wrapper";
 import {ServerApiResponseService, ServerApiService} from "@/lib/server-utils";
 import z from "zod";
 import {GetBlogImagesSchema} from "@/types/blog-types";
 import {isAuthenticated} from "@/server-actions/User/user";
 import LoginRequired from "@/app/(error)/log-in-required";
+import {ENDPOINTS} from "@/constants/endpoints";
+import {UserLevel} from "@/constants/user-levels";
+import Forbidden from "@/app/(error)/forbidden";
 
 
 export default async function CreateBlog() {
-  const blogImagesResponse = await ServerApiService.get("/get-blog-images?page_no=1");
+  const blogImagesResponse = await ServerApiService.get(ENDPOINTS.BLOG + "/images?page_no=1");
 
   if(!blogImagesResponse.ok) {
     return (
@@ -22,9 +25,13 @@ export default async function CreateBlog() {
     return <LoginRequired />
   }
 
+  if(userData.user_lvl !== UserLevel.super_admin) {
+    return <Forbidden />
+  }
+
   return (
     <div className="w-full px-4 flex flex-col gap-4">
-      <CreateEditorWrapper blog_images={blogImages} user_data={userData} />
+      <EditorWrapper blog_images={blogImages} user_data={userData} />
     </div>
   )
 }

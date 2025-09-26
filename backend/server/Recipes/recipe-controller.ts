@@ -27,7 +27,8 @@ export class RecipeController {
   }
   
   static async getRecipe(req: Request, res: Response) {
-    const {recipe_id, recipe_name, is_edit} = req.query;
+    const { is_edit, recipe_name} = req.query;
+    const {recipe_id} = req.params;
 
     const GET_RECIPE_KEY = `GET:recipe_id=${recipe_id}&recipe_name=${recipe_name}`;
 
@@ -121,7 +122,7 @@ export class RecipeController {
       recipe_ingredients: formData.recipe_ingredients.map( (i: z.infer<typeof RecipeSchema.RecipeIngredient>) =>
           ({...i, recipe_ingredient_id: i.recipe_ingredient_id ? Number(i.recipe_ingredient_id) : undefined})
         ),
-      user_id: formData.user_id,
+      user_id: Number(formData.user_id),
       checkbox_size: formData.checkbox_size,
       checkbox_age: formData.checkbox_age,
       checkbox_event: formData.checkbox_event,
@@ -152,7 +153,10 @@ export class RecipeController {
   }
 
   static async getLikedRecipes(req: Request, res: Response) {
-    const {user_id, page} = req.query;
+    const {user_id} = req.params;
+    const {page} = req.query;
+    console.log(user_id);
+    console.log("da user");
 
     const likedRecipes = await RecipeService.getLikedRecipe(Number(user_id), Number(page));
 
@@ -165,7 +169,8 @@ export class RecipeController {
   }
 
   static async getOwnRecipes(req: Request, res: Response) {
-    const {user_id, page} = req.query;
+    const {user_id} = req.params;
+    const {page} = req.query;
 
     const ownedRecipes = await RecipeService.getOwnedRecipe(Number(user_id), Number(page));
 
@@ -178,7 +183,8 @@ export class RecipeController {
   }
 
   static async getArchivedRecipes(req: Request, res: Response) {
-    const {user_id, page} = req.query;
+    const {user_id} = req.params;
+    const {page} = req.query;
 
     const archivedRecipes = await RecipeService.getArchivedRecipes(Number(user_id), Number(page));
 
@@ -191,7 +197,8 @@ export class RecipeController {
   }
 
   static async archiveRecipe(req: Request, res: Response) {
-    const {recipe_id, recipe_name, recipe_user_id, is_archive} = req.query;
+    const {recipe_id} = req.params;
+    const {recipe_name, recipe_user_id, is_archive} = req.query;
 
     const user = getUserData(req);
 
@@ -234,7 +241,8 @@ export class RecipeController {
   }
 
   static async hardDeleteRecipe(req: Request, res: Response) {
-    const {recipe_id, recipe_name, recipe_user_id} = req.query;
+    const {recipe_id} = req.params;
+    const {recipe_name, recipe_user_id} = req.query;
 
     const user = getUserData(req);
 
@@ -278,26 +286,56 @@ export class RecipeController {
   }
 
   static async getRecipeList(req: Request, res: Response) {
-    const {page_no} = req.query;
+    const {page_no, search_text} = req.query;
 
-    const pageParse = z.number().safeParse(Number(page_no));
+    if(search_text !== undefined) {
+      const searchRecipeParse = RecipeControllerValidationSchema.SearchRecipeList.safeParse({
+        page_no: Number(page_no),
+        search_text: search_text
+      });
 
-    if(!pageParse.success) {
-      ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
+      if(!searchRecipeParse.success) {
+        ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
+        return;
+      }
+
+      const searchRecipeList = await CacheUtil.get<
+        z.infer<typeof RecipeSchema.RecipeList>,
+        typeof RecipeService.getSearchRecipeList
+      >(RecipeCacheKey.GET_SEARCH_RECIPE_LIST(
+        searchRecipeParse.data.page_no,
+        searchRecipeParse.data.search_text
+      ), RecipeService.getSearchRecipeList, 60, searchRecipeParse.data.page_no, searchRecipeParse.data.search_text);
+
+      if(searchRecipeList === undefined) {
+        ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
+        return;
+      }
+
+      ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, searchRecipeList);
+      return;
+    } else {
+
+      const pageParse = z.number().safeParse(Number(page_no));
+
+      if(!pageParse.success) {
+        ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
+        return;
+      }
+
+      const recipeList = await CacheUtil.get<
+        z.infer<typeof RecipeSchema.RecipeList>,
+        typeof RecipeService.getRecipeList
+      >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
+
+      if(recipeList === undefined) {
+        ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
+        return;
+      }
+
+      ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, recipeList);
       return;
     }
-
-    const recipeList = await CacheUtil.get<
-      z.infer<typeof RecipeSchema.RecipeList>,
-      typeof RecipeService.getRecipeList
-    >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
-
-    if(recipeList === undefined) {
-      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
-      return;
-    }
-
-    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, recipeList);
   }
 
   static async getSearchRecipeList(req: Request, res: Response) {
@@ -330,7 +368,7 @@ export class RecipeController {
   }
 
   static async viewedRecipe(req: Request, res: Response) {
-    const {recipe_id} = req.query;
+    const {recipe_id} = req.params;
 
     const recipeIdParse = z.number().safeParse(Number(recipe_id));
     if(!recipeIdParse.success) {
@@ -349,7 +387,8 @@ export class RecipeController {
   }
 
   static async isLikedRecipe(req: Request, res: Response) {
-    const {recipe_id} = req.query;
+    const {recipe_id} = req.params;
+    console.log("is liekd recipe")
 
     const user = getUserData(req);
 
@@ -374,12 +413,13 @@ export class RecipeController {
       isLikedRecipeParseResult.data.recipe_id,
       isLikedRecipeParseResult.data.user_id
     );
-
+    console.log("is liked ", isLiked);
     ApiResponse.success(res, RecipeSuccessMessage.IS_LIKED_RECIPE, {is_liked: isLiked});
   }
 
   static async likeRecipe(req: Request, res: Response) {
-    const {recipe_id, is_liked, recipe_name, notification_date} = req.query;
+    const {recipe_id} = req.params;
+    const { is_liked, recipe_name, notification_date} = req.body;
 
     const user = getUserData(req);
 
@@ -390,7 +430,7 @@ export class RecipeController {
 
     const submitData = {
       recipe_id: Number(recipe_id),
-      is_liked: is_liked === 'true',
+      is_liked: is_liked,
       user_id: user.user_id,
       recipe_name: recipe_name,
     }
@@ -419,11 +459,29 @@ export class RecipeController {
     const owner = await RecipeService.getRecipeOwner(likeRecipeParseResult.data.recipe_id);
 
     if(owner === undefined || owner === null) {
-      ApiResponse.error(res, RecipeErrorMessage.OWNER_DATA);
+      ApiResponse.success(res, likeRecipeParseResult.data.is_liked ? RecipeSuccessMessage.LIKE_RECIPE : RecipeSuccessMessage.UNLIKE_RECIPE);
+      return;
+    }
+
+    const notification = await EventService.postNotification(
+      owner.user_id,
+      user.user_details?.user_codename!,
+      user.user_details?.user_image!,
+      false,
+      "like",
+      likeRecipeParseResult.data.is_liked,
+      likeRecipeParseResult.data.recipe_id,
+      likeRecipeParseResult.data.recipe_name,
+      new Date(String(notification_date))
+    );
+
+    if(notification === undefined) {
+      ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
       return;
     }
 
     const sendData = {
+      notification_id: notification.notification_id,
       type: likeRecipeParseResult.data.is_liked ? "like" : "unlike",
       recipe_id: likeRecipeParseResult.data.recipe_id,
       recipe_name: likeRecipeParseResult.data.recipe_name,
@@ -433,7 +491,7 @@ export class RecipeController {
       notification_date: new Date(String(notification_date))
     };
 
-    const notificationSendDataParseResult = EventSchema.Event.safeParse(sendData);
+    const notificationSendDataParseResult = EventSchema.Event.safeParse(sendData)
 
     if(!notificationSendDataParseResult.success) {
       log("Invalid notification data to send: " + notificationSendDataParseResult.error.issues[0].message);
@@ -442,27 +500,9 @@ export class RecipeController {
     }
 
     recipeEvents.sendMessageToClient(
-      JSON.stringify(notificationSendDataParseResult.data),
+      JSON.stringify({...notificationSendDataParseResult.data, notification_id: notification.notification_id}),
       `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
     );
-
-    const notificationData = notificationSendDataParseResult.data;
-    const notification = await EventService.postNotification(
-      owner.user_id,
-      notificationData.user_codename,
-      notificationData.user_image,
-      false,
-      "like",
-      likeRecipeParseResult.data.is_liked,
-      notificationData.recipe_id,
-      notificationData.recipe_name,
-      notificationData.notification_date
-    );
-
-    if(notification === undefined) {
-      ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
-      return;
-    }
 
     ApiResponse.success(res, likeRecipeParseResult.data.is_liked ? RecipeSuccessMessage.LIKE_RECIPE : RecipeSuccessMessage.UNLIKE_RECIPE);
   }
@@ -505,21 +545,9 @@ export class RecipeController {
     const owner = await RecipeService.getRecipeOwner(postCommentParseResult.data.recipe_id);
 
     if(owner === undefined || owner === null) {
-      ApiResponse.error(res, RecipeErrorMessage.OWNER_DATA);
+      ApiResponse.success(res, RecipeSuccessMessage.POST_COMMENT, submittedComment);
       return;
     }
-
-    recipeEvents.sendMessageToClient(
-      JSON.stringify({
-        type: "comment",
-        recipe_id: postCommentParseResult.data.recipe_id,
-        recipe_name: postCommentParseResult.data.recipe_name,
-        user_codename: user.user_details?.user_codename,
-        user_image: user.user_details?.user_image,
-        notification_date: new Date()
-      }),
-      `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
-    );
 
     const notification = await EventService.postNotification(
       owner.user_id,
@@ -537,6 +565,19 @@ export class RecipeController {
       ApiResponse.error(res, RecipeErrorMessage.NOTIFICATION_INSERT);
       return;
     }
+
+    recipeEvents.sendMessageToClient(
+      JSON.stringify({
+        notification_id: notification.notification_id,
+        type: "comment",
+        recipe_id: postCommentParseResult.data.recipe_id,
+        recipe_name: postCommentParseResult.data.recipe_name,
+        user_codename: user.user_details?.user_codename,
+        user_image: user.user_details?.user_image,
+        notification_date: new Date()
+      }),
+      `user_id=${owner?.user_id}&user_codename=${owner?.user_codename}`
+    );
 
     ApiResponse.success(res, RecipeSuccessMessage.POST_COMMENT, submittedComment);
   }

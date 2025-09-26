@@ -1,23 +1,18 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $addNodeStyle, $patchStyleText } from "@lexical/selection";
+import { $patchStyleText } from "@lexical/selection";
 import {
   $getSelection,
-  $getTextContent,
-  $insertNodes,
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   createCommand,
-  EditorConfig,
   LexicalCommand,
-  LexicalEditor, LexicalNode,
+   LexicalNode,
   NodeKey,
   SerializedLexicalNode,
-  SerializedTextNode,
   Spread,
   TextModeType,
   TextNode,
 } from "lexical";
-import { DEFAULT_SERIF_FONT } from "next/dist/shared/lib/constants";
 
 export class FontSizeNode extends TextNode {
   __size: string;
@@ -35,7 +30,7 @@ export class FontSizeNode extends TextNode {
     return new FontSizeNode(node.__text, node.__size, node.__key);
   }
 
-  createDOM(config: EditorConfig, editor?: LexicalEditor): HTMLElement {
+  createDOM(): HTMLElement {
     const element = document.createElement("span");
     element.style.fontSize = this.__size + "px";
     element.textContent = this.getTextContent();
@@ -43,9 +38,6 @@ export class FontSizeNode extends TextNode {
   }
 
   updateDOM(
-    prevNode: TextNode,
-    dom: HTMLElement,
-    config: EditorConfig
   ): boolean {
     return false;
   }

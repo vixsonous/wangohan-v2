@@ -72,7 +72,7 @@ export default async function ShowRecipe({params}: Props) {
   return (
     <section className="flex max-w-3xl flex-col text-primary-text items-center w-full mt-10 gap-2">
       <ViewCounter recipe_id={recipe.recipe_id} />
-      <ShowRecipeCarousel user_id={recipe.user?.user_id || -1} is_owner={userData?.user_id === recipe.user?.user_id} recipe_images={recipe.recipe_images} recipe_id={recipe.recipe_id} recipe_name={recipe.recipe_name} />
+      <ShowRecipeCarousel user_id={recipe.user?.user_id || -1} is_owner={recipe.user !== null && (userData?.user_id === recipe.user.user_id)} recipe_images={recipe.recipe_images} recipe_id={recipe.recipe_id} recipe_name={recipe.recipe_name} />
       <ShowRecipeTags
         total_likes={recipe.total_likes}
         recipe_id={recipe.recipe_id}

@@ -1,5 +1,5 @@
 import z from "zod";
-import {content} from "@/app/(protected-user)/columns/create/components/create-editor";
+import {content} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor";
 
 export class BlogSchema {
   static Blog = z.object({
@@ -8,6 +8,7 @@ export class BlogSchema {
     title: z.string(),
     editor_state: z.string(),
     is_deleted: z.boolean(),
+    is_published: z.boolean(),
     blog_image: z.string(),
     blog_category: z.string(),
     updated_at: z.date()
@@ -25,10 +26,12 @@ export class GetBlogSchema {
 
 export class PostBlogSchema {
   static PostBlog = z.object({
+    blog_id: z.number().optional(),
     title: z.string().min(1, "Please provide the blog title!"),
     category: z.string("Please provide the blog category!"),
     editor_state: z.string(),
-    file: z.file("Please provide the blog image!")
+    file: z.string("Please provide the blog image!"),
+    is_published: z.boolean().optional(),
   }).refine(data => data.editor_state !== content, {
     message: "Please provide the content of your blog!",
     path: ["editor_state"]
@@ -56,5 +59,13 @@ export class PostBlogImageSchema {
   static PostBlogImage = z.object({
     blog_image_title: z.string("Please provide the title text of the image!"),
     blog_image: z.file("Please provide the image!"),
+  })
+}
+
+export class AdminBlogSchema {
+  static Blog = z.object({
+    blog_id: z.number(),
+    title: z.string(),
+    is_published: z.boolean(),
   })
 }

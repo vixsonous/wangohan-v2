@@ -7,12 +7,29 @@ export class BlogSchema {
     title: z.string(),
     editor_state: z.string(),
     is_deleted: z.boolean(),
+    is_published: z.boolean(),
     blog_image: z.string(),
     blog_category: z.string(),
     updated_at: z.date()
   });
 
   static BlogList = z.array(BlogSchema.Blog);
+
+  static PostBlog = z.object({
+    title: z.string().min(1, "Please provide the blog title!"),
+    category: z.string().min(1, "Please provide a valid blog category!"),
+    editor_state: z.string().min(1, "Please provide the blog content!"),
+    file: z.string().min(1, "Please provide the blog image!")
+  });
+
+  static PutBlog = z.object({
+    blog_id: z.number("Please provide the blog id!"),
+    title: z.string().min(1, "Please provide the blog title!"),
+    category: z.string().min(1, "Please provide a valid blog category!"),
+    editor_state: z.string().min(1, "Please provide the blog content!"),
+    file: z.string().min(1, "Please provide the blog image!"),
+    is_published: z.boolean()
+  })
 }
 
 export class BlogControllerSchema {
@@ -27,6 +44,10 @@ export class BlogControllerSchema {
   });
 
   static GetBlogImages = z.number("Please provide a valid page number!");
+
+  static PutBlog = z.object({
+    blog_id: z.number("Please provide a valid blog id!"),
+  })
 }
 
 export class GetBlogSchema {
@@ -53,6 +74,14 @@ export class GetBlogImagesSchema {
 export class PostBlogImageSchema {
   static PostBlogImage = z.object({
     blog_image_title: z.string("Please provide the title text of the image!"),
-    blog_image: z.custom<Express.Multer.File>().nonoptional("Please provide the image file!"),
+    blog_image: z.custom<Express.Multer.File>().nonoptional(),
+  })
+}
+
+export class AdminBlogSchema {
+  static Blog = z.object({
+    blog_id: z.number(),
+    title: z.string(),
+    is_published: z.boolean(),
   })
 }

@@ -70,7 +70,7 @@ export default async function User({
   return (
     <div className="flex gap-2 flex-col md:flex-row justify-center w-full max-w-7xl text-primary-text mt-10 px-4">
       <section className="w-full flex flex-col gap-2 items-center">
-        <Image className="rounded-full" width={300} height={300} src={user.user_image} alt="profile picture"/>
+        <Image className="rounded-full w-3/4 h-3/4 md:w-1/2 md:h-auto" width={300} height={300} src={user.user_image} alt="profile picture"/>
         <h1 className="text-3xl mb-4">{user.user_codename}</h1>
         <div className="relative">
           <Image width={300} height={122} src={"/banner/ribbon.webp"} alt="ribbon banner image"/>

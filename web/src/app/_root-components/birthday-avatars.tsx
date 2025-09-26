@@ -35,7 +35,7 @@ function Avatar({active, pet_image, pet_name}: AvatarProps) {
     return (
       <div className="relative flex-[0_0_100%] text-white flex flex-col items-center justify-center">
         <div style={{ scale: scale}} className={`transition-all duration-1000 w-full flex justify-center ${active ? 'animate-bubble': ''}`}>
-          <Image width={100} height={100} src={pet_image} loading="lazy" className="aspect-square max-w-[100px] max-h-[100px] rounded-full object-cover overflow-hidden" alt="website banner" />
+          <Image width={100} height={100} src={pet_image} loading="lazy" className="aspect-square max-w-[70px] max-h-[70px] md:max-w-[100px] md:max-h-[100px] rounded-full object-cover overflow-hidden" alt="website banner" />
         </div>
         <h1 className="whitespace-nowrap relative w-full text-sm opacity-90 z-10 bg-primary-bg font-bold text-[#523636] text-center">
           {pet_name}
@@ -78,7 +78,7 @@ export default function BirthdayAvatars({birthday_pets}: {birthday_pets: Array<z
         delay: 5000
       })
     ]}>
-      <CarouselContent className="items-center h-[200px] lg:h-[250px]">
+      <CarouselContent className={`${birthday_pets.length < 5 && 'flex justify-center items-center'} h-[200px] lg:h-[250px]`}>
         {
           birthday_pets.map( (k, idx) => {
             return <CarouselItem className="lg:basis-1/5 md:basis-1/3" key={k.pet_id}>

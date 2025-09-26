@@ -1,9 +1,7 @@
 
-import useToolbarStates from "../toolbar-states";
 import {
   FORMAT_TEXT_COMMAND,
   LexicalCommand,
-  LexicalEditor,
   TextFormatType,
 } from "lexical";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
@@ -21,7 +19,7 @@ const TextMod = () => {
   const state = useSelector((state: RootState) => state.editorState);
   const handleButtonClick =
     (command: LexicalCommand<TextFormatType>, payload: TextFormatType) =>
-    (e: React.MouseEvent<HTMLButtonElement>) =>
+    () =>
       editor.dispatchCommand(command, payload);
   return (
     <Popover>

@@ -1,11 +1,11 @@
 import InputField from "@/components/Input";
 import Error from "@/components/Error";
 import React, {useEffect} from "react";
-import CreateEditorLexicalComposer
-  from "@/app/(protected-user)/columns/create/components/create-editor-lexical-composer";
+import EditorLexicalComposer
+  from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-lexical-composer";
 import {Controller, useForm} from "react-hook-form";
 import z from "zod";
-import {GetBlogImagesSchema, PostBlogSchema} from "@/types/blog-types";
+import {BlogSchema, GetBlogImagesSchema, PostBlogSchema} from "@/types/blog-types";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {
   Select,
@@ -18,44 +18,53 @@ import {
 } from "@/components/ui/select";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store";
-import CreateEditorFileUpload from "@/app/(protected-user)/columns/create/components/create-editor-file-upload";
+import EditorFileUpload from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-file-upload";
 import {
   setTotalBlogImages,
   setUploadedImages
-} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 import {UserSchema} from "@/types/user-types.user";
 import {setUser} from "@/store/slice/user-slice";
 
 type CreateEditorWrapperProps = {
   blog_images: z.infer<typeof GetBlogImagesSchema.GetBlogImages>;
   user_data: z.infer<typeof UserSchema.User>;
+  blog?: z.infer<typeof BlogSchema.Blog> | undefined;
 }
 
 export const content = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
 
-export default function CreateEditor({blog_images, user_data}: CreateEditorWrapperProps) {
+export default function Editor({blog_images, user_data, blog}: CreateEditorWrapperProps) {
 
   const dispatch = useDispatch();
 
   const {register, control, setValue, handleSubmit, formState: {errors}} = useForm<z.infer<typeof PostBlogSchema.PostBlog>>({
     mode: 'onBlur',
-    resolver: zodResolver(PostBlogSchema.PostBlog)
+    resolver: zodResolver(PostBlogSchema.PostBlog),
+    defaultValues: blog ? {
+      blog_id: blog.blog_id,
+      title: blog.title,
+      editor_state: blog.editor_state,
+      category: blog.blog_category,
+      file: blog.blog_image,
+      is_published: blog.is_published
+    } : undefined
   });
 
   const editorState = useSelector((state: RootState) => state.editorState);
 
   useEffect(() => {
     setValue("editor_state", editorState.editorState);
-  }, [editorState.editorState]);
+  }, [editorState.editorState, setValue]);
 
   useEffect(() => {
     dispatch(setUploadedImages(blog_images.blog_images));
     dispatch(setTotalBlogImages(blog_images.total_blog_images));
-  }, [blog_images.blog_images]);
+  }, [blog_images.blog_images, dispatch, blog_images.total_blog_images]);
 
   useEffect(() => {
     dispatch(setUser(user_data));
-  }, [user_data]);
+  }, [user_data, dispatch]);
   return (
     <form className="mt-6">
       {Object.keys(errors).map((err, idx) => {
@@ -72,12 +81,12 @@ export default function CreateEditor({blog_images, user_data}: CreateEditorWrapp
       <div className="flex gap-4">
         <Controller render={({field}) => (
           <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger id={"user_gender"} className="min-w-32 bg-secondary-bg border border-primary-text">
-              <SelectValue placeholder="性別を選択" />
+            <SelectTrigger className="min-w-32 bg-secondary-bg border border-primary-text">
+              <SelectValue placeholder="カテゴリを選択" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>性別を選択</SelectLabel>
+                <SelectLabel>カテゴリを選択</SelectLabel>
                 <SelectItem value="レシピ特集">レシピ特集</SelectItem>
                 <SelectItem value="基礎知識">基礎知識</SelectItem>
                 <SelectItem value="その他">その他</SelectItem>
@@ -88,9 +97,9 @@ export default function CreateEditor({blog_images, user_data}: CreateEditorWrapp
           name={"category"}
           control={control}
         />
-        <CreateEditorFileUpload control={control} />
+        <EditorFileUpload control={control} />
       </div>
-      <CreateEditorLexicalComposer handleSubmit={handleSubmit} />
+      <EditorLexicalComposer handleSubmit={handleSubmit} blog={blog} />
     </form>
   )
 }

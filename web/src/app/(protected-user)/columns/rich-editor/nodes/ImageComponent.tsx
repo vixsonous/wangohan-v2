@@ -1,6 +1,5 @@
 import "./ImageNode.css";
 
-import { useCollaborationContext } from "@lexical/react/LexicalCollaborationContext";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
 import { mergeRegister } from "@lexical/utils";
@@ -8,14 +7,14 @@ import {
   $getNodeByKey,
   $getSelection,
   $isNodeSelection,
-  $setSelection,
+  $setSelection, BaseSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
   DRAGSTART_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
-  KEY_ESCAPE_COMMAND,
+  KEY_ESCAPE_COMMAND, LexicalEditor,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import * as React from "react";
@@ -60,6 +59,7 @@ function LazyImage({
 }: LazyImageProps): JSX.Element {
   useSuspenseImage(src);
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       className={className || undefined}
       src={src}
@@ -105,10 +105,9 @@ export default function ImageComponent({
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
   const [isResizing, setIsResizing] = useState<boolean>(false);
-  const { isCollabActive } = useCollaborationContext();
   const [editor] = useLexicalComposerContext();
-  const [selection, setSelection] = useState<any>(null);
-  const activeEditorRef = useRef<any>(null);
+  const [selection, setSelection] = useState<BaseSelection | null>(null);
+  const activeEditorRef = useRef<HTMLDivElement | LexicalEditor | null>(null);
 
   const onDelete = useCallback(
     (payload: KeyboardEvent) => {

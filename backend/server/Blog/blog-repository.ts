@@ -2,8 +2,7 @@ import {log} from "@/server/utils/log";
 import {db} from "@/database/database";
 import z from "zod";
 import {BlogSchema, GetBlogImagesSchema, GetBlogSchema} from "@/server/Blog/blog-types";
-import {ImageProcess} from "@/server/Images/image-service";
-import {Image} from "@/server/Images/image";
+import {ImageProcess, ImageService} from "@/server/Images/image-service";
 import {BlogImageInsert} from "@/database/types";
 
 export class BlogRepository {
@@ -16,6 +15,7 @@ export class BlogRepository {
           "title",
           "editor_state",
           "is_deleted",
+          "is_published",
           "blog_image",
           "blog_category",
           "updated_at"
@@ -33,9 +33,69 @@ export class BlogRepository {
       return undefined;
     }
   }
+
+  static async postBlog(blog: z.infer<typeof BlogSchema.PostBlog>, publish: boolean, user_id: number): Promise<boolean | undefined> {
+    try {
+      await db.insertInto("blog_columns_table")
+        .values({
+          blog_category: blog.category,
+          user_id: user_id,
+          title: blog.title,
+          is_deleted: false,
+          is_published: publish,
+          blog_image: blog.file,
+          editor_state: blog.editor_state,
+          updated_at: new Date(),
+          created_at: new Date(),
+        })
+        .executeTakeFirstOrThrow();
+
+      log("Successfully posted blog!");
+      return true;
+    } catch(e) {
+      log(e);
+      return undefined;
+    }
+  }
+
+  static async putBlog(blog: z.infer<typeof BlogSchema.PutBlog>, blog_id: number): Promise<z.infer<typeof BlogSchema.Blog> | undefined> {
+    try {
+      const blogResult: z.infer<typeof BlogSchema.Blog> = await db.updateTable("blog_columns_table")
+        .set({
+          blog_id: blog.blog_id,
+          title: blog.title,
+          blog_image: blog.file,
+          editor_state: blog.editor_state,
+          is_published: blog.is_published
+        })
+        .returning([
+          "blog_id",
+          "user_id",
+          "title",
+          "editor_state",
+          "is_deleted",
+          "is_published",
+          "blog_image",
+          "blog_category",
+          "updated_at",
+        ])
+        .where(eb => eb.and({
+          blog_id: blog_id
+        }))
+        .executeTakeFirstOrThrow();
+
+      log("Successfully updated blog!");
+
+      return blogResult;
+    } catch (e) {
+      log(e);
+      return undefined;
+    }
+  }
   static BLOG_LIMIT = 6;
   static async getBlogs(page_no: number, category: string = "全て"): Promise<z.infer<typeof GetBlogSchema.GetBlogList> | undefined> {
     try {
+
       const blogs: z.infer<typeof BlogSchema.BlogList> = await db.selectFrom("blog_columns_table")
         .select([
           "blog_id",
@@ -43,12 +103,17 @@ export class BlogRepository {
           "title",
           "editor_state",
           "is_deleted",
+          "is_published",
           "blog_image",
           "blog_category",
           "updated_at"
         ])
         .$if(category !== "全て", q => q.where("blog_columns_table.blog_category", "=", category))
-        .where("is_deleted", "=", false)
+        .where(eb => eb.and({
+          is_deleted: false,
+          is_published: true
+        }))
+        .orderBy("created_at", "desc")
         .offset(BlogRepository.BLOG_LIMIT * page_no)
         .limit(BlogRepository.BLOG_LIMIT)
         .execute();
@@ -57,8 +122,14 @@ export class BlogRepository {
         .select(lteb => [
           lteb.fn.coalesce(lteb.selectFrom("blog_columns_table").select(({fn}) => [
             fn.count<number>("blog_columns_table.blog_id").as("total_blogs")
-          ]), lteb.val(0)).as("total_blogs")
-        ]).executeTakeFirstOrThrow();
+          ]).$if(category !== "全て", q => q.where("blog_columns_table.blog_category", "=", category))
+            .where(eb => eb.and({
+              is_deleted: false,
+              is_published: true
+            })), lteb.val(0)).as("total_blogs")
+        ])
+
+        .executeTakeFirstOrThrow();
 
       log("Successfully retrieved blogs!");
       return {blogs, total_blogs: totalBlogs.total_blogs};
@@ -115,7 +186,7 @@ export class BlogRepository {
 
       const uploadImage = await image.result();
       const folder = `blog-uploads`;
-      const uploadDone = await Image.uploadToR2Public(folder, uploadImage, blog_image.originalname.split(".")[0], "webp", "images/webp");
+      const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, blog_image.originalname.split(".")[0], "webp", "images/webp");
 
       if(uploadDone.Key === undefined) {
         return undefined;

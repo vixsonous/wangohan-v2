@@ -28,7 +28,7 @@ export class RecipeDisplaySchema {
     total_views: z.number(),
     recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay),
     recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
-    user_id: z.number(),
+    user: UserSchema.UserDisplay,
     created_at: z.date(),
   });
 
@@ -84,7 +84,7 @@ export class RecipeSchema {
   });
 
   static Recipe = z.object({
-    recipe_id: z.string().optional(),
+    recipe_id: z.number().optional(),
     recipe_name: z.string().min(1, "タイトルを入力してください").max(25, "文字オーバーしています"),
     recipe_description: z.string().min(1, "内容を入力してください"),
     recipe_instructions: z.array(RecipeSchema.RecipeInstruction).min(1, "Please input recipe instructions!"),
@@ -137,4 +137,19 @@ export class RecipeSchema {
     comment: z.string().min(1, "Please provide your comment for the recipe!"),
     recipe_name: z.string().min(1, "Please provide the recipe name!"),
   });
+}
+
+export class AdminRecipeSchema {
+  static Recipe = z.object({
+    recipe_name: z.string(),
+    recipe_description: z.string(),
+    recipe_id: z.number(),
+    total_likes: z.number(),
+    total_views: z.number(),
+    recipe_images: Array<typeof RecipeDisplaySchema.RecipeImageDisplay>,
+    recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
+    is_published: z.boolean(),
+    user: UserSchema.UserDisplay,
+    created_at: z.date(),
+  })
 }

@@ -6,6 +6,8 @@ import Link from "next/link";
 import Image from "@/components/Image/client";
 import HomeSearchBar from "@/app/_root-components/home-search-bar";
 import useColumnDisplay from "@/app/(public)/columns/show/[blogId]/[blogTitle]/components/use-column";
+import {useEffect, useState} from "react";
+import {ROUTES} from "@/constants/routes";
 
 type ColumnDisplayProps = {
   blog_data: z.infer<typeof BlogSchema.Blog>;
@@ -14,10 +16,10 @@ type ColumnDisplayProps = {
 }
 
 const blogCategories = [
-  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for all"}/>,text: "全て", url: "/columns/list/1?category=全て"}, //pawprint
-  {icon: <Image src={"/icons/svg/primary-fork-knife.svg"} width={16} height={16} alt={"icon for special feature"}/>,text: "レシピ特集", url: "/columns/list/1?category=レシピ特集"}, //fork knife
-  {icon: <Image src={"/icons/svg/primary-book.svg"} width={16} height={16} alt={"icon for basic knowledge"}/>,text: "基礎知識", url: "/columns/list/1?category=基礎知識"}, // book
-  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for others"}/>,text: "その他", url: "/columns/list/1?category=その他"}, // pawprint
+  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for all"}/>,text: "全て", url: ROUTES.COLUMNS + "?category=全て"}, //pawprint
+  {icon: <Image src={"/icons/svg/primary-fork-knife.svg"} width={16} height={16} alt={"icon for special feature"}/>,text: "レシピ特集", url: ROUTES.COLUMNS + "?category=レシピ特集"}, //fork knife
+  {icon: <Image src={"/icons/svg/primary-book.svg"} width={16} height={16} alt={"icon for basic knowledge"}/>,text: "基礎知識", url: ROUTES.COLUMNS + "?category=基礎知識"}, // book
+  {icon: <Image src={"/icons/svg/primary-paw-print.svg"} width={16} height={16} alt={"icon for others"}/>,text: "その他", url: ROUTES.COLUMNS + "?category=その他"}, // pawprint
 ]
 
 const icons = {
@@ -30,17 +32,26 @@ const icons = {
 export default function ColumnDisplay({blog_data, related_blogs, popular_recipes}: ColumnDisplayProps) {
   const { htmlString } = useColumnDisplay(blog_data);
 
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    setDate(new Date(blog_data.updated_at).toDateString());
+
+    return () => setDate("");
+  }, [blog_data.updated_at]);
+
   return (
     <article className="grid lg:gap-4 grid-cols-12">
       <section className="col-span-12 max-h-max lg:col-span-8 mt-6 bg-secondary-bg p-10">
         <h1 className="text-xl mb-2">{blog_data.title}</h1>
         <p className="flex gap-2 items-center mb-6 text-sm text-gray-500">
-          {/*<CalendarPlus size={16} />*/}
-          {new Date(blog_data.updated_at).toDateString()}
+          <Image src={"/icons/svg/primary-calendar.svg"} height={20} width={20} alt={"calendar icon for the update date"}/>
+          {date || "XXX Mmm DD YYYY"}
           <span className="ml-4">{blog_data.blog_category}</span>
         </p>
         <Image
           src={blog_data.blog_image}
+          alt={blog_data.title}
           width={1280}
           fit="cover"
         />
@@ -62,7 +73,7 @@ export default function ColumnDisplay({blog_data, related_blogs, popular_recipes
             />
             <h1>Search</h1>
           </header>
-          <HomeSearchBar />
+          <HomeSearchBar id={"column-search"} />
         </section>
         <section className="flex flex-col gap-2 items-center">
           <header className="flex w-full gap-4 items-center">

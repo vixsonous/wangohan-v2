@@ -1,18 +1,14 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $addNodeStyle, $patchStyleText } from "@lexical/selection";
+import { $patchStyleText } from "@lexical/selection";
 import {
   $getSelection,
-  $getTextContent,
-  $insertNodes,
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   createCommand,
   EditorConfig,
   LexicalCommand,
-  LexicalEditor,
   NodeKey,
   SerializedLexicalNode,
-  SerializedTextNode,
   Spread,
   TextModeType,
   TextNode,
@@ -35,16 +31,13 @@ export class FontNode extends TextNode {
     return new FontNode(node.__text, node.__font, node.__key);
   }
 
-  createDOM(config: EditorConfig, editor?: LexicalEditor): HTMLElement {
+  createDOM(config: EditorConfig): HTMLElement {
     const element = document.createElement("p");
     element.style.fontFamily = config.theme.fontFamily;
     return element;
   }
 
   updateDOM(
-    prevNode: TextNode,
-    dom: HTMLElement,
-    config: EditorConfig
   ): boolean {
     return false;
   }
@@ -92,8 +85,8 @@ export function FontFamilyPlugin(): null {
     (font: string) => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        const text = $getTextContent();
-        const node = $createFontNode(text, font);
+        // const text = $getTextContent();
+        // const node = $createFontNode(text, font);
         $patchStyleText(selection, {
           "font-family": font || DEFAULT_SERIF_FONT.name,
         });

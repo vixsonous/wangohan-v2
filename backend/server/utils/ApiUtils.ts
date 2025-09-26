@@ -39,6 +39,16 @@ export class ApiResponse {
       status: 401
     } as ResponseData<T>)
   }
+
+  static forbidden<T>(res: Response, message?: any) {
+    console.error("Error!");
+    log(message);
+    res.status(403).json({
+      message: message || "Forbidden!",
+      data: undefined,
+      status: 403
+    } as ResponseData<T>)
+  }
   
 }
 

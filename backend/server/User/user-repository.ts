@@ -6,8 +6,7 @@ import {UserDetailInsert, UserDetailUpdate, UserInsert} from "@/database/types";
 // @ts-ignore
 import bcrypt from 'bcrypt';
 import {User} from "./user";
-import {ImageProcess} from "@/server/Images/image-service";
-import {Image} from "@/server/Images/image";
+import {ImageProcess, ImageService} from "@/server/Images/image-service";
 import {jsonArrayFrom, jsonObjectFrom} from "kysely/helpers/postgres";
 import {UserDetailSchema} from "@/server/types/user-types.user-detail";
 import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
@@ -164,7 +163,7 @@ export class UserDetailsRepository {
 
       const uploadImage = await image.result();
       const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
-      const uploadDone = await Image.uploadToR2Public(folder, uploadImage, "profile_picture_" + user_detail.user_id, "webp", "images/webp");
+      const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, "profile_picture_" + user_detail.user_id, "webp", "images/webp");
 
       if(uploadDone.Key === undefined) {
         return undefined;
@@ -222,7 +221,7 @@ export class UserDetailsRepository {
 
         const uploadImage = await image.result();
         const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
-        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, user_detail.user_image.originalname.split(".")[0], "webp", "images/webp");
+        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, user_detail.user_image.originalname.split(".")[0], "webp", "images/webp");
 
         if(uploadDone.Key === undefined) {
           return undefined;
@@ -290,6 +289,7 @@ export class UserRepository {
         .select(eb => [
           "user_id",
           "email",
+          "user_lvl",
           jsonObjectFrom(
             eb.selectFrom("user_details_table")
               .select([
@@ -311,6 +311,7 @@ export class UserRepository {
               .innerJoin("user_details_table", "notifications_table.user_id", "user_details_table.user_id")
               .innerJoin("recipes_table", "recipes_table.recipe_id","notifications_table.recipe_id")
               .select([
+                "notifications_table.notification_id",
                 "notifications_table.recipe_id",
                 "notifications_table.recipe_name",
                 "is_read",
@@ -345,6 +346,7 @@ export class UserRepository {
         .select(eb => [
           "user_id",
           "email",
+          "user_lvl",
           jsonObjectFrom(
             eb.selectFrom("user_details_table")
               .select([
@@ -366,6 +368,7 @@ export class UserRepository {
               .innerJoin("user_details_table", "notifications_table.user_id", "user_details_table.user_id")
               .innerJoin("recipes_table", "recipes_table.recipe_id","notifications_table.recipe_id")
               .select([
+                "notifications_table.notification_id",
                 "notifications_table.recipe_id",
                 "notifications_table.recipe_name",
                 "is_read",

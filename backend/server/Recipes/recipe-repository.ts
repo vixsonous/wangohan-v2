@@ -10,11 +10,11 @@ import {
 import { log } from "../utils/log";
 import { RecipeDisplaySchema, RecipeSchema} from "../types/recipe-types";
 import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
-import {ImageProcess} from "../Images/image-service";
-import {Image} from "../Images/image";
+import {ImageProcess, ImageService} from "../Images/image-service";
 import {RecipeCacheUtil} from "@/server/utils/redis";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
-import {UserSchema} from "@/server/types/user-types.user";
+import { UserSchema} from "@/server/types/user-types.user";
+import {R2_FILE_PREFIX} from "@/server/utils/constants";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -42,7 +42,14 @@ export class RecipeRepository {
           "recipe_event_tag",
           "recipe_size_tag",
           "recipe_description",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
           "recipes_table.created_at",
           "total_likes",
           "total_views",
@@ -98,7 +105,14 @@ export class RecipeRepository {
           "recipe_event_tag",
           "recipe_size_tag",
           "recipe_description",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
           "created_at",
           "total_likes",
           "total_views",
@@ -299,6 +313,7 @@ export class RecipeRepository {
         total_likes: 0,
         total_views: 0,
         is_deleted: false,
+        is_published: false,
         updated_at: new Date(),
         created_at: new Date()
       } satisfies RecipeInsert;
@@ -347,7 +362,7 @@ export class RecipeRepository {
         const uploadImage = await image.result();
 
         const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe_id).padStart(8, "0")}`;
-        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
+        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
         return {key: uploadDone.Key, order: idx, filename: i.originalname};
       }));
 
@@ -408,11 +423,11 @@ export class RecipeRepository {
 
           let key = deleteImage.delete_image_key;
 
-          if(key.startsWith("r2://")) {
+          if(key.startsWith(R2_FILE_PREFIX)) {
             key = key.slice(5);
           }
 
-          return Image.deleteR2Public(key);
+          return ImageService.deleteR2Public(key);
         }));
 
         const deleteIds = rcImageDeleteIds.map(deleteImage => Number(deleteImage.delete_image_id));
@@ -442,7 +457,7 @@ export class RecipeRepository {
         const uploadImage = await imageProcess.result();
 
         const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe.recipe_id).padStart(8, "0")}`;
-        const uploadDone = await Image.uploadToR2Public(folder, uploadImage, image.originalname.split(".")[0], "webp", "images/webp");
+        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, image.originalname.split(".")[0], "webp", "images/webp");
 
         return {key: uploadDone.Key, order: 0, filename: image.originalname};
       }));
@@ -675,7 +690,14 @@ export class RecipeRepository {
           "recipe_event_tag",
           "recipe_size_tag",
           "recipe_description",
-          "user_id",
+          jsonObjectFrom(
+            lteb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "recipes_table.user_id")
+          ).as("user"),
           "created_at",
           "total_likes",
           "total_views",
@@ -870,8 +892,8 @@ export class RecipeRepository {
 
       // Delete images in the bucket
       await Promise.all(images.map(async image => {
-        const key = image.recipe_image.startsWith("r2://") ? image.recipe_image.split("r2://")[1] : image.recipe_image;
-        await Image.deleteR2Public(key);
+        const key = image.recipe_image.startsWith(R2_FILE_PREFIX) ? image.recipe_image.split(R2_FILE_PREFIX)[1] : image.recipe_image;
+        await ImageService.deleteR2Public(key);
       }));
 
       const res = await trx.deleteFrom("recipes_table")

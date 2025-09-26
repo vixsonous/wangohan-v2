@@ -2,7 +2,7 @@
 import {ClientApiResponseService, ClientApiService} from "@/lib/client-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {AxiosError, AxiosResponse} from "axios";
-import React, {useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -10,11 +10,14 @@ import {useMutation} from "@tanstack/react-query";
 import heic2any from "heic2any";
 import {RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
 import {FileSchema} from "@/types/file-types";
+import {ENDPOINTS} from "@/constants/endpoints";
+import {useRouter} from "next/navigation";
 
 const MAX_FILES_LENGTH = 5;
 
-export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe>) => {
+export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRecipe>, setOpen?: Dispatch<SetStateAction<boolean>> | undefined) => {
 
+  const router = useRouter();
   const {
     register, 
     unregister, 
@@ -83,6 +86,27 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     }
   }, [recipe_data]);
 
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File): Promise<File> => new Promise(async (resolve) => {
+      let retFile = file;
+      const fileExt = file.name.substring(file.name.lastIndexOf(".") + 1);
+
+      if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
+        const image = await heic2any({
+          blob: file,
+          toType: "image/webp",
+          quality: 0.8,
+
+        });
+
+        const img = !Array.isArray(image) ? [image] : image;
+        retFile = new File(img, file.name);
+      }
+
+      resolve(retFile);
+    })
+  })
+
   const fileOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const targetFiles = e.currentTarget.files;
@@ -92,27 +116,29 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     const temp = structuredClone(files);
     for(let i = 0; i < targetFiles.length && temp.length < MAX_FILES_LENGTH; i++) {
 
-      const fileExt = targetFiles[i].name.substring(targetFiles[i].name.lastIndexOf(".") + 1);
+      const file = await uploadFileMutation.mutateAsync(targetFiles[i]);
 
-      if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
-        const image = await heic2any({
-          blob: targetFiles[i],
-          toType: "image/webp",
-          quality: 0.8
-        });
+      temp.push({
+        file: file,
+        preview_url: URL.createObjectURL(file)
+      });
 
-        const img = !Array.isArray(image) ? [image] : image;
-        const file = new File(img, targetFiles[i].name);
-        temp.push({
-          file: file,
-          preview_url: URL.createObjectURL(targetFiles[i])
-        });
-      } else {
-        temp.push({
-          file: targetFiles[i] as File,
-          preview_url: URL.createObjectURL(targetFiles[i])
-        });
-      }
+      // if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
+      //   const image = await heic2any({
+      //     blob: targetFiles[i],
+      //     toType: "image/webp",
+      //     quality: 0.8
+      //   });
+      //
+      //   const img = !Array.isArray(image) ? [image] : image;
+      //   const file = new File(img, targetFiles[i].name);
+      //
+      // } else {
+      //   temp.push({
+      //     file: targetFiles[i] as File,
+      //     preview_url: URL.createObjectURL(targetFiles[i])
+      //   });
+      // }
 
     }
     setFiles(structuredClone(temp));
@@ -146,7 +172,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   });
 
   const submitMutation = useMutation({
-    mutationFn: (data: z.infer<typeof RecipeSchema.PostRecipe>) => ClientApiService.post("/post-recipe", data, {
+    mutationFn: (data: z.infer<typeof RecipeSchema.PostRecipe>) => ClientApiService.post(ENDPOINTS.RECIPE + "/", data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -159,6 +185,11 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
       });
 
       reset();
+      router.refresh();
+
+      if(setOpen) {
+        setOpen(false);
+      }
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(error.response as AxiosResponse);
@@ -170,7 +201,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: z.infer<typeof RecipeSchema.UpdateRecipe>) => ClientApiService.post("/update-recipe", data, {
+    mutationFn: (data: z.infer<typeof RecipeSchema.UpdateRecipe>) => ClientApiService.put(ENDPOINTS.RECIPE + "/", data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -183,6 +214,8 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
       });
 
       reset();
+      router.refresh();
+
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(error.response as AxiosResponse);
@@ -259,6 +292,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
     watch,
     submitMutation,
     removeIngredients,
-    removeInstructions
+    removeInstructions,
+    uploadFileMutation
   }
 }

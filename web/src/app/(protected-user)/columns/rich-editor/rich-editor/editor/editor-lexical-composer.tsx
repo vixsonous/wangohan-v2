@@ -13,7 +13,6 @@ import {FontBackgroundColorNodePlugin} from "@/app/(protected-user)/columns/rich
 import {FontFamilyPlugin} from "@/app/(protected-user)/columns/rich-editor/nodes/FontNode";
 import {LexicalComposer} from "@lexical/react/LexicalComposer";
 import React, {memo, useEffect } from "react";
-import {Button} from "@/components/ui/button";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {customGenerateHtmlFromNodes} from "@/app/(protected-user)/columns/rich-editor/lib/GenerateHtml";
 import {useDispatch, useSelector} from "react-redux";
@@ -21,12 +20,30 @@ import {RootState} from "@/store/store";
 import {
   setEditorState,
   setHTMLString
-} from "@/app/(protected-user)/columns/create/components/create-editor-slice";
+} from "@/app/(protected-user)/columns/rich-editor/rich-editor/editor/editor-slice";
 import dynamic from "next/dynamic";
 import SpinLoader from "@/components/SpinLoader";
 import "@/app/(protected-user)/columns/rich-editor/rich-editor/style.css";
-import {FieldValues, SubmitErrorHandler, SubmitHandler} from "react-hook-form";
+import { SubmitErrorHandler, SubmitHandler} from "react-hook-form";
 import z from "zod";
+import InitEditor from "@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/components/init-editor";
+import {BlogSchema} from "@/types/blog-types";
+import UpdateBlogButton from "@/app/(protected-user)/columns/edit/[blogId]/[blogTitle]/components/update-blog-button";
+import CreateBlogButton from "@/app/(protected-user)/columns/create/components/create-blog-button";
+
+export type HandleSubmit = (onValid: SubmitHandler<{
+  blog_id?: number | undefined,
+  title: string
+  category: string
+  editor_state: string
+  file: string
+}>, onInvalid?: (SubmitErrorHandler<{
+  blog_id?: number | undefined,
+  title: string
+  category: string
+  editor_state: string
+  file: string
+}> | undefined)) => (e?: React.BaseSyntheticEvent) => Promise<void>;
 
 const ToolbarPlugin = dynamic(
   () => import("@/app/(protected-user)/columns/rich-editor/rich-editor/plugins/ToolbarPlugin"),
@@ -46,23 +63,14 @@ const OnChangePlugin = memo(function OnChangePlugin() {
         sessionStorage.setItem("editor", JSON.stringify(jsonState));
       });
     });
-  }, [editor]);
+  }, [editor, dispatch]);
   return null;
 });
 
 
-export default function CreateEditorLexicalComposer({handleSubmit}: {
-  handleSubmit:  (onValid: SubmitHandler<{
-    title: string
-    category: string
-    editor_state: string
-    file: z.core.File
-  }>, onInvalid?: (SubmitErrorHandler<{
-    title: string
-    category: string
-    editor_state: string
-    file: z.core.File
-  }> | undefined)) => (e?: React.BaseSyntheticEvent) => Promise<void>
+export default function EditorLexicalComposer({handleSubmit, blog}: {
+  handleSubmit: HandleSubmit,
+  blog?: z.infer<typeof BlogSchema.Blog> | undefined;
 }) {
 
   const editorState = useSelector((state: RootState) => state.editorState);
@@ -75,6 +83,7 @@ export default function CreateEditorLexicalComposer({handleSubmit}: {
         className="editor-container"
         style={{ margin: "0", marginTop: "1em", maxWidth: "none" }}
       >
+        <InitEditor blog={blog} />
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
@@ -104,12 +113,11 @@ export default function CreateEditorLexicalComposer({handleSubmit}: {
         </div>
       </div>
       <div className="w-full flex justify-center gap-2 items-center mt-8">
-        <Button onClick={handleSubmit((data: FieldValues) => console.log(data + "hello"))} type={"button"}>
-          Post Blog
-        </Button>
-        <Button onClick={handleSubmit((data: FieldValues) => console.log(data))} type={"button"}>
-          Save blog
-        </Button>
+        {blog === undefined ? (
+          <CreateBlogButton handleSubmit={handleSubmit} />
+        ) : (
+          <UpdateBlogButton handleSubmit={handleSubmit} blog={blog} />
+        )}
       </div>
       <div
         className="mt-8 max-w-full whitespace-pre-wrap break-all"

@@ -6,10 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import React, { useEffect, useState } from "react";
 import ShowRecipeDropdown from "./show-recipe-dropdown";
-import { RecipeImageDisplay } from "@/server-actions/Recipe/recipe-types";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
 
 interface ShowRecipeCarouselProps {
-  recipe_images: Array<RecipeImageDisplay>;
+  recipe_images: z.infer<typeof RecipeDisplaySchema.RecipeImageDisplay>[];
   recipe_id: number;
   recipe_name: string;
   is_owner: boolean;
@@ -43,7 +44,7 @@ export default function ShowRecipeCarousel({recipe_images, recipe_id, recipe_nam
       <CarouselContent>
         {recipe_images.map(a => {
           return (
-            <CarouselItem className="h-[468px]" key={a.recipe_image_id}>
+            <CarouselItem className="h-auto" key={a.recipe_image_id}>
               <Card className="p-0 h-full bg-transparent border-0">
                 <CardContent className="relative bg-transparent w-full h-full flex items-center justify-center p-0 ">
                   <div className='absolute top-0 w-full h-full bg-primary-text opacity-10 -z-10'></div>

@@ -14,8 +14,8 @@ export default async function RootNavigationButtons() {
       {
         userData === undefined ? (
           <>
-          <li><Link href="/login">ログイン</Link></li>
-          <li><Link href="/signup">登録</Link></li>
+          <li className={"hidden md:block"}><Link href="/login">ログイン</Link></li>
+          <li className={"hidden md:block"}><Link href="/signup">登録</Link></li>
           </>
         ) : (
           <li>

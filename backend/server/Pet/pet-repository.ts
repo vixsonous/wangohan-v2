@@ -3,8 +3,7 @@ import z from "zod";
 import {PetSchema} from "@/server/types/pet-types.pet";
 import {log} from "@/server/utils/log";
 import {db} from "@/database/database";
-import {ImageProcess} from "@/server/Images/image-service";
-import {Image} from "@/server/Images/image";
+import {ImageProcess, ImageService} from "@/server/Images/image-service";
 import {sql} from "kysely";
 
 export class PetRepository {
@@ -45,7 +44,7 @@ export class PetRepository {
 
       const uploadImage = await image.result();
       const folder = `${String(pet.user_id).padStart(8, "0")}/pets/${String(nextId).padStart(8, "0")}`;
-      const uploadDone = await Image.uploadToR2Public(folder, uploadImage, pet.pet_image.originalname.split(".")[0], "webp", "images/webp");
+      const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, pet.pet_image.originalname.split(".")[0], "webp", "images/webp");
 
       if(uploadDone.Key === undefined) {
         return undefined;

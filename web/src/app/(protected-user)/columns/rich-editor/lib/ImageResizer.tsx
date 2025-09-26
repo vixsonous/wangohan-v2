@@ -30,13 +30,9 @@ interface ImageResizerProps {
 const ImageResizer: FC<ImageResizerProps> = ({
   onResizeStart,
   onResizeEnd,
-  buttonRef,
   imageRef,
   maxWidth,
   editor,
-  showCaption,
-  setShowCaption,
-  captionsEnabled,
 }) => {
   const controlWrapperRef = useRef<HTMLDivElement | null>(null);
   const userSelect = useRef<{ priority: string; value: string }>({

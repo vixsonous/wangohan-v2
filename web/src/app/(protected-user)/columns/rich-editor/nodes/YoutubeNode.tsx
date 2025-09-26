@@ -91,7 +91,7 @@ export class YouTubeNode extends DecoratorBlockNode {
     this.__id = id;
   }
 
-  exportDOM(editor: LexicalEditor): DOMExportOutput {
+  exportDOM(): DOMExportOutput {
     const iframe = document.createElement("iframe");
     iframe.setAttribute("src", `https://www.youtube.com/embed/${this.__id}`);
     iframe.setAttribute("width", "420");
@@ -115,8 +115,6 @@ export class YouTubeNode extends DecoratorBlockNode {
   }
 
   getTextContent(
-    _includeInert?: boolean | undefined,
-    _includeDirectionless?: false | undefined
   ): string {
     return `https://www.youtube.com/watch?v=${this.__id}`;
   }

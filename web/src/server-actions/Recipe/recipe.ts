@@ -1,12 +1,12 @@
 import {ServerApiResponseService, ServerApiService} from '@/lib/server-utils';
-import { RecipeDisplayDetails } from './recipe-types';
 import z from "zod";
 import {RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
+import {ENDPOINTS} from "@/constants/endpoints";
 
 export const getRecipe = async (recipe_id: number, recipe_name: string, is_edit: boolean):
   Promise<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | z.infer<typeof RecipeSchema.UpdateRecipe> | undefined> => {
   try {
-    const response = await ServerApiService.get(`/get-recipe?recipe_id=${recipe_id}&recipe_name=${recipe_name}&is_edit=${is_edit}`);
+    const response = await ServerApiService.get(ENDPOINTS.RECIPE + `/${recipe_id}?recipe_name=${recipe_name}&is_edit=${is_edit}`);
 
     return await ServerApiResponseService.getResponseData<z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay> | z.infer<typeof RecipeSchema.UpdateRecipe> | undefined>(response);
   } catch(e) {
@@ -16,13 +16,13 @@ export const getRecipe = async (recipe_id: number, recipe_name: string, is_edit:
 }
 
 export const getSliderRecipes = async (): Promise<{
-  weeklyRecipes: Array<RecipeDisplayDetails>, 
-  popularRecipes: Array<RecipeDisplayDetails>} | undefined> => {
+  weeklyRecipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[],
+  popularRecipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]} | undefined> => {
   try {
 
     const [weeklyRecipes, popularRecipes] = await Promise.all([
-      await ServerApiService.get("/get-weekly-recipes"),
-      await ServerApiService.get("/get-popular-recipes")
+      await ServerApiService.get(ENDPOINTS.RECIPE + "/slider/weekly"),
+      await ServerApiService.get(ENDPOINTS.RECIPE + "/slider/popular")
     ])
 
     return {
