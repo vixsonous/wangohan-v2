@@ -1,0 +1,18 @@
+User-agent: Googlebot
+Disallow: /nogooglebot/
+
+User-agent: *
+Allow: /
+Disallow: /fonts/
+Disallow: /icons/
+Disallow: /LP/
+Disallow: /recipe-making/
+Disallow: /resource/
+Disallow: /Setting/
+Disallow: /dashboard.webp
+Disallow: /admin/
+Disallow: /user/
+Disallow: /recipe/edit/
+
+Sitemap: https://www.wangohanjp.com/sitemap.xml
+

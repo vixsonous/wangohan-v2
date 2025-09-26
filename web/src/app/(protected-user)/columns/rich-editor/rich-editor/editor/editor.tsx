@@ -81,12 +81,12 @@ export default function Editor({blog_images, user_data, blog}: CreateEditorWrapp
       <div className="flex gap-4">
         <Controller render={({field}) => (
           <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger id={"user_gender"} className="min-w-32 bg-secondary-bg border border-primary-text">
-              <SelectValue placeholder="性別を選択" />
+            <SelectTrigger className="min-w-32 bg-secondary-bg border border-primary-text">
+              <SelectValue placeholder="カテゴリを選択" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>性別を選択</SelectLabel>
+                <SelectLabel>カテゴリを選択</SelectLabel>
                 <SelectItem value="レシピ特集">レシピ特集</SelectItem>
                 <SelectItem value="基礎知識">基礎知識</SelectItem>
                 <SelectItem value="その他">その他</SelectItem>
