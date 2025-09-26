@@ -5,9 +5,8 @@ import {useSortable} from "@dnd-kit/sortable";
 import {TableCell, TableRow} from "@/components/ui/table";
 import { CSS } from "@dnd-kit/utilities";
 import {isBlog, isRecipe, isUser} from "@/app/(protected-admin)/admin/dashboard/components/generic-data-table";
-import {memo} from "react";
 
-export default memo(function DraggableRow<T>({ row }: { row: Row<T> }) {
+export default function DraggableRow<T>({ row }: { row: Row<T> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: isRecipe(row.original) ? row.original.recipe_id : isBlog(row.original) ? row.original.blog_id : isUser(row.original) ? row.original.user_id : -1,
   })
@@ -30,4 +29,4 @@ export default memo(function DraggableRow<T>({ row }: { row: Row<T> }) {
       ))}
     </TableRow>
   )
-});
+};
