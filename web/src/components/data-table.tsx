@@ -68,7 +68,7 @@ function DataTableCore({
     }
 
     setInit(true);
-  }, [recipes, blogs, users]);
+  }, [recipes, blogs, users, dispatch]);
 
   return init && (
     <Tabs

@@ -32,8 +32,8 @@ import {
 import {Button} from "@/components/ui/button";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import DraggableRow from "@/app/(protected-admin)/admin/dashboard/components/draggable-row";
-import {AdminBlogSchema, BlogSchema} from "@/types/blog-types";
-import {AdminUserSchema, UserSchema} from "@/types/user-types.user";
+import {AdminBlogSchema} from "@/types/blog-types";
+import {AdminUserSchema} from "@/types/user-types.user";
 import {useMemo} from "react";
 
 
@@ -41,14 +41,17 @@ export type Recipe = z.infer<typeof AdminRecipeSchema.Recipe>;
 export type Blog = z.infer<typeof AdminBlogSchema.Blog>;
 export type User = z.infer<typeof AdminUserSchema.User>;
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function isRecipe(dt: any): dt is Recipe {
   return 'recipe_id' in dt;
 }
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function isBlog(dt: any): dt is Blog {
   return 'blog_id' in dt;
 }
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export function isUser(dt: any): dt is User {
   return 'user_lvl' in dt;
 }
@@ -61,7 +64,7 @@ type DataTableProps<T> = {
 export default function GenericDataTable<T>({initialData, columns}: DataTableProps<T>) {
 
   const dt = useMemo(() => initialData, [initialData]);
-  const cols = useMemo(() => columns, []);
+  const cols = useMemo(() => columns, [columns]);
 
   const [data, setData] = React.useState<T[]>(dt)
   const [rowSelection, setRowSelection] = React.useState({})

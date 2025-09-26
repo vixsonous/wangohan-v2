@@ -8,7 +8,7 @@ import {useRouter} from "next/navigation";
 import Button from "@/components/Button";
 
 
-export default function HomeSearchBar({width, id}: { width?: string | undefined, id: string }) {
+export default function HomeSearchBar({ id}: {  id: string }) {
 
   const router = useRouter();
   const submit = (data: FieldValues) => router.push("/recipe/search/" + data.search_text + "/1");

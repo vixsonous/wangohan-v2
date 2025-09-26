@@ -27,6 +27,7 @@ export const useHeader = (user_data: z.infer<typeof UserSchema.User>) => {
     mutationFn: (notification_id: number): Promise<number> => new Promise(res => {
       const p = ClientApiService.get(ENDPOINTS.EVENT + "/notifications/"+notification_id+"/status/read");
       res(notification_id);
+      return p;
     }),
     onSuccess: (notification_id: number) => dispatch(readNotification(notification_id))
   });

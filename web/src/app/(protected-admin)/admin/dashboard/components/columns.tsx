@@ -4,7 +4,7 @@ import {AdminRecipeSchema} from "@/types/recipe-types";
 import {Checkbox} from "@/components/ui/checkbox";
 import TableCellViewer from "@/app/(protected-admin)/admin/dashboard/components/table-cell-viewer";
 import {Badge} from "@/components/ui/badge";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, UseMutationResult} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import Link from "next/link";
@@ -47,16 +47,384 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import SpinLoader from "@/components/SpinLoader";
-import {useRouter} from "next/navigation";
 import {deleteUser} from "@/app/(protected-admin)/admin/dashboard/components/user/user-slice";
+import { store} from "@/store/store";
 
 type PublishState = "published" | "unpublished" | "loading";
 type MutationTypes = "recipes" | "blogs" | "users";
 type UserLevels = "2" | "1" | "0";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PublishMutationType = UseMutationResult<AxiosResponse<any, any>, AxiosError<unknown, any>, {
+  id: number
+  publish: boolean
+  type: "recipes" | "blogs"
+}>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DeleteMutationType = UseMutationResult<AxiosResponse<any, any>, AxiosError<unknown, any>, {
+  id: number
+  name: string
+  type: MutationTypes
+}>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type UpdateUserLevelMutationType = UseMutationResult<AxiosResponse<any, any>, AxiosError<unknown, any>, {
+  id: number
+  name: string
+  level: string
+}, unknown>
+
+type DispatchType = typeof store.dispatch;
+
+function RecipePublish({ publishMutation, dispatch, recipe_id, is_published}: {recipe_id: number, is_published: boolean, publishMutation: PublishMutationType, dispatch: DispatchType}) {
+  const [isPublished, setIsPublished] = React.useState<PublishState>(() => is_published ? "published" : "unpublished");
+  return (
+    <>
+      <Select disabled={publishMutation.isPending} onValueChange={async (value: string) => {
+        setIsPublished("loading")
+        const response = await publishMutation.mutateAsync({
+          id: recipe_id,
+          publish: value === "publish",
+          type: "recipes"
+        });
+
+        const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+        dispatch(setPublishRecipe(data));
+        setIsPublished(data.publish ? "published" : "unpublished");
+      }} defaultValue={is_published ? "publish" : "unpublish"}>
+        <SelectTrigger
+          className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
+          size="sm"
+          id={`${is_published}-reviewer`}
+        >
+          {isPublished === "published" && <IconCircleCheckFilled className={"fill-green-500 dark:fill-green-400"} />}
+          {isPublished === "unpublished" && <IconCircleXFilled className={"fill-red-500 dark:fill-red-400"} />}
+          {isPublished === "loading" && <IconLoader className={"animate-spin"} />}
+          <SelectValue placeholder="Publish Recipe" />
+        </SelectTrigger>
+        <SelectContent align="end">
+          <SelectItem value="publish">Publish</SelectItem>
+          <SelectItem value="unpublish">
+            Unpublish
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </>
+  )
+}
+
+function RecipeActions(
+  {
+    recipe_id,
+    recipe_name,
+    deleteMutation,
+    dispatch
+  }: {
+    recipe_id: number,
+    recipe_name: string,
+    deleteMutation: DeleteMutationType,
+    dispatch: DispatchType
+  }) {
+
+  const [dpOpen, setDpOpen] = React.useState(false);
+  const [open , setOpen] = React.useState(false);
+
+  return (
+    <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+          size="icon"
+        >
+          <IconDotsVertical />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuItem>
+          <Link className={"w-full"} href={`/recipe/edit/${recipe_id}/${recipe_name}`}>
+            Edit
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant={"destructive"} asChild={true}>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild={true}>
+              <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
+                Delete
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Delete recipe?</DialogTitle>
+              <DialogDescription>Are you sure you want to delete this recipe?</DialogDescription>
+              <DialogFooter>
+                <Button
+                  variant={"destructive"}
+                  onClick={async () => {
+                    const response = await deleteMutation.mutateAsync({
+                      id: recipe_id,
+                      name: recipe_name,
+                      type: "recipes"
+                    });
+                    const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
+                    dispatch(deleteRecipe(Number(data.id)));
+                    setOpen(false);
+                    setDpOpen(false);
+                  }}
+                  disabled={deleteMutation.isPending}
+                >
+                  {deleteMutation.isPending && <SpinLoader />} Delete
+                </Button>
+                <DialogClose>Cancel</DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function BlogPublish(
+  {
+    blog_id,
+    is_published,
+    publishMutation,
+    dispatch
+  }: {
+    blog_id: number,
+    is_published: boolean,
+    publishMutation: PublishMutationType,
+    dispatch: DispatchType
+  }) {
+  const [isPublished, setIsPublished] = React.useState<PublishState>(() => is_published ? "published" : "unpublished");
+  return (
+    <>
+      <Select
+        disabled={publishMutation.isPending}
+        onValueChange={async (value: string) => {
+          setIsPublished("loading");
+          const response = await publishMutation.mutateAsync({id: blog_id, publish: value === "publish", type: "blogs"});
+          const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
+          dispatch(setPublishBlog(data));
+          setIsPublished(data.publish ? "published" : "unpublished");
+        }}
+        defaultValue={is_published ? "publish" : "unpublish"}
+      >
+        <SelectTrigger
+          className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
+          size="sm"
+          id={`${is_published}-reviewer`}
+        >
+          {isPublished === "published" && <IconCircleCheckFilled className={"fill-green-500 dark:fill-green-400"} />}
+          {isPublished === "unpublished" && <IconCircleXFilled className={"fill-red-500 dark:fill-red-400"} />}
+          {isPublished === "loading" && <IconLoader className={"animate-spin"} />}
+          <SelectValue placeholder="Publish Recipe" />
+        </SelectTrigger>
+        <SelectContent align="end">
+          <SelectItem value="publish" className={"flex gap-2 items-center"}>
+            Publish
+          </SelectItem>
+          <SelectItem value="unpublish">
+            Unpublish
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </>
+  )
+}
+
+function BlogActions(
+  {
+    blog_id,
+    title,
+    deleteMutation,
+    dispatch
+  }:{
+    blog_id: number,
+    title: string,
+    deleteMutation: DeleteMutationType,
+    dispatch: DispatchType
+  }) {
+
+  const [dpOpen, setDpOpen] = React.useState(false);
+  const [open , setOpen] = React.useState(false);
+
+  return (
+    <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+          size="icon"
+        >
+          <IconDotsVertical />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuItem>
+          <Link className={"w-full"} href={`/columns/edit/${blog_id}/${title}`}>
+            Edit
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant={"destructive"} asChild={true}>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild={true}>
+              <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
+                Delete
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Delete blog?</DialogTitle>
+              <DialogDescription>Are you sure you want to delete this blog?</DialogDescription>
+              <DialogFooter>
+                <Button
+                  variant={"destructive"}
+                  onClick={async () => {
+                    const response = await deleteMutation.mutateAsync({
+                      id: blog_id,
+                      name: title,
+                      type: "blogs"
+                    });
+                    const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
+                    dispatch(deleteBlog(Number(data.id)));
+                    setOpen(false);
+                    setDpOpen(false);
+                  }}
+                  disabled={deleteMutation.isPending}
+                >
+                  {deleteMutation.isPending && <SpinLoader />} Delete
+                </Button>
+                <DialogClose>Cancel</DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function UserLevel(
+  {
+    user_id,
+    user_codename,
+    updateUserLevelMutation,
+    user_lvl,
+  }: {
+    user_id: number,
+    user_codename: string,
+    user_lvl: number,
+    updateUserLevelMutation: UpdateUserLevelMutationType,
+  }) {
+  const [loading, setLoading] = React.useState(() => false);
+  return (
+    <>
+      <Select disabled={updateUserLevelMutation.isPending} onValueChange={async (value: string) => {
+        setLoading(true);
+        await updateUserLevelMutation.mutateAsync({
+          id: user_id,
+          name: user_codename,
+          level: value
+        });
+        setLoading(false);
+      }} defaultValue={String(user_lvl)}>
+        <SelectTrigger
+          className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
+          size="sm"
+          id={`${user_lvl}-reviewer`}
+        >
+          {loading && <IconLoader />} <SelectValue placeholder="Select User Level" />
+        </SelectTrigger>
+        <SelectContent align="end">
+          <SelectItem value="0">Super Admin</SelectItem>
+          <SelectItem value="1">
+            Admin
+          </SelectItem>
+          <SelectItem value="2">
+            User
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </>
+  )
+}
+
+function UserActions(
+  {
+    user_id,
+    user_codename,
+    deleteMutation,
+    dispatch
+  } : {
+    user_id: number,
+    user_codename: string,
+    deleteMutation: DeleteMutationType,
+    dispatch: DispatchType
+  }) {
+
+  const [dpOpen, setDpOpen] = React.useState(false);
+  const [open , setOpen] = React.useState(false);
+
+  return (
+    <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+          size="icon"
+        >
+          <IconDotsVertical />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuItem disabled={true}>Reset Password</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant={"destructive"} asChild={true}>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild={true}>
+              <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
+                Delete
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Delete user?</DialogTitle>
+              <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
+              <DialogFooter>
+                <Button
+                  variant={"destructive"}
+                  onClick={async () => {
+                    const response = await deleteMutation.mutateAsync({
+                      id: user_id,
+                      name: user_codename,
+                      type: "users"
+                    });
+                    const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
+                    dispatch(deleteUser(Number(data.id)));
+                    setOpen(false);
+                    setDpOpen(false);
+                  }}
+                  disabled={deleteMutation.isPending}
+                >
+                  {deleteMutation.isPending && <SpinLoader />} Delete
+                </Button>
+                <DialogClose>Cancel</DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 export const useColumns = () => {
   const dispatch = useDispatch();
-  const router = useRouter();
 
   const deleteMutation = useMutation({
     mutationFn: (data: {id: number, name: string, type: MutationTypes}) =>
@@ -214,40 +582,7 @@ export const useColumns = () => {
       accessorKey: "is_published",
       header: "Published Status",
       cell: ({ row }) => {
-        const [isPublished, setIsPublished] = React.useState<PublishState>(() => row.original.is_published ? "published" : "unpublished");
-        return (
-          <>
-            <Select disabled={publishMutation.isPending} onValueChange={async (value: string) => {
-              setIsPublished("loading")
-              const response = await publishMutation.mutateAsync({
-                id: row.original.recipe_id,
-                publish: value === "publish",
-                type: "recipes"
-              });
-
-              const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
-              dispatch(setPublishRecipe(data));
-              setIsPublished(data.publish ? "published" : "unpublished");
-            }} defaultValue={row.original.is_published ? "publish" : "unpublish"}>
-              <SelectTrigger
-                className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-                size="sm"
-                id={`${row.original.is_published}-reviewer`}
-              >
-                {isPublished === "published" && <IconCircleCheckFilled className={"fill-green-500 dark:fill-green-400"} />}
-                {isPublished === "unpublished" && <IconCircleXFilled className={"fill-red-500 dark:fill-red-400"} />}
-                {isPublished === "loading" && <IconLoader className={"animate-spin"} />}
-                <SelectValue placeholder="Publish Recipe" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                <SelectItem value="publish">Publish</SelectItem>
-                <SelectItem value="unpublish">
-                  Unpublish
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </>
-        )
+        return <RecipePublish recipe_id={row.original.recipe_id} is_published={row.original.is_published} publishMutation={publishMutation} dispatch={dispatch} />
       },
     },
     {
@@ -272,67 +607,13 @@ export const useColumns = () => {
     },
     {
       id: "actions",
-      cell: ({row}) => {
-
-        const [dpOpen, setDpOpen] = React.useState(false);
-        const [open , setOpen] = React.useState(false);
-
-        return (
-          <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                size="icon"
-              >
-                <IconDotsVertical />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem>
-                <Link className={"w-full"} href={`/recipe/edit/${row.original.recipe_id}/${row.original.recipe_name}`}>
-                  Edit
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant={"destructive"} asChild={true}>
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger asChild={true}>
-                    <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
-                      Delete
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle>Delete recipe?</DialogTitle>
-                    <DialogDescription>Are you sure you want to delete this recipe?</DialogDescription>
-                    <DialogFooter>
-                      <Button
-                        variant={"destructive"}
-                        onClick={async () => {
-                          const response = await deleteMutation.mutateAsync({
-                            id: row.original.recipe_id,
-                            name: row.original.recipe_name,
-                            type: "recipes"
-                          });
-                          const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
-                          dispatch(deleteRecipe(Number(data.id)));
-                          setOpen(false);
-                          setDpOpen(false);
-                        }}
-                        disabled={deleteMutation.isPending}
-                      >
-                        {deleteMutation.isPending && <SpinLoader />} Delete
-                      </Button>
-                      <DialogClose>Cancel</DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      }
+      cell: ({row}) =>
+        <RecipeActions
+          recipe_id={row.original.recipe_id}
+          recipe_name={row.original.recipe_name}
+          deleteMutation={deleteMutation}
+          dispatch={dispatch}
+        />
     },
   ]
 
@@ -379,107 +660,23 @@ export const useColumns = () => {
     {
       accessorKey: "is_published",
       header: "Published Status",
-      cell: ({ row }) => {
-        const [isPublished, setIsPublished] = React.useState<PublishState>(() => row.original.is_published ? "published" : "unpublished");
-        return (
-          <>
-            <Select
-              disabled={publishMutation.isPending}
-              onValueChange={async (value: string) => {
-                setIsPublished("loading");
-                const response = await publishMutation.mutateAsync({id: row.original.blog_id, publish: value === "publish", type: "blogs"});
-                const data = ClientApiResponseService.getAxiosResponseData<{id: number, publish: boolean}>(response);
-                dispatch(setPublishBlog(data));
-                setIsPublished(data.publish ? "published" : "unpublished");
-              }}
-              defaultValue={row.original.is_published ? "publish" : "unpublish"}
-            >
-              <SelectTrigger
-                className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-                size="sm"
-                id={`${row.original.is_published}-reviewer`}
-              >
-                {isPublished === "published" && <IconCircleCheckFilled className={"fill-green-500 dark:fill-green-400"} />}
-                {isPublished === "unpublished" && <IconCircleXFilled className={"fill-red-500 dark:fill-red-400"} />}
-                {isPublished === "loading" && <IconLoader className={"animate-spin"} />}
-                <SelectValue placeholder="Publish Recipe" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                <SelectItem value="publish" className={"flex gap-2 items-center"}>
-                  Publish
-                </SelectItem>
-                <SelectItem value="unpublish">
-                  Unpublish
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </>
-        )
-      },
+      cell: ({ row }) =>
+        <BlogPublish
+          blog_id={row.original.blog_id}
+          is_published={row.original.is_published}
+          publishMutation={publishMutation}
+          dispatch={dispatch}
+        />
     },
     {
       id: "actions",
-      cell: ({row}) => {
-
-        const [dpOpen, setDpOpen] = React.useState(false);
-        const [open , setOpen] = React.useState(false);
-
-        return (
-          <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                size="icon"
-              >
-                <IconDotsVertical />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem>
-                <Link className={"w-full"} href={`/columns/edit/${row.original.blog_id}/${row.original.title}`}>
-                  Edit
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant={"destructive"} asChild={true}>
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger asChild={true}>
-                    <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
-                      Delete
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle>Delete blog?</DialogTitle>
-                    <DialogDescription>Are you sure you want to delete this blog?</DialogDescription>
-                    <DialogFooter>
-                      <Button
-                        variant={"destructive"}
-                        onClick={async () => {
-                          const response = await deleteMutation.mutateAsync({
-                            id: row.original.blog_id,
-                            name: row.original.title,
-                            type: "blogs"
-                          });
-                          const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
-                          dispatch(deleteBlog(Number(data.id)));
-                          setOpen(false);
-                          setDpOpen(false);
-                        }}
-                        disabled={deleteMutation.isPending}
-                      >
-                        {deleteMutation.isPending && <SpinLoader />} Delete
-                      </Button>
-                      <DialogClose>Cancel</DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      },
+      cell: ({row}) =>
+        <BlogActions
+          blog_id={row.original.blog_id}
+          title={row.original.title}
+          deleteMutation={deleteMutation}
+          dispatch={dispatch}
+        />,
     },
   ]
 
@@ -526,99 +723,23 @@ export const useColumns = () => {
     {
       accessorKey: "user_lvl",
       header: "User Level",
-      cell: ({ row }) => {
-        const [loading, setLoading] = React.useState(() => false);
-        return (
-          <>
-            <Select disabled={updateUserLevelMutation.isPending} onValueChange={async (value: string) => {
-              setLoading(true);
-              await updateUserLevelMutation.mutateAsync({
-                id: row.original.user_id,
-                name: row.original.user_codename,
-                level: value
-              });
-              setLoading(false);
-            }} defaultValue={String(row.original.user_lvl)}>
-              <SelectTrigger
-                className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-                size="sm"
-                id={`${row.original.user_lvl}-reviewer`}
-              >
-                {loading && <IconLoader />} <SelectValue placeholder="Select User Level" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                <SelectItem value="0">Super Admin</SelectItem>
-                <SelectItem value="1">
-                  Admin
-                </SelectItem>
-                <SelectItem value="2">
-                  User
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </>
-        )
-      },
+      cell: ({ row }) =>
+        <UserLevel
+          user_id={row.original.user_id}
+          user_lvl={row.original.user_lvl}
+          user_codename={row.original.user_codename}
+          updateUserLevelMutation={updateUserLevelMutation}
+        />,
     },
     {
       id: "actions",
-      cell: ({row}) => {
-
-        const [dpOpen, setDpOpen] = React.useState(false);
-        const [open , setOpen] = React.useState(false);
-
-        return (
-          <DropdownMenu open={dpOpen} onOpenChange={setDpOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                size="icon"
-              >
-                <IconDotsVertical />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem disabled={true}>Reset Password</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant={"destructive"} asChild={true}>
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger asChild={true}>
-                    <Button className={"w-full justify-start pl-2 py-1.5 h-auto"} variant={"ghostDestructive"}>
-                      Delete
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle>Delete user?</DialogTitle>
-                    <DialogDescription>Are you sure you want to delete this user?</DialogDescription>
-                    <DialogFooter>
-                      <Button
-                        variant={"destructive"}
-                        onClick={async () => {
-                          const response = await deleteMutation.mutateAsync({
-                            id: row.original.user_id,
-                            name: row.original.user_codename,
-                            type: "users"
-                          });
-                          const data = ClientApiResponseService.getAxiosResponseData<{id: number}>(response);
-                          dispatch(deleteUser(Number(data.id)));
-                          setOpen(false);
-                          setDpOpen(false);
-                        }}
-                        disabled={deleteMutation.isPending}
-                      >
-                        {deleteMutation.isPending && <SpinLoader />} Delete
-                      </Button>
-                      <DialogClose>Cancel</DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      },
+      cell: ({row}) =>
+        <UserActions
+          user_id={row.original.user_id}
+          user_codename={row.original.user_codename}
+          deleteMutation={deleteMutation}
+          dispatch={dispatch}
+        />,
     },
   ]
 

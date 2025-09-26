@@ -45,7 +45,7 @@ export const notificationsSlice = createSlice({
       return state.map(notification => ({...notification, is_read: true}));
     },
 
-    readNotification(state, action) {
+    readNotification(state, action: ReadNotificationActionPayload) {
       const idx = state.findIndex( n => n.notification_id === action.payload);
       if(idx < 0) return state;
       state[idx].is_read = true;
