@@ -73,7 +73,7 @@ export default function ColumnDisplay({blog_data, related_blogs, popular_recipes
             />
             <h1>Search</h1>
           </header>
-          <HomeSearchBar />
+          <HomeSearchBar id={"column-search"} />
         </section>
         <section className="flex flex-col gap-2 items-center">
           <header className="flex w-full gap-4 items-center">

@@ -11,7 +11,7 @@ export default async function RootHeader() {
         <Link href="/">
           <Image preload className='relative' src={'/logo/logo.webp'} width={60} height={60} alt="wangohan website logo" />
         </Link>
-        <HomeSearchBar />
+        <HomeSearchBar width={'50%'} id={"header-search"} />
         <RootNavigationButtons />
         <GoogleLoginSuccess />
       </div>

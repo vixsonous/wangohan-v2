@@ -46,6 +46,8 @@ export default function SidebarMenu(
     {text: "ブログを作成する", show: user_data?.user_lvl === UserLevel.super_admin, condition: pathname.includes("/columns/create"), href: "/columns/create", src: "/icons/svg/white-simple-pencil.svg", alt: "an icon for blog creation", type: "link"},
     {text: "管理者", show: user_data?.user_lvl === UserLevel.super_admin, condition: pathname.includes("/admin/dashboard"), href: "/admin/dashboard", src: "/icons/svg/white-user-circle.svg", alt: "an icon for blog creation", type: "link"},
     {text: "ログアウト", function: () => logoutMutation.mutate(), show: user_data !== undefined, condition: false, href: `/`, src: "/icons/svg/primary-sign-out.svg", alt: "sign out icon", type: "button"},
+    {text: "ログイン", show: user_data === undefined, condition: pathname.includes("/login"), href: "/login", src: "/icons/svg/white-paw-print.svg", alt: "an icon for login", type: "link"},
+    {text: "登録", show: user_data === undefined, condition: pathname.includes("/signup"), href: "/signup", src: "/icons/svg/white-paw-print.svg", alt: "an icon for signup", type: "link"},
   ]
 
   return (
