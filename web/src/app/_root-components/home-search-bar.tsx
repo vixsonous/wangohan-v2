@@ -43,9 +43,8 @@ export default function HomeSearchBar({width, id}: { width?: string | undefined,
       style={{
         clipPath:  id === "header-search" && !homePast ? `inset(0 100% 0 0)` :
           id === "category-search" && homePast ? `inset(0 100% 0 0)` : `inset(0 0% 0 0)`,
-        // opacity: id === "header-search" && !homePast ? 0 : 1
       }}
-      className={`relative w-full box-border transition-[clip-path] duration-250  flex items-center ${id === 'category-search' ? 'max-w-none' : 'max-w-[170px] sm:max-w-[250px] md:max-w-[500px]'} `}
+      className={`relative w-full box-border transition-[clip-path] duration-250  flex items-center ${id === 'category-search' ? 'max-w-none' : 'max-w-none sm:max-w-[250px] md:max-w-[500px]'} `}
     >
       <InputField
         {...register("search_text")}
