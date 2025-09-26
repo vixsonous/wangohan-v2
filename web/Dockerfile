@@ -18,6 +18,7 @@ FROM node:18-alpine AS production
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
@@ -27,6 +28,8 @@ COPY package*.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY . .
+
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 RUN pnpm run build && echo "✅ Build ran" && ls -la && ls -R .next || (echo "❌ Build failed" && exit 1)
 
