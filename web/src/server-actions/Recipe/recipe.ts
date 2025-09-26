@@ -1,5 +1,4 @@
 import {ServerApiResponseService, ServerApiService} from '@/lib/server-utils';
-import { RecipeDisplayDetails } from './recipe-types';
 import z from "zod";
 import {RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
 import {ENDPOINTS} from "@/constants/endpoints";
@@ -17,8 +16,8 @@ export const getRecipe = async (recipe_id: number, recipe_name: string, is_edit:
 }
 
 export const getSliderRecipes = async (): Promise<{
-  weeklyRecipes: Array<RecipeDisplayDetails>, 
-  popularRecipes: Array<RecipeDisplayDetails>} | undefined> => {
+  weeklyRecipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[],
+  popularRecipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]} | undefined> => {
   try {
 
     const [weeklyRecipes, popularRecipes] = await Promise.all([

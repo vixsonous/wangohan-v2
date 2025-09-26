@@ -1,7 +1,9 @@
-import { RecipeInstruction } from "@/server-actions/Recipe/recipe-types";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
+
 
 interface ShowRecipeInstructionsProps {
-  recipe_instructions: Array<RecipeInstruction>;
+  recipe_instructions: z.infer<typeof RecipeDisplaySchema.RecipeInstruction>[];
 }
 
 export default async function ShowRecipeInstructions({recipe_instructions}: ShowRecipeInstructionsProps) {

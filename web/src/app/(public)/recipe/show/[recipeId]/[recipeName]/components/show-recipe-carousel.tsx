@@ -6,10 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import React, { useEffect, useState } from "react";
 import ShowRecipeDropdown from "./show-recipe-dropdown";
-import { RecipeImageDisplay } from "@/server-actions/Recipe/recipe-types";
+import z from "zod";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
 
 interface ShowRecipeCarouselProps {
-  recipe_images: Array<RecipeImageDisplay>;
+  recipe_images: z.infer<typeof RecipeDisplaySchema.RecipeImageDisplay>[];
   recipe_id: number;
   recipe_name: string;
   is_owner: boolean;
