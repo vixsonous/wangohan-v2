@@ -47,7 +47,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import SpinLoader from "@/components/SpinLoader";
-import {deleteUser} from "@/app/(protected-admin)/admin/dashboard/components/user/user-slice";
+import {deleteUser, updateUserLevel} from "@/app/(protected-admin)/admin/dashboard/components/user/user-slice";
 import { store} from "@/store/store";
 
 type PublishState = "published" | "unpublished" | "loading";
@@ -315,11 +315,13 @@ function UserLevel(
     user_codename,
     updateUserLevelMutation,
     user_lvl,
+    dispatch
   }: {
     user_id: number,
     user_codename: string,
     user_lvl: number,
     updateUserLevelMutation: UpdateUserLevelMutationType,
+    dispatch: DispatchType,
   }) {
   const [loading, setLoading] = React.useState(() => false);
   return (
@@ -331,6 +333,10 @@ function UserLevel(
           name: user_codename,
           level: value
         });
+        dispatch(updateUserLevel({
+          id: user_id,
+          level: Number(value) as 0 | 1 | 2
+        }))
         setLoading(false);
       }} defaultValue={String(user_lvl)}>
         <SelectTrigger
@@ -729,6 +735,7 @@ export const useColumns = () => {
           user_lvl={row.original.user_lvl}
           user_codename={row.original.user_codename}
           updateUserLevelMutation={updateUserLevelMutation}
+          dispatch={dispatch}
         />,
     },
     {
