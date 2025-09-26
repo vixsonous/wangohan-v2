@@ -67,7 +67,7 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
             <InputField
               aria-invalid={errors.pet_name?.message !== undefined}
               className="sm:text-base" {...petForm.register("pet_name")}
-              placeholder="姓を入力"
+              placeholder="名前を入力"
               id="pet_name"
               type="text"
             />
@@ -122,13 +122,13 @@ export default function AddPetsForm({user_id}: {user_id: number}) {
 
           <p className="col-span-1 flex flex-col gap-2">
             <label className="text-xl font-semibold flex items-baseline gap-2" htmlFor="pet_breed">
-              姓
+              犬種
               <Error>{errors.pet_breed?.message}</Error>
             </label>
             <InputField
               aria-invalid={errors.pet_breed?.message !== undefined}
               className="sm:text-base" {...petForm.register("pet_breed")}
-              placeholder="姓を入力"
+              placeholder="犬種を入力"
               id="pet_breed"
               type="text"
             />
