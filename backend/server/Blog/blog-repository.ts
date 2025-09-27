@@ -4,14 +4,22 @@ import z from "zod";
 import {BlogSchema, GetBlogImagesSchema, GetBlogSchema} from "@/server/Blog/blog-types";
 import {ImageProcess, ImageService} from "@/server/Images/image-service";
 import {BlogImageInsert} from "@/database/types";
+import {jsonObjectFrom} from "kysely/helpers/postgres";
 
 export class BlogRepository {
   static async getBlog(blog_id: number, blog_title: string) {
     try {
       const blog: z.infer<typeof BlogSchema.Blog> = await db.selectFrom("blog_columns_table")
-        .select([
+        .select(eb => [
           "blog_id",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "blog_columns_table.user_id")
+          ).as("user"),
           "title",
           "editor_state",
           "is_deleted",
@@ -68,9 +76,16 @@ export class BlogRepository {
           editor_state: blog.editor_state,
           is_published: blog.is_published
         })
-        .returning([
+        .returning(eb => [
           "blog_id",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "blog_columns_table.user_id")
+          ).as("user"),
           "title",
           "editor_state",
           "is_deleted",
@@ -97,9 +112,16 @@ export class BlogRepository {
     try {
 
       const blogs: z.infer<typeof BlogSchema.BlogList> = await db.selectFrom("blog_columns_table")
-        .select([
+        .select(eb =>[
           "blog_id",
-          "user_id",
+          jsonObjectFrom(
+            eb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_id", "=", "blog_columns_table.user_id")
+          ).as("user"),
           "title",
           "editor_state",
           "is_deleted",
@@ -217,9 +239,16 @@ export class BlogRepository {
     try {
 
       const blogs: z.infer<typeof BlogSchema.BlogList> = await db.selectFrom("blog_columns_table")
-        .select([
+        .select(lteb => [
           "blog_id",
-          "user_id",
+          jsonObjectFrom(
+            lteb.selectFrom("user_details_table")
+              .select([
+                "user_codename",
+                "user_id",
+                "user_image"
+              ]).whereRef("user_details_table.user_id", "=", "blog_columns_table.user_id")
+          ).as("user"),
           "title",
           "editor_state",
           "is_deleted",

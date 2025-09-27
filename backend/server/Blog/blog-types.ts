@@ -1,9 +1,10 @@
 import z from "zod";
+import {UserSchema} from "@/server/types/user-types.user";
 
 export class BlogSchema {
   static Blog = z.object({
     blog_id: z.number(),
-    user_id: z.number(),
+    user: UserSchema.UserDisplay,
     title: z.string(),
     editor_state: z.string(),
     is_deleted: z.boolean(),

@@ -28,7 +28,7 @@ export class RecipeDisplaySchema {
     total_views: z.number(),
     recipe_images: z.array(RecipeDisplaySchema.RecipeImageDisplay),
     recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
-    user: UserSchema.UserDisplay,
+    user: z.lazy(() => UserSchema.UserDisplay),
     created_at: z.date(),
   });
 
@@ -37,7 +37,7 @@ export class RecipeDisplaySchema {
   static RecipeDetailsDisplayComments = z.object({
     recipe_comment_subtext: z.string(),
     recipe_comment_rating: z.number(),
-    user: UserSchema.UserDisplay,
+    user: z.lazy(() => UserSchema.UserDisplay),
     created_at: z.date(),
   });
 
@@ -66,7 +66,7 @@ export class RecipeDisplaySchema {
     recipe_ingredients: z.array(RecipeDisplaySchema.RecipeIngredient),
     recipe_comments: z.array(RecipeDisplaySchema.RecipeDetailsDisplayComments),
     total_comments: z.number(),
-    user: UserSchema.UserDisplay,
+    user: z.lazy(() => UserSchema.UserDisplay),
     created_at: z.date(),
   });
 }
@@ -149,7 +149,7 @@ export class AdminRecipeSchema {
     recipe_images: Array<typeof RecipeDisplaySchema.RecipeImageDisplay>,
     recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
     is_published: z.boolean(),
-    user: UserSchema.UserDisplay,
+    user: z.lazy(() => UserSchema.UserDisplay),
     created_at: z.date(),
   })
 }
