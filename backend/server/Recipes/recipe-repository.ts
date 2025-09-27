@@ -79,7 +79,10 @@ export class RecipeRepository {
           ).as("recipe_rating_data")
         ])
         .orderBy("total_views", "desc")
-        .where("is_deleted", "=", false)
+        .where(eb => eb.and({
+          is_deleted: false,
+          is_published: true
+        }))
         .limit(limit)
         .offset(OFFSET)
         .execute();
@@ -142,7 +145,10 @@ export class RecipeRepository {
           ).as("recipe_rating_data")
         ])
         .where("created_at", ">=", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
-        .where("is_deleted", "=", false)
+        .where(eb => eb.and({
+          is_deleted: false,
+          is_published: true
+        }))
         .orderBy("created_at", "desc")
         .limit(this.FRONT_PAGE_RECIPE_QUERY_LIMIT)
         .execute();
@@ -255,12 +261,13 @@ export class RecipeRepository {
         .where(eb => eb.and({
           recipe_id: recipe_id,
           recipe_name: recipe_name,
-          is_deleted: false
+          is_deleted: false,
+          is_published: true
         }))
         .executeTakeFirstOrThrow();
 
       log("Successfully retrieved recipe details!");
-      console.log(recipe);
+
       return is_edit ?
         recipe as z.infer<typeof RecipeSchema.UpdateRecipe> :
         recipe as z.infer<typeof RecipeDisplaySchema.RecipeDetailsDisplay>;
@@ -313,7 +320,7 @@ export class RecipeRepository {
         total_likes: 0,
         total_views: 0,
         is_deleted: false,
-        is_published: false,
+        is_published: true,
         updated_at: new Date(),
         created_at: new Date()
       } satisfies RecipeInsert;
@@ -584,7 +591,8 @@ export class RecipeRepository {
         .where("recipes_table.user_id", "=", user_id)
         .where(eb => eb.and({
           is_liked: true,
-          is_deleted: false
+          is_deleted: false,
+          is_published: true
         }))
         .limit(RecipeRepository.BASIC_RECIPES_LIMIT)
         .offset(RecipeRepository.BASIC_RECIPES_LIMIT * page)
@@ -619,7 +627,8 @@ export class RecipeRepository {
         ])
         .where(eb => eb.and({
           user_id: user_id,
-          is_deleted: get_archived
+          is_deleted: get_archived,
+
         }))
         .limit(RecipeRepository.BASIC_RECIPES_LIMIT)
         .offset(RecipeRepository.BASIC_RECIPES_LIMIT * page)
@@ -654,22 +663,32 @@ export class RecipeRepository {
           "recipes_table.created_at"
         ])
         .orderBy("recipes_table.created_at", "desc")
+        .where(eb => eb.and({
+          is_deleted: false,
+          is_published: true
+        }))
         .limit(RecipeRepository.LIST_RECIPES_LIMIT)
         .offset(RecipeRepository.LIST_RECIPES_LIMIT * page)
         .execute();
-
+      console.log(recipeList);
       log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
 
-      const totalRecipes = await db.selectFrom("recipes_table")
+      const [totalRecipes] = await db.selectFrom("recipes_table")
         .select(lteb => [
           lteb.fn.coalesce(lteb.selectFrom("recipes_table").select(({fn}) => [
             fn.count<number>("recipes_table.user_id").as("total_recipes")
-          ]), lteb.val(0)).as("total_recipes")
-        ]).executeTakeFirstOrThrow();
+          ]).where(eb => eb.and({
+            is_deleted: false,
+            is_published: true
+          })), lteb.val(0)).as("total_recipes")
+        ]).where(eb => eb.and({
+          is_deleted: false,
+          is_published: true
+        })).execute();
 
       return {
         recipes: recipeList,
-        total_recipes: Number(totalRecipes.total_recipes)
+        total_recipes: totalRecipes ? Number(totalRecipes.total_recipes) : 0
       };
     } catch(e) {
       log(e);
@@ -785,6 +804,10 @@ export class RecipeRepository {
             ),
           ])
         )
+        .where(eb => eb.and({
+          is_deleted: false,
+          is_published: true
+        }))
         .limit(RecipeRepository.SEARCH_RECIPES_LIMIT)
         .offset(RecipeRepository.SEARCH_RECIPES_LIMIT * page)
         .execute();
@@ -844,7 +867,10 @@ export class RecipeRepository {
                   )
               ),
             ])
-          ), lteb.val(0)).as("total_recipes")
+          ).where(eb => eb.and({
+            is_deleted: false,
+            is_published: true
+          })), lteb.val(0)).as("total_recipes")
         ]).executeTakeFirstOrThrow();
 
       return {

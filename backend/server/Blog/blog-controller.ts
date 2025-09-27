@@ -3,6 +3,8 @@ import {ApiResponse} from "@/server/utils/ApiUtils";
 import {BlogControllerSchema, BlogSchema, PostBlogImageSchema} from "@/server/Blog/blog-types";
 import {BlogService} from "@/server/Blog/blog-service";
 import {getUserData} from "@/server/utils/server-utils";
+import {BlogCacheKey, CacheUtil} from "@/server/utils/redis";
+import z from "zod";
 
 export class BlogController {
 
@@ -156,5 +158,35 @@ export class BlogController {
     }
 
     ApiResponse.success(res, "Successfully updated blog!", blog);
+  }
+
+  static async getRelatedBlogs(req: Request, res: Response) {
+    const {blog_category} = req.query;
+
+    const relatedBlogSafeParse = BlogControllerSchema.RelatedBlog.safeParse({
+      blog_category: blog_category
+    });
+
+    if(!relatedBlogSafeParse.success) {
+      ApiResponse.error(res, relatedBlogSafeParse.error.issues[0].message);
+      return;
+    }
+
+    const relatedBlogList = await CacheUtil.get<
+      z.infer<typeof BlogSchema.BlogList>,
+      typeof BlogService.getRelatedBlogs
+    >(
+      BlogCacheKey.RELATED_BLOG_KEY(relatedBlogSafeParse.data.blog_category),
+      BlogService.getRelatedBlogs,
+      60,
+      relatedBlogSafeParse.data.blog_category
+    );
+
+    if(relatedBlogList === undefined) {
+      ApiResponse.error(res, "Failed to get related blogs!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully retrieved related blogs!", relatedBlogList);
   }
 }

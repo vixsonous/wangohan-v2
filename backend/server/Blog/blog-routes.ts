@@ -14,6 +14,7 @@ blogRouter.get("/", BlogController.getBlogs);
 blogRouter.get("/:blog_id/:blog_title", BlogController.getBlog);
 blogRouter.put("/:blog_id", BlogController.putBlog);
 blogRouter.post("/", BlogController.postBlog);
+blogRouter.get("/related", BlogController.getRelatedBlogs);
 blogRouter.use("/images", blogImagesRouter);
 
 

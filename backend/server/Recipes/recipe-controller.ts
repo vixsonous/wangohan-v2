@@ -16,7 +16,13 @@ export class RecipeController {
 
   static async getWeeklyRecipes(_: Request, res: Response) {
     const GET_WEEKLY_RECIPES_KEY = 'GET:weekly-recipes';
-    const recipes = await CacheUtil.get<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[], typeof RecipeService.getWeeklyRecipes>(GET_WEEKLY_RECIPES_KEY, RecipeService.getWeeklyRecipes);
+    const recipes = await CacheUtil.get<
+      z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[],
+      typeof RecipeService.getWeeklyRecipes
+    >(
+      GET_WEEKLY_RECIPES_KEY,
+      RecipeService.getWeeklyRecipes
+    );
     ApiResponse.success(res, RecipeSuccessMessage.SUCCESS_WEEKLY_RECIPE, recipes, 200);
   }
 
@@ -322,12 +328,13 @@ export class RecipeController {
         ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
         return;
       }
-
+      console.log("there");
       const recipeList = await CacheUtil.get<
         z.infer<typeof RecipeSchema.RecipeList>,
         typeof RecipeService.getRecipeList
       >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
-
+      console.log("here");
+      console.log(recipeList);
       if(recipeList === undefined) {
         ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
         return;
@@ -336,35 +343,6 @@ export class RecipeController {
       ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, recipeList);
       return;
     }
-  }
-
-  static async getSearchRecipeList(req: Request, res: Response) {
-    const {page_no, search_text} = req.query;
-
-    const searchRecipeParse = RecipeControllerValidationSchema.SearchRecipeList.safeParse({
-      page_no: Number(page_no),
-      search_text: search_text
-    });
-
-    if(!searchRecipeParse.success) {
-      ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
-      return;
-    }
-
-    const searchRecipeList = await CacheUtil.get<
-      z.infer<typeof RecipeSchema.RecipeList>,
-      typeof RecipeService.getSearchRecipeList
-    >(RecipeCacheKey.GET_SEARCH_RECIPE_LIST(
-      searchRecipeParse.data.page_no,
-      searchRecipeParse.data.search_text
-    ), RecipeService.getSearchRecipeList, 60, searchRecipeParse.data.page_no, searchRecipeParse.data.search_text);
-
-    if(searchRecipeList === undefined) {
-      ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
-      return;
-    }
-
-    ApiResponse.success(res, RecipeSuccessMessage.RETRIEVE_RECIPES, searchRecipeList);
   }
 
   static async viewedRecipe(req: Request, res: Response) {

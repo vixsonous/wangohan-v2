@@ -10,6 +10,10 @@ export const redisClient = await createClient({
 .on("error", (err) => log(err))
 .connect();
 
+export class BlogCacheKey {
+  public static RELATED_BLOG_KEY = (blog_category: string) => `GET:blogs:blog_category=${blog_category}`;
+}
+
 export class RecipeCacheKey {
   public static GET_WEEKLY_RECIPES_KEY = 'GET:weekly-recipes';
   public static GET_POPULAR_RECIPES_KEY = 'GET:popular-recipes';

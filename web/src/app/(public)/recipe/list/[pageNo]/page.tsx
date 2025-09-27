@@ -39,7 +39,7 @@ export default async function RecipeListPage({params}: Props) {
           alt="image list page title ribbon"
         />
         <RecipeList recipes={recipeList.recipes} />
-        <PaginationWithLinks totalCount={recipeList.total_recipes} pageSize={20} page={Number(p.pageNo)} />
+        {recipeList.total_recipes > 20 && <PaginationWithLinks totalCount={recipeList.total_recipes} pageSize={20} page={Number(p.pageNo)} /> }
       </div>
     </div>
   )

@@ -83,8 +83,4 @@ export class RecipeService {
   static async getComments(recipe_id: number, page: number) {
     return await RecipeRepository.getComments(recipe_id, page);
   }
-
-  static async getAdminData() {
-    return await RecipeRepository.getAdminData();
-  }
 }

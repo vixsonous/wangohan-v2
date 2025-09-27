@@ -211,4 +211,37 @@ export class BlogRepository {
       return undefined;
     }
   }
+
+  static RELATED_BLOG_LIMIT = 3;
+  static async getRelatedBlogs(blog_category: string): Promise<z.infer<typeof BlogSchema.BlogList> | undefined> {
+    try {
+
+      const blogs: z.infer<typeof BlogSchema.BlogList> = await db.selectFrom("blog_columns_table")
+        .select([
+          "blog_id",
+          "user_id",
+          "title",
+          "editor_state",
+          "is_deleted",
+          "is_published",
+          "blog_image",
+          "blog_category",
+          "updated_at"
+        ])
+        .where(eb => eb.and({
+          is_deleted: false,
+          is_published: true,
+          blog_category: blog_category
+        }))
+        .orderBy("created_at", "desc")
+        .limit(BlogRepository.RELATED_BLOG_LIMIT)
+        .execute();
+
+      log("Successfully retrieved blogs!");
+      return blogs;
+    } catch(e) {
+      log(e);
+      return undefined;
+    }
+  }
 }

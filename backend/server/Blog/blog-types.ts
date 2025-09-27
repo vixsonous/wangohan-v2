@@ -33,6 +33,11 @@ export class BlogSchema {
 }
 
 export class BlogControllerSchema {
+
+  static RelatedBlog = z.object({
+    blog_category: z.string("Please provide the blog category!"),
+  });
+
   static GetBlogs = z.object({
     page_no: z.number("Provide a valid page number!"),
     category: z.string().optional()

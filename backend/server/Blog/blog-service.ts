@@ -26,4 +26,8 @@ export class BlogService {
   static async putBlog(blog: z.infer<typeof BlogSchema.PutBlog>, blog_id: number) {
     return BlogRepository.putBlog(blog, blog_id);
   }
+
+  static async getRelatedBlogs(blog_category: string) {
+    return BlogRepository.getRelatedBlogs(blog_category);
+  }
 }

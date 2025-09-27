@@ -26,7 +26,9 @@ type RecipeListProps = {
 export default function RecipeList({recipes}: RecipeListProps) {
   return (
     <div className=" w-[100%] lg:gap-8 grid grid-cols-3 gap-0.5 md:grid-cols-4 lg:grid-cols-5">
-      {recipes.map((recipe, idx) => <Recipe key={idx} recipe={recipe} />)}
+      {recipes.length > 0 ? recipes.map((recipe, idx) => <Recipe key={idx} recipe={recipe} />) : (
+        <h1 className={"w-full flex justify-center col-span-5"}>There are no recipes!</h1>
+      )}
     </div>
   )
 }

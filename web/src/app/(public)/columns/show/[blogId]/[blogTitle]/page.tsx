@@ -3,6 +3,7 @@ import {BlogSchema} from "@/types/blog-types";
 import z from "zod";
 import ColumnDisplay from "@/app/(public)/columns/show/[blogId]/[blogTitle]/components/column-display";
 import {ENDPOINTS} from "@/constants/endpoints";
+import {RecipeDisplaySchema} from "@/types/recipe-types";
 
 type BlogProps = {
   params: Promise<{
@@ -14,7 +15,10 @@ export default async function Blog({params}: BlogProps) {
 
   const {blogId, blogTitle} = await params;
 
-  const blogResponse = await ServerApiService.get(ENDPOINTS.BLOG +"/" + blogId + "/" + blogTitle);
+  const [blogResponse, popularRecipesResponse] = await Promise.all([
+    await ServerApiService.get(ENDPOINTS.BLOG +"/" + blogId + "/" + blogTitle),
+    await ServerApiService.get(ENDPOINTS.RECIPE + "/slider/popular")
+  ])
 
   if(!blogResponse.ok) {
     return (
@@ -23,6 +27,10 @@ export default async function Blog({params}: BlogProps) {
   }
 
   const blog = await ServerApiResponseService.getResponseData<z.infer<typeof BlogSchema.Blog>>(blogResponse);
+
+  const relatedBlogResponse = await ServerApiService.get(ENDPOINTS.BLOG + "/related?blog_category=" + blog.blog_category);
+  const relatedBlogs = await ServerApiResponseService.getResponseData<z.infer<typeof BlogSchema.BlogList>>(relatedBlogResponse);
+  const popularRecipes = await ServerApiResponseService.getResponseData<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]>(popularRecipesResponse);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -46,7 +54,7 @@ export default async function Blog({params}: BlogProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <ColumnDisplay blog_data={blog} related_blogs={[]} popular_recipes={[]} />
+      <ColumnDisplay blog_data={blog} related_blogs={relatedBlogs} popular_recipes={popularRecipes} />
     </div>
   )
 }

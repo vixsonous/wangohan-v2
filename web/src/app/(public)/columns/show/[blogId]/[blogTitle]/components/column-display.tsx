@@ -163,6 +163,7 @@ export default function ColumnDisplay({blog_data, related_blogs, popular_recipes
                   <li className="hover:bg-black/5 text-sm transition-colors duration-250 flex items-center gap-4 px-4 py-2" key={idx}>
                     <Link className="grid grid-cols-7 py-1 w-full gap-2 overflow-hidden" href={"/columns/" + c.blog_id}>
                       <Image
+                        imgonly={true}
                         src={c.blog_image}
                         className=" h-[90px] w-[140px] col-span-3 relative"
                         width={120}
@@ -202,6 +203,7 @@ export default function ColumnDisplay({blog_data, related_blogs, popular_recipes
                   <li className="hover:bg-black/5 text-sm transition-colors duration-250 flex items-center gap-4 px-4 py-2" key={idx}>
                     <Link className="grid grid-cols-7 py-1 w-full gap-2 overflow-hidden" href={"/recipes/show/" + r.recipe_id}>
                       <Image
+                        imgonly={true}
                         src={r.recipe_images[0].recipe_image}
                         className=" h-[90px] w-[140px] col-span-3 relative"
                         width={120}
