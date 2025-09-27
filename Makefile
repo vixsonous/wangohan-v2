@@ -7,7 +7,7 @@ clean_build: docker-compose.dev.yaml
 	docker compose -f docker-compose.dev.yaml up --build
 
 deploy: docker-compose.prod.yaml
-	docker build prune
+	docker builder prune
 	docker compose -f docker-compose.prod.yaml up --build -d
 
 clean_deploy: docker-compose.prod.yaml
