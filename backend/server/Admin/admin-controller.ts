@@ -31,6 +31,10 @@ export class AdminControllerSchema {
 
   static DeleteUser = z.object({
     user_id: z.number("Please provide a valid user id!"),
+  });
+
+  static DeleteComment = z.object({
+    recipe_comment_id: z.number("Please provide a valid comment id!"),
   })
 }
 
@@ -179,5 +183,26 @@ export class AdminController {
     }
 
     ApiResponse.success(res, "Successfully deleted the user!", {id: user_id});
+  }
+
+  static async deleteComment(req: Request, res: Response) {
+    const recipe_comment_id = req.params.recipe_comment_id;
+    const deleteCommentParseResult = AdminControllerSchema.DeleteComment.safeParse({
+      recipe_comment_id: Number(recipe_comment_id),
+    });
+
+    if(!deleteCommentParseResult.success) {
+      ApiResponse.error(res, deleteCommentParseResult.error.issues[0].message);
+      return;
+    }
+
+    const result = await AdminService.deleteComment(deleteCommentParseResult.data);
+
+    if(!result) {
+      ApiResponse.error(res, "There was an error deleting the comment!");
+      return;
+    }
+
+    ApiResponse.success(res, "Successfully deleted the comment!", {id: recipe_comment_id});
   }
 }

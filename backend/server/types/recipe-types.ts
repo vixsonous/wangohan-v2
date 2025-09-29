@@ -34,6 +34,7 @@ export class RecipeDisplaySchema {
   });
 
   static RecipeDetailsDisplayComments = z.object({
+    recipe_comment_id: z.number(),
     recipe_comment_subtext: z.string(),
     recipe_comment_rating: z.number(),
     user: z.lazy(() => UserSchema.UserDisplay),

@@ -9,29 +9,25 @@ import {
   DrawerTitle,
   DrawerTrigger
 } from "@/components/ui/drawer";
-import {Button} from "@/components/ui/button";
 import {ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart";
 import {Area, AreaChart, CartesianGrid, XAxis} from "recharts";
 import {Separator} from "@/components/ui/separator";
 import {IconTrendingUp} from "@tabler/icons-react";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import * as React from "react";
 import {
-  Blog,
-  isBlog,
-  isRecipe,
-  Recipe, User
+  Recipe
 } from "@/app/(protected-admin)/admin/dashboard/components/generic-data-table";
 import {memo} from "react";
-import {useQuery} from "@tanstack/react-query";
 import Image from "@/components/Image/client";
 import {Avatar, AvatarImage} from "@/components/ui/avatar";
 import {ENDPOINTS} from "@/constants/endpoints";
+import {DeleteMutationType, DispatchType} from "@/app/(protected-admin)/admin/dashboard/components/columns";
+import StarReviews from "@/components/StarReviews";
+import Button from "@/components/Button";
+import {Button as ButtonUI} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {DeleteMutationType} from "@/app/(protected-admin)/admin/dashboard/components/columns";
+import {deleteComment} from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
+import {ScrollArea} from "@/components/ui/scroll-area";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -53,7 +49,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default memo(function RecipeCellViewer<T>({ item, deleteMutation }: { item: Recipe, deleteMutation: DeleteMutationType }) {
+export default memo(function RecipeCellViewer<T>({ item, deleteMutation, dispatch }: { item: Recipe, deleteMutation: DeleteMutationType, dispatch: DispatchType }) {
   const isMobile = useIsMobile();
 
   const title = item.recipe_name;
@@ -61,9 +57,9 @@ export default memo(function RecipeCellViewer<T>({ item, deleteMutation }: { ite
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
-        <Button variant="link" className="text-foreground w-fit px-0 text-left">
+        <ButtonUI variant="link" className="text-foreground w-fit px-0 text-left">
           {title}
-        </Button>
+        </ButtonUI>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-1">
@@ -130,37 +126,47 @@ export default memo(function RecipeCellViewer<T>({ item, deleteMutation }: { ite
               <Separator />
             </>
           )}
-          <section>
-            <h1>Comments</h1>
-            <div>
+          <section className={"max-h-1/2"}>
+            <h1 className={"mb-4"}>Comments</h1>
+            <ScrollArea className={"flex flex-col gap-2 max-h-full "}>
               {item.recipe_comments.length > 0 ? (
                 item.recipe_comments.map( (comment, idx) => (
-                  <form action="">
-                    <Card className={"flex flex-col gap-2 items-start justify-start"}>
-                      <CardHeader className={"w-full"}>
-                        <CardTitle className={"flex items-center gap-2 w-full"}>
-                          <Avatar>
-                            <AvatarImage src={`${process.env.NEXT_PUBLIC_ORIGIN}/api${ENDPOINTS.IMAGE}/transform?src=${(comment.user && comment.user.user_image)}&w=32&h=32`} />
-                          </Avatar>
-                          {comment.user?.user_codename || "Anonymous"}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <span>{comment.recipe_comment_subtext}</span>
-                      </CardContent>
-                    </Card>
+                  <form key={idx} action="" className={"mb-2"}>
+                    <Badge variant={"outline"} className={"flex w-full flex-col gap-2 items-start justify-start"}>
+                      <section className={"w-full flex items-center gap-2"}>
+                        <Avatar>
+                          <AvatarImage src={`${process.env.NEXT_PUBLIC_ORIGIN}/api${ENDPOINTS.IMAGE}/transform?src=${(comment.user && comment.user.user_image)}&w=32&h=32`} />
+                        </Avatar>
+                        {comment.user?.user_codename || "Anonymous"}
+                        <StarReviews value={comment.recipe_comment_rating} />
+                        <Button type={"button"} onClick={async () => {
+                          await deleteMutation.mutateAsync({
+                            id: comment.recipe_comment_id,
+                            name: comment.recipe_comment_subtext,
+                            type: "comments"
+                          });
+
+                          dispatch(deleteComment({
+                            recipe_id: item.recipe_id,
+                            recipe_comment_id: comment.recipe_comment_id,
+                          }));
+                        }} className={"ml-auto"}>
+                          <Image width={15} height={15} noprocess src={"/icons/svg/primary-trash.svg"} alt="trash icon for deleting comments"/>
+                        </Button>
+                      </section>
+                      <span>{comment.recipe_comment_subtext}</span>
+                    </Badge>
                   </form>
                 ))
               ) : (
                 <h1>No comments!</h1>
               )}
-            </div>
+            </ScrollArea>
           </section>
         </div>
         <DrawerFooter>
-          <Button>Submit</Button>
           <DrawerClose asChild>
-            <Button variant="outline">Done</Button>
+            <ButtonUI variant="outline">Done</ButtonUI>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

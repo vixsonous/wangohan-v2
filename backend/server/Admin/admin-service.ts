@@ -31,4 +31,8 @@ export class AdminService {
   static async deleteUser(data: z.infer<typeof AdminControllerSchema.DeleteUser>) {
     return AdminRepository.deleteUser(data);
   }
+
+  static async deleteComment(data: z.infer<typeof AdminControllerSchema.DeleteComment>) {
+    return AdminRepository.deleteComment(data);
+  }
 }

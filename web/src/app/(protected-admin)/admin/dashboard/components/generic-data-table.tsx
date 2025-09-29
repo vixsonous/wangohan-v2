@@ -20,7 +20,7 @@ import z from "zod";
 import {AdminRecipeSchema} from "@/types/recipe-types";
 import {
   IconChevronDown,
-  IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconLayoutColumns, IconPlus,
+  IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconLayoutColumns,
 } from "@tabler/icons-react";
 import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -173,10 +173,6 @@ export default function GenericDataTable<T>({initialData, columns}: DataTablePro
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline" size="sm">
-          <IconPlus />
-          <span className="hidden lg:inline">Add Section</span>
-        </Button>
       </div>
       <div className="overflow-hidden rounded-lg border">
         <DndContext

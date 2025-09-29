@@ -11,3 +11,4 @@ adminRouter.delete("/recipes/:recipe_id", Middleware.superAdmin, AdminController
 adminRouter.delete("/blogs/:blog_id", Middleware.superAdmin, AdminController.deleteBlog);
 adminRouter.patch("/users/:user_id/level", Middleware.superAdmin, AdminController.updateUserLevel);
 adminRouter.delete("/users/:user_id", Middleware.superAdmin, AdminController.deleteUser);
+adminRouter.delete("/comments/:recipe_comment_id", Middleware.superAdmin, AdminController.deleteComment);

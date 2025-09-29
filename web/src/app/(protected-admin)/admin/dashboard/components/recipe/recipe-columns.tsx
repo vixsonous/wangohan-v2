@@ -60,7 +60,7 @@ export const useRecipeColumns = (
       accessorKey: "recipe_name",
       header: "Recipe Name",
       cell: ({ row }) => {
-        return <RecipeCellViewer deleteMutation={deleteMutation} item={row.original} />
+        return <RecipeCellViewer deleteMutation={deleteMutation} item={row.original} dispatch={dispatch}/>
       },
       enableHiding: false,
     },

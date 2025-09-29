@@ -1029,6 +1029,7 @@ export class RecipeRepository {
           created_at: comment.created_at
         })
         .returning(se => [
+          "recipe_comment_id",
           "recipe_comment_rating",
           "recipe_comment_subtext",
           "created_at",
@@ -1053,6 +1054,7 @@ export class RecipeRepository {
     try {
       const comments = await db.selectFrom("recipe_comments_table")
         .select(rc => [
+          "recipe_comment_id",
           "recipe_comment_subtext",
           "recipe_comment_rating",
           "recipe_comments_table.created_at",

@@ -18,6 +18,14 @@ type DeleteRecipeActionPayload = {
   payload: number;
   type: string;
 }
+
+type DeleteCommentActionPayload = {
+  payload: {
+    recipe_id: number;
+    recipe_comment_id: number;
+  };
+  type: string;
+}
 export const recipeSlice = createSlice({
   name: "Admin Recipe Data",
   initialState: [] as Recipe[],
@@ -36,9 +44,20 @@ export const recipeSlice = createSlice({
       const idx = state.findIndex(r => r.recipe_id === action.payload);
       if(idx < 0) return state;
       state.splice(idx, 1);
+    },
+
+    deleteComment(state, action: DeleteCommentActionPayload) {
+      const recipeIdx = state.findIndex( r => r.recipe_id === action.payload.recipe_id);
+      if(recipeIdx < 0) return state;
+
+      const commentIdx = state[recipeIdx].recipe_comments.findIndex(c => c.recipe_comment_id === action.payload.recipe_comment_id);
+
+      if(commentIdx < 0) return state;
+
+      state[recipeIdx].recipe_comments.splice(commentIdx, 1);
     }
   }
 });
 
-export const {setRecipes, setPublishRecipe, deleteRecipe} = recipeSlice.actions;
+export const {setRecipes, setPublishRecipe, deleteRecipe, deleteComment} = recipeSlice.actions;
 export default recipeSlice.reducer;

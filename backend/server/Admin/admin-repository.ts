@@ -61,6 +61,7 @@ export class AdminRepository {
           jsonArrayFrom(
             eb.selectFrom("recipe_comments_table")
               .select(rc => [
+                "recipe_comment_id",
                 "recipe_comment_subtext",
                 "recipe_comment_rating",
                 "recipe_comments_table.created_at",
@@ -226,6 +227,22 @@ export class AdminRepository {
         .executeTakeFirstOrThrow();
 
       log(`Successfully deleted the user!`);
+      return true;
+    } catch (e) {
+      log(e);
+      return false;
+    }
+  }
+
+  static async deleteComment(data: z.infer<typeof AdminControllerSchema.DeleteComment>) {
+    try {
+      await db.deleteFrom("recipe_comments_table")
+        .where(lb => lb.and({
+          recipe_comment_id: data.recipe_comment_id
+        }))
+        .executeTakeFirstOrThrow();
+
+      log(`Successfully deleted the comment!`);
       return true;
     } catch (e) {
       log(e);
