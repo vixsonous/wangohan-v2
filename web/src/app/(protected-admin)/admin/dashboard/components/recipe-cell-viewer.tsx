@@ -49,7 +49,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default memo(function RecipeCellViewer<T>({ item, deleteMutation, dispatch }: { item: Recipe, deleteMutation: DeleteMutationType, dispatch: DispatchType }) {
+export default memo(function RecipeCellViewer({ item, deleteMutation, dispatch }: { item: Recipe, deleteMutation: DeleteMutationType, dispatch: DispatchType }) {
   const isMobile = useIsMobile();
 
   const title = item.recipe_name;
