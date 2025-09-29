@@ -148,6 +148,7 @@ export class AdminRecipeSchema {
     total_views: z.number(),
     recipe_images: Array<typeof RecipeDisplaySchema.RecipeImageDisplay>,
     recipe_rating_data: RecipeDisplaySchema.RecipeRatingData,
+    recipe_comments: z.array(RecipeDisplaySchema.RecipeDetailsDisplayComments),
     is_published: z.boolean(),
     user: z.lazy(() => UserSchema.UserDisplay),
     created_at: z.date(),

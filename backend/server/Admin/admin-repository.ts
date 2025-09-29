@@ -57,7 +57,26 @@ export class AdminRepository {
                   .filterWhereRef("recipe_id", "=", "recipes_table.recipe_id")
                   .as("avg_rating"),
               ])
-          ).as("recipe_rating_data")
+          ).as("recipe_rating_data"),
+          jsonArrayFrom(
+            eb.selectFrom("recipe_comments_table")
+              .select(rc => [
+                "recipe_comment_subtext",
+                "recipe_comment_rating",
+                "recipe_comments_table.created_at",
+                jsonObjectFrom(
+                  rc.selectFrom("user_details_table")
+                    .select([
+                      "user_id",
+                      "user_image",
+                      "user_codename"
+                    ])
+                    .whereRef("recipe_comments_table.user_id", "=", "user_details_table.user_id")
+                ).as("user")
+              ])
+              .orderBy("recipe_comments_table.created_at","desc")
+              .whereRef("recipe_comments_table.recipe_id","=","recipes_table.recipe_id")
+          ).as("recipe_comments"),
         ])
         .orderBy("created_at", "desc")
         .execute();

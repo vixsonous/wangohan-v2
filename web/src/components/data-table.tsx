@@ -33,6 +33,9 @@ import {RootState, store} from "@/store/store";
 import {setRecipes} from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-slice";
 import {setBlogs} from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-slice";
 import {setUsers} from "@/app/(protected-admin)/admin/dashboard/components/user/user-slice";
+import {useRecipeColumns} from "@/app/(protected-admin)/admin/dashboard/components/recipe/recipe-columns";
+import {useBlogColumns} from "@/app/(protected-admin)/admin/dashboard/components/blog/blog-columns";
+import {useUserColumns} from "@/app/(protected-admin)/admin/dashboard/components/user/user-columns";
 
 type DataTableProps = {
   recipes: z.infer<typeof AdminRecipeSchema.Recipe>[],
@@ -52,7 +55,11 @@ function DataTableCore({
   const blogsAdmin = useSelector((state: RootState) => state.blogsAdmin);
   const usersAdmin = useSelector((state: RootState) => state.usersAdmin);
 
-  const {recipeColumns, userColumns, blogColumns} = useColumns();
+  const { publishMutation, deleteMutation, updateUserLevelMutation} = useColumns();
+
+  const recipeColumns = useRecipeColumns(deleteMutation, publishMutation, dispatch);
+  const blogColumns = useBlogColumns(publishMutation, deleteMutation, dispatch);
+  const userColumns = useUserColumns(updateUserLevelMutation, deleteMutation, dispatch);
 
   useEffect(() => {
     if(recipes && recipes.length !== 0) {
