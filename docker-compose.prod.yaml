@@ -38,6 +38,28 @@ services:
     environment:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
+      - POSTGRES_USER=${{project.POSTGRES_USER}}
+      - POSTGRES_PASSWORD=${{project.POSTGRES_PASSWORD}}
+      - POSTGRES_PORT=${{project.POSTGRES_PORT}}
+      - POSTGRES_DATABASE=${{project.POSTGRES_DATABASE}}
+      - POSTGRES_HOST=${{project.POSTGRES_HOST}}
+
+      - # FILE UPLOAD
+      - AWS_ACCESS_KEY_ID=${{project.AWS_ACCESS_KEY_ID}}
+      - AWS_SECRET_ACCESS_KEY=${{project.AWS_SECRET_ACCESS_KEY}}
+      - CF_ACCOUNT_ID=${{project.CF_ACCOUNT_ID}}
+      - CF_BUCKET=${{project.CF_BUCKET}}
+
+      - #URL
+      - BASE_URL=${{project.BASE_URL}}
+      - BASE_PUBLIC_BUCKET_URL=${{project.BASE_PUBLIC_BUCKET_URL}}
+      - BASE_WEB_INTERNAL_URL=${{project.BASE_WEB_INTERNAL_URL}}
+      - BASE_SERVER_INTERNAL_URL=${{project.BASE_SERVER_INTERNAL_URL}}
+
+      - #GOOGLE
+      - GOOGLE_AUTH_CALLBACK_URL=${{project.GOOGLE_AUTH_CALLBACK_URL}}
+      - GOOGLE_CLIENT_SECRET=${{project.GOOGLE_CLIENT_SECRET}}
+      - GOOGLE_CLIENT_ID=${{project.GOOGLE_CLIENT_ID}}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`wangohan.victorchiong.com`) && PathPrefix(`/api`)"
@@ -53,6 +75,8 @@ services:
     environment:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
+      - NEXT_PUBLIC_ORIGIN={{project.NEXT_PUBLIC_ORIGIN}}
+      - NEXT_PUBLIC_BUCKET_URL={{project.NEXT_PUBLIC_BUCKET_URL}}
     ports:
       - 3002:3000
     depends_on:
