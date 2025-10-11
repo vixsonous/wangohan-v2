@@ -19,7 +19,7 @@ export default function HomeSearchBar({ id}: {  id: string }) {
 
   useEffect(() => {
     const category = document.querySelector("#category");
-    if(!category) return;
+    if(!category || typeof window === 'undefined') return;
     const top = category.getBoundingClientRect().top + window.scrollY;
 
     function handleScroll() {

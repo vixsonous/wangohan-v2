@@ -2,11 +2,14 @@
 import Image from "@/components/Image/client";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import RecipeFormWrapper from "@/app/_root-components/root-recipe-form/root-recipe-form-wrapper";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
 import Link from "next/link";
 import {useState} from "react";
+import dynamic from "next/dynamic";
+
+const RecipeFormWrapper =
+  dynamic(() => import("@/app/_root-components/root-recipe-form/root-recipe-form-wrapper"), {ssr: false});
 
 export function CreateRecipe({user_data}: {user_data: z.infer<typeof UserSchema.User> | undefined}) {
   const [open, setOpen] = useState(false);
@@ -37,7 +40,7 @@ export function CreateRecipe({user_data}: {user_data: z.infer<typeof UserSchema.
         <ScrollArea className="overflow-auto">
           <section className="p-5 flex flex-col items-center">
             <header className="flex justify-center items-center relative mt-14 mb-28">
-              <SheetTitle className="absolute top-[55px] font-semibold text-primary-text text-[2em]">レシピを書く</SheetTitle>
+              <SheetTitle className="absolute top-[55px] z-10 font-semibold text-primary-text text-[2em]">レシピを書く</SheetTitle>
               <Image src={'/icons/btn/recipe-button.webp'} loading="lazy" className="max-w-none" width={300}  alt="ribbon" />
             </header>
             <RecipeFormWrapper setOpen={setOpen} />

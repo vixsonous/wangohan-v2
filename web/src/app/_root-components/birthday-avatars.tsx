@@ -21,7 +21,7 @@ function Avatar({active, pet_image, pet_name}: AvatarProps) {
   const [isSet, setIsSet] = useState(false);
 
   useEffect(() => {
-    
+    if(typeof window === "undefined") return;
     if(active) {
       setScale(window.innerWidth < 1024 ? 1.3 : 2);
     } else {

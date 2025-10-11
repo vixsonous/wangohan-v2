@@ -150,7 +150,7 @@ export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
                 </label>
                 <label htmlFor="recipe_images" className={`w-full ${uploadFileMutation.isPending ? '' : 'cursor-pointer'}`}>
                   <span className={`relative flex h-full  after:content-[''] after:transition-all after:duration-300 after:absolute after:top-0 after:left-0 after:w-full after:h-full ${uploadFileMutation.isPending ? 'after:bg-black/10' : 'hover:after:bg-black/10'}`}>
-                    <Image className="rounded-md w-full" width={200} height={50} src={"/banner/empty-bg.webp"} alt="empty background for image upload"/>
+                    <Image className="rounded-md w-full" width={768} height={200} src={"/banner/empty-bg.webp"} alt="empty background for image upload"/>
                     <span className="absolute tracking-tight w-full leading-8 text-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                       {!uploadFileMutation.isPending && <>料理の画像をアップロード <br /> （横長or正方形推奨）</>}
                     </span>
@@ -167,7 +167,7 @@ export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
               <DialogDescription className="grid grid-cols-5 gap-1 w-full h-full">
                 {files.map((f, idx) => (
                   <span key={idx} className="relative col-span-1 w-full h-full">
-                    <Image alt="preview image of uploaded file" className="w-full h-[100px] aspect-auto" src={f.preview_url} width={100} height={100} noprocess={true}/>
+                    <Image alt="preview image of uploaded file" className="w-full h-[100px] aspect-auto object-cover" src={f.preview_url} width={100} height={100} noprocess={true}/>
                     <Button className="absolute top-2 right-2 bg-secondary-bg rounded-full" onClick={deleteFiles(f.preview_url)}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x size-4" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
                     </Button>

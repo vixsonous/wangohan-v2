@@ -1,12 +1,15 @@
 "use client";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import LoginForm from "./login-form";
 import { queryClient } from "@/lib/tanstack-query";
 import {useEffect} from "react";
 import {toast} from "sonner";
 import {useRouter, useSearchParams} from "next/navigation";
 import {Toaster} from "@/components/ui/sonner";
+import dynamic from "next/dynamic";
+
+const LoginForm =
+  dynamic(() => import("./login-form"), {ssr: false});
 
 export default function LoginWrapper() {
   const searchParams = useSearchParams();

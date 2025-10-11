@@ -6,7 +6,7 @@ import React from "react";
 
 export function scroll(id: string, duration: number, offset?: number) {
   const el = document.querySelector(id);
-  if(!el) return;
+  if(!el || typeof window === 'undefined') return;
   const elementY = (el.getBoundingClientRect().top - document.body.getBoundingClientRect().top) - (offset || 65);
   const startingY = window.scrollY;
   const diff = elementY - startingY;
@@ -17,7 +17,7 @@ export function scroll(id: string, duration: number, offset?: number) {
     if (start === 0) start = timestamp;
     // Elapsed milliseconds since start of scrolling.
     const time = timestamp - start;
-    
+
     // Get percent of completion in range [0, 1].
     const percent = Math.min(time / duration, 1);
 

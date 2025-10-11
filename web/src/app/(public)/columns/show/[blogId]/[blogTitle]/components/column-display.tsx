@@ -4,10 +4,19 @@ import {BlogSchema} from "@/types/blog-types";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
 import Link from "next/link";
 import Image from "@/components/Image/client";
-import HomeSearchBar from "@/app/_root-components/home-search-bar";
 import useColumnDisplay from "@/app/(public)/columns/show/[blogId]/[blogTitle]/components/use-column";
 import {useEffect, useState} from "react";
 import {ROUTES} from "@/constants/routes";
+import dynamic from "next/dynamic";
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
+const HomeSearchBar = dynamic(
+  () => import("@/app/_root-components/home-search-bar"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className={"h-9"} />
+  });
 
 type ColumnDisplayProps = {
   blog_data: z.infer<typeof BlogSchema.Blog>;

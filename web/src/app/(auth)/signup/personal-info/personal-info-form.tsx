@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "@/components/Image/client";
-import {usePersonalForm} from "@/app/(auth)/signup/personal-info/personal-form-helper";
 import Error from "@/components/Error";
 import InputField from "@/components/Input";
 import React from "react";
@@ -24,6 +23,9 @@ import TermsAndConditions from "@/app/(auth)/signup/personal-info/terms-and-cond
 import {formatInTimeZone} from "date-fns-tz";
 import z from "zod";
 import {UserSchema} from "@/types/user-types.user";
+
+const usePersonalForm = (await import("@/app/(auth)/signup/personal-info/personal-form-helper")).usePersonalForm;
+
 
 interface PersonalInfoFormProps {
   user_id: number,

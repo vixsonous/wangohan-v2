@@ -21,6 +21,7 @@ export default function AddPetsDialog({user_id}: {user_id: number}) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   useEffect(() => {
+    if(typeof window === 'undefined') return;
     if(searchParams.get("register_pet")) {
       setOpen(true);
       router.replace(window.location.pathname);

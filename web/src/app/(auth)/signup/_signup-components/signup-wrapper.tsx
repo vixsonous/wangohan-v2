@@ -1,8 +1,11 @@
 "use client";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import SignupForm from "./signup-form";
 import { queryClient } from "@/lib/tanstack-query";
+import dynamic from "next/dynamic";
+
+const SignupForm =
+  dynamic(() => import("./signup-form"), {ssr: false});
 
 export default function SignupWrapper() {
   return (
