@@ -10,6 +10,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    env_file:
+      - ./.env
     ports:
       - 3001:3001
     volumes:
@@ -18,19 +20,6 @@ services:
     environment:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
-      - POSTGRES_CONNECTION_STRING=${{POSTGRES_CONNECTION_STRING}}
-      - REDIS_CONNECTION_STRING=${{REDIS_CONNECTION_STRING}}
-      - AWS_ACCESS_KEY_ID=${{AWS_ACCESS_KEY_ID}}
-      - AWS_SECRET_ACCESS_KEY=${{AWS_SECRET_ACCESS_KEY}}
-      - CF_ACCOUNT_ID=${{CF_ACCOUNT_ID}}
-      - CF_BUCKET=${{CF_BUCKET}}
-      - BASE_URL=${{BASE_URL}}
-      - BASE_PUBLIC_BUCKET_URL=${{BASE_PUBLIC_BUCKET_URL}}
-      - BASE_WEB_INTERNAL_URL=${{BASE_WEB_INTERNAL_URL}}
-      - BASE_SERVER_INTERNAL_URL=${{BASE_SERVER_INTERNAL_URL}}
-      - GOOGLE_AUTH_CALLBACK_URL=${{GOOGLE_AUTH_CALLBACK_URL}}
-      - GOOGLE_CLIENT_SECRET=${{GOOGLE_CLIENT_SECRET}}
-      - GOOGLE_CLIENT_ID=${{GOOGLE_CLIENT_ID}}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`wangohan.victorchiong.com`) && PathPrefix(`/api`)"
@@ -43,6 +32,8 @@ services:
     container_name: wangohan_web
     networks:
       - dokploy-network
+    env_file:
+      - ./.env
     build: 
       context: ./web
       dockerfile: Dockerfile
@@ -50,8 +41,6 @@ services:
     environment:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
-      - NEXT_PUBLIC_ORIGIN=${{NEXT_PUBLIC_ORIGIN}}
-      - NEXT_PUBLIC_BUCKET_URL=${{NEXT_PUBLIC_BUCKET_URL}}
     ports:
       - 3002:3000
     depends_on:
