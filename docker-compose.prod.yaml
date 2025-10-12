@@ -62,4 +62,8 @@ services:
 volumes:
   web_node_modules:
   server_node_modules:
-  letsencrypt: 
+  letsencrypt:
+networks:
+  default:
+    external: true
+    name: dokploy-traefik
