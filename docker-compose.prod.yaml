@@ -3,6 +3,8 @@ services:
     image: redis:latest
     container_name: wangohan_redis
     restart: always
+    networks:
+      - dokploy-network
   server:
     container_name: wangohan_server
     build:
@@ -38,8 +40,12 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls.certresolver=myresolver"
       - "traefik.http.services.server.loadbalancer.server.port=3001"
+    networks:
+      - dokploy-network
   web:
     container_name: wangohan_web
+    networks:
+      - dokploy-network
     build: 
       context: ./web
       dockerfile: Dockerfile
