@@ -88,5 +88,4 @@ services:
 volumes:
   web_node_modules:
   server_node_modules:
-  wangohan_data:
   letsencrypt: 
