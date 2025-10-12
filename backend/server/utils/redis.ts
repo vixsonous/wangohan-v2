@@ -2,6 +2,7 @@ import {createClient} from 'redis';
 import { log } from './log';
 
 console.log(process.env.REDIS_CONNECTION_STRING);
+console.log(process.env);
 export const redisClient = await createClient({
   url: process.env.REDIS_CONNECTION_STRING
 })
