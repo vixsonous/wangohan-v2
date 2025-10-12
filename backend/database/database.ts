@@ -4,12 +4,13 @@ import dotenv from 'dotenv';
 import { Database } from './types';
 dotenv.config();
 
-console.log("Connecting to " + process.env.POSTGRES_CONNECTION_STRING);
 const dialect = new PostgresDialect({
   pool: new Pool({
     connectionString: process.env.POSTGRES_CONNECTION_STRING,
     max: 10
   })
 });
+
+console.log(dialect)
 
 export const db = new Kysely<Database>({dialect});
