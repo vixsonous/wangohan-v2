@@ -2,10 +2,7 @@ import {createClient} from 'redis';
 import { log } from './log';
 
 export const redisClient = await createClient({
-  socket: {
-    host: "redis",
-    port: 6379
-  }
+  url: process.env.REDIS_CONNECTION_STRING
 })
 .on("error", (err) => log(err))
 .connect();
