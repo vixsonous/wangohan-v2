@@ -3,3 +3,5 @@ export const UserLevel = {
   admin: 1,
   user: 2
 }
+
+export type UserLevel = (typeof UserLevel)[keyof typeof UserLevel];
