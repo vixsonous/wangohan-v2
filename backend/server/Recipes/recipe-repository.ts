@@ -88,6 +88,7 @@ export class RecipeRepository {
         .execute();
 
       log("Successfully retrieved popular recipes!");
+      console.log(recipes);
       return recipes;
     } catch (error) {
       log("There was an error retrieving popular recipes!");
