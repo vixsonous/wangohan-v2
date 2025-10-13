@@ -15,6 +15,7 @@ import {RecipeCacheUtil} from "@/server/utils/redis";
 import {RecipeControllerValidationSchema} from "@/server/types/recipe-types.controller";
 import { UserSchema} from "@/server/types/user-types.user";
 import {R2_FILE_PREFIX} from "@/server/utils/constants";
+import {sql} from "kysely";
 
 export class RecipeRepository {
   private static FRONT_PAGE_RECIPE_QUERY_LIMIT = 10;
@@ -30,6 +31,10 @@ export class RecipeRepository {
     limit: number = this.FRONT_PAGE_RECIPE_QUERY_LIMIT
   ): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
     try {
+
+      const res = await sql`'SELECT inet_server_addr() as server_ip, inet_client_addr() as client_ip, current_database() as db, current_user as user;'`.execute(db);
+
+      console.log(res.rows[0]);
 
       const OFFSET = page * limit;
       const recipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[] = await db
