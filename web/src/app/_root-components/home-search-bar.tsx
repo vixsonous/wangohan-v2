@@ -23,8 +23,6 @@ export default function HomeSearchBar({ id}: {  id: string }) {
     const top = category.getBoundingClientRect().top + window.scrollY;
 
     function handleScroll() {
-      console.log(top);
-      console.log(window.scrollY > top - 100);
       setHomePast(window.scrollY > top - 100);
     }
 

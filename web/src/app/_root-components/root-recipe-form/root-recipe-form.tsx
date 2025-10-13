@@ -48,8 +48,7 @@ function Checkbox({label, control, name, checked}: CheckboxProps) {
 
   return (
     <p>
-      <input 
-        onClick={() => console.log(field.value)} 
+      <input
         value={label} 
         name="checkbox-age" 
         checked={!!field.value} 

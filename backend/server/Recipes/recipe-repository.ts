@@ -31,11 +31,6 @@ export class RecipeRepository {
     limit: number = this.FRONT_PAGE_RECIPE_QUERY_LIMIT
   ): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
     try {
-
-      const res = await sql`SELECT * FROM recipes_table LIMIT 5;`.execute(db);
-
-      console.log(res.rows[0]);
-
       const OFFSET = page * limit;
       const recipes: z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[] = await db
         .selectFrom("recipes_table")
@@ -93,7 +88,6 @@ export class RecipeRepository {
         .execute();
 
       log("Successfully retrieved popular recipes!");
-      console.log(recipes);
       return recipes;
     } catch (error) {
       log("There was an error retrieving popular recipes!");
@@ -676,7 +670,7 @@ export class RecipeRepository {
         .limit(RecipeRepository.LIST_RECIPES_LIMIT)
         .offset(RecipeRepository.LIST_RECIPES_LIMIT * page)
         .execute();
-      console.log(recipeList);
+
       log(RecipeRepository.RECIPE_SUCCESS_LOGS.GET_LIKED_RECIPE_SUCCESS);
 
       const [totalRecipes] = await db.selectFrom("recipes_table")

@@ -26,7 +26,6 @@ export class RecipeEvents {
     const clients = this.clients.filter(client => client.id.includes(id));
 
     clients.forEach(client => {
-      console.log(client.id);
       client.res.write(`data: ${message}\n\n`);
     })
   }

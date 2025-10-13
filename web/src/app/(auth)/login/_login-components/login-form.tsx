@@ -25,8 +25,6 @@ const UserLoginSchema = z.object({
 });
 
 export default function LoginForm({className, ...props}: HTMLAttributes<HTMLDivElement>) {
-  console.log(process.env.NEXT_PUBLIC_ORIGIN);
-  console.log(process.env);
   const {register, handleSubmit, formState: {errors}} = useForm({mode: 'onBlur', resolver: zodResolver(UserLoginSchema)});
   const [passwordState, setPasswordState] = useState('password');
   const router = useRouter();

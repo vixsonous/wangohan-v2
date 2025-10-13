@@ -161,8 +161,6 @@ export class RecipeController {
   static async getLikedRecipes(req: Request, res: Response) {
     const {user_id} = req.params;
     const {page} = req.query;
-    console.log(user_id);
-    console.log("da user");
 
     const likedRecipes = await RecipeService.getLikedRecipe(Number(user_id), Number(page));
 
@@ -328,13 +326,12 @@ export class RecipeController {
         ApiResponse.error(res, RecipeErrorMessage.INVALID_PAGE);
         return;
       }
-      console.log("there");
+
       const recipeList = await CacheUtil.get<
         z.infer<typeof RecipeSchema.RecipeList>,
         typeof RecipeService.getRecipeList
       >(RecipeCacheKey.GET_RECIPE_LIST(pageParse.data), RecipeService.getRecipeList, 60, pageParse.data);
-      console.log("here");
-      console.log(recipeList);
+
       if(recipeList === undefined) {
         ApiResponse.error(res, RecipeErrorMessage.RETRIEVE_RECIPES);
         return;
@@ -366,7 +363,6 @@ export class RecipeController {
 
   static async isLikedRecipe(req: Request, res: Response) {
     const {recipe_id} = req.params;
-    console.log("is liekd recipe")
 
     const user = getUserData(req);
 
@@ -391,7 +387,6 @@ export class RecipeController {
       isLikedRecipeParseResult.data.recipe_id,
       isLikedRecipeParseResult.data.user_id
     );
-    console.log("is liked ", isLiked);
     ApiResponse.success(res, RecipeSuccessMessage.IS_LIKED_RECIPE, {is_liked: isLiked});
   }
 
