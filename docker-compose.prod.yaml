@@ -1,10 +1,4 @@
 services:
-  redis:
-    image: redis:latest
-    container_name: wangohan_redis
-    restart: always
-    networks:
-      - dokploy-network
   server:
     container_name: wangohan_server
     build:

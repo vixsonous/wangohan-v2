@@ -11,6 +11,4 @@ const dialect = new PostgresDialect({
   })
 });
 
-console.log(dialect)
-
 export const db = new Kysely<Database>({dialect});
