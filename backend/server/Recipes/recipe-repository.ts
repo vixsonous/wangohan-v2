@@ -32,7 +32,7 @@ export class RecipeRepository {
   ): Promise<z.infer<typeof RecipeDisplaySchema.RecipeCardDisplay>[]> {
     try {
 
-      const res = await sql`'SELECT inet_server_addr() as server_ip, inet_client_addr() as client_ip, current_database() as db, current_user as user;'`.execute(db);
+      const res = await sql`SELECT inet_server_addr() as server_ip, inet_client_addr() as client_ip, current_database() as db, current_user as user;`.execute(db);
 
       console.log(res.rows[0]);
 
