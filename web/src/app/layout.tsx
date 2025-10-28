@@ -57,7 +57,7 @@ export default async function RootLayout({
             <link key={l} rel="preload" href={l} as="image"/>
           )
         })}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="favicon.ico" sizes="any" />
         <meta name="google-adsense-account" content="ca-pub-9990388374961956"></meta>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9990388374961956"
           crossOrigin="anonymous"></script>
