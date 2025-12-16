@@ -1,4 +1,4 @@
-FROM node:18-alpine as development
+FROM node:20-alpine as development
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -14,7 +14,7 @@ COPY . .
 
 CMD ["pnpm", "run", "dev"]
 
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
