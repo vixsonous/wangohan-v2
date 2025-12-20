@@ -1,3 +1,5 @@
+.PHONY: docker docker_build docker_push build clean_build deploy clean_deploy clear_db
+
 build: docker-compose.dev.yaml
 	docker compose -f docker-compose.dev.yaml up --build
 
@@ -18,3 +20,21 @@ clean_deploy: docker-compose.prod.yaml
 clear_db: docker-compose.dev.yaml
 	docker container prune
 	docker volume rm wangohan-v2_wangohan_data
+
+REGISTRY ?= docker.io
+NAMESPACE ?= dasdasd443
+
+BACKEND_IMAGE := $(REGISTRY)/${NAMESPACE}/wangohan-backend
+FRONTEND_IMAGE := $(REGISTRY)/${NAMESPACE}/wangohan-web
+
+TAG ?= latest
+
+docker: docker_build docker_push
+
+docker_build:
+	docker build -t $(BACKEND_IMAGE):$(TAG) -f backend/Dockerfile backend
+	docker build -t $(FRONTEND_IMAGE):$(TAG) -f web/Dockerfile web
+
+docker_push:
+	docker push $(BACKEND_IMAGE):$(TAG)
+	docker push $(FRONTEND_IMAGE):$(TAG)

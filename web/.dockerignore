@@ -1,3 +1,7 @@
 node_modules
-*.md
+.next
 dist
+build
+.git
+Dockerfile
+docker-compose*.yml
