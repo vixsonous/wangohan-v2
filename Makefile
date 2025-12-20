@@ -32,9 +32,9 @@ TAG ?= latest
 docker: docker_build docker_push
 
 docker_build:
-	docker build -t $(BACKEND_IMAGE):$(TAG) -f backend/Dockerfile backend
-	docker build -t $(FRONTEND_IMAGE):$(TAG) -f web/Dockerfile web
+	sudo docker build -t $(BACKEND_IMAGE):$(TAG) -f backend/Dockerfile backend
+	sudo docker build -t $(FRONTEND_IMAGE):$(TAG) -f web/Dockerfile web
 
 docker_push:
-	docker push $(BACKEND_IMAGE):$(TAG)
-	docker push $(FRONTEND_IMAGE):$(TAG)
+	sudo docker push $(BACKEND_IMAGE):$(TAG)
+	sudo docker push $(FRONTEND_IMAGE):$(TAG)

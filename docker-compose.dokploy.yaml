@@ -1,9 +1,7 @@
 services:
   server:
     container_name: wangohan_server
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: dasdasd443/wangohan-backend:latest
     ports:
       - 3001:3001
     volumes:
@@ -14,10 +12,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
   web:
     container_name: wangohan_web
-    build: 
-      context: ./web
-      dockerfile: Dockerfile
-      target: production
+    image: dasdasd443/wangohan-frontend:latest
     environment:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
