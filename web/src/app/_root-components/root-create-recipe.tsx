@@ -23,12 +23,14 @@ export function CreateRecipe({user_data}: {user_data: z.infer<typeof UserSchema.
              className="self-center rounded-md h-auto w-full relative top-0"
              width={234}
              alt="create recipe button"
+            loading={"eager"}
           />
         </SheetTrigger>
       ) : (
         <Link href={"/login"} className={`cursor-pointer w-full rounded-md text-base relative active:scale-[1.075] md:hover:scale-[1.075] transition-all duration-250`}>
           <p className="absolute text-primary-text z-1 w-full top-1/2 text-center left-0 font-bold">レシピを作成する</p>
           <Image src={'/icons/btn/recipe-button.webp'}
+             loading={"eager"}
              className="self-center rounded-md h-auto w-full relative top-0"
              width={234}
              alt="create recipe button"
