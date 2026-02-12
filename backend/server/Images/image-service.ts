@@ -4,9 +4,14 @@ import z from "zod";
 import {ImageSchema, ImageTypes} from "@/server/types/image-types.image";
 import {Request} from "express";
 import {log} from "@/server/utils/log";
-import {CompleteMultipartUploadCommandOutput, DeleteObjectCommand, DeleteObjectsCommand} from "@aws-sdk/client-s3";
+import {
+  CompleteMultipartUploadCommandOutput,
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  GetObjectCommand
+} from "@aws-sdk/client-s3";
 import {Upload} from "@aws-sdk/lib-storage";
-import {Bucket, s3} from "@/server/Images/image";
+import {Bucket, GetObjectCommandProcessing, s3} from "@/server/Images/image";
 import {R2_FILE_PREFIX} from "@/server/utils/constants";
 
 export type Formats = "webp" | "png" | "jpg" | "jpeg";
@@ -85,22 +90,38 @@ export class ImageService {
     const {src,h ,w, fit='cover', quality=undefined, format=undefined, upscale=false, upscaleMethod="nearest"} = req.query;
 
     try {
-      let response: any;
+      let arrayBuffer: ArrayBuffer;
 
       if(String(src).startsWith("/")) {
-        response = await fetch(process.env.BASE_WEB_INTERNAL_URL + "/" + src);
+        const response = await fetch(process.env.BASE_WEB_INTERNAL_URL + "/" + src);
+
+        if(!response.ok) {
+          log("Failed to fetch image: " + response.statusText);
+          return undefined;
+        }
+
+        arrayBuffer = await response.arrayBuffer();
       } else if(String(src).startsWith(R2_FILE_PREFIX)) {
-        response = await fetch(process.env.BASE_PUBLIC_BUCKET_URL + "/" + String(src).split(R2_FILE_PREFIX)[1]);
+        const key = String(src).split(R2_FILE_PREFIX)[1];
+        const command = new GetObjectCommand({
+          Bucket: process.env.CF_BUCKET!,
+          Key: key
+        });
+
+        const commandOutput = await s3.send(command);
+        const byteArray = await GetObjectCommandProcessing.getByteArray(commandOutput);
+        arrayBuffer = byteArray.buffer as ArrayBuffer;
+
       } else {
-        response = await fetch(src as string);
-      }
+        const response = await fetch(src as string);
 
-      if(!response.ok) {
-        log("Failed to fetch image: " + response.statusText);
-        return undefined;
-      }
+        if(!response.ok) {
+          log("Failed to fetch image: " + response.statusText);
+          return undefined;
+        }
 
-      const arrayBuffer = await response.arrayBuffer();
+        arrayBuffer = await response.arrayBuffer();
+      }
 
       let image = new ImageProcess(arrayBuffer);
 

@@ -138,6 +138,7 @@ export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
                 <span className=" cursor-pointer">
                   <span className="relative flex h-full  after:content-[''] after:transition-all after:duration-300 after:absolute after:top-0 after:left-0 after:w-full after:h-full hover:after:bg-black/10">
                     <Image className="rounded-md" width={624} height={351} src={"/banner/empty-bg.webp"} alt="empty background for image upload"/>
+                    <span className={"absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl"}>+</span>
                   </span>
                 </span>
               </p>
@@ -161,7 +162,7 @@ export default function RecipeForm({recipe_data, setOpen}: RecipeFormProps) {
                     )}
                   </span>
                 </label>
-                <InputField disabled={uploadFileMutation.isPending} accept="images/*" onChange={fileOnChange} multiple className="hidden" id="recipe_images" type="file"/>
+                <InputField disabled={uploadFileMutation.isPending} accept="image/*" onChange={fileOnChange} multiple className="hidden" id="recipe_images" type="file"/>
               </DialogTitle>
               <DialogDescription className="grid grid-cols-5 gap-1 w-full h-full">
                 {files.map((f, idx) => (

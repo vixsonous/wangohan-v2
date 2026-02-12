@@ -27,7 +27,7 @@ services:
     restart: always
   postgres:
     container_name: wangohan_db
-    image: postgres:latest
+    image: postgres:18-alpine
     env_file: ./backend/.env
     volumes:
       - wangohan_data:/var/lib/postgresql/data    

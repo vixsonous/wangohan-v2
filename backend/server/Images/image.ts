@@ -1,4 +1,4 @@
-import { S3Client} from '@aws-sdk/client-s3';
+import {GetObjectCommandOutput, S3Client} from '@aws-sdk/client-s3';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -12,10 +12,13 @@ export const s3 = new S3Client({
   }
 })
 
-export class Image {
-  private image: Express.Multer.File;
+export class GetObjectCommandProcessing {
+  static async getByteArray(output: GetObjectCommandOutput) {
+    const body = output.Body;
+    if(body === undefined) {
+      throw new Error("GetObjectCommandOutput body is undefined!");
+    }
 
-  constructor(image: Express.Multer.File) {
-    this.image = image;
+    return body.transformToByteArray();
   }
 }

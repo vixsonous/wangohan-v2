@@ -151,10 +151,10 @@ export class BlogRepository {
             })), lteb.val(0)).as("total_blogs")
         ])
 
-        .executeTakeFirstOrThrow();
+        .executeTakeFirst();
 
       log("Successfully retrieved blogs!");
-      return {blogs, total_blogs: totalBlogs.total_blogs};
+      return {blogs, total_blogs: totalBlogs?.total_blogs || 0};
     } catch(e) {
       log(e);
       return undefined;
