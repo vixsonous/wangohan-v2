@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { ServerUtils } from "@/lib/server-utils";
 import RootFooter from "./_root-components/root-footer";
 import { Toaster } from "@/components/ui/sonner";
+import {GoogleAnalytics} from "@next/third-parties/google";
 
 export const metadata:Metadata = {
   title: {
@@ -62,6 +63,7 @@ export default async function RootLayout({
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9990388374961956"
           crossOrigin="anonymous"></script>
       </head>
+      <GoogleAnalytics gaId={"G-FG7VR2H1WJ"} />
       <body
         style={{fontFamily: 'mitimasu'}}
         className={` antialiased bg-primary-bg `}

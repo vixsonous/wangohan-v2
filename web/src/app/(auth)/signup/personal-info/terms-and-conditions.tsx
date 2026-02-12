@@ -1,5 +1,4 @@
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {DialogBody} from "next/dist/client/components/react-dev-overlay/ui/components/dialog";
 
 export default function TermsAndConditions() {
   return (
@@ -11,7 +10,7 @@ export default function TermsAndConditions() {
         <DialogHeader>
           <DialogTitle>Terms and Conditions</DialogTitle>
         </DialogHeader>
-        <DialogBody>
+        <div>
           <h1 className="font-bold text-xl">利用規約</h1>
           <span className="text-xs mt-5">
             この利用規約（以下，「本規約」といいます。）は，わんごはん（以下，「当サイト」といいます。）がこのウェブサイト上で提供するサービス（以下，「本サービス」といいます。）の利用条件を定めるものです。登録ユーザーの皆さま（以下，「ユーザー」といいます。）には，本規約に従って，本サービスをご利用いただきます。
@@ -157,7 +156,7 @@ export default function TermsAndConditions() {
               </ol>
             </div>
           </div>
-        </DialogBody>
+        </div>
       </DialogContent>
     </Dialog>
   )
