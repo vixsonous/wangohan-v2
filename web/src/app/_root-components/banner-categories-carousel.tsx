@@ -145,6 +145,7 @@ export default function BannerCategoriesCarousel() {
                         className="flex gap-2 text-primary-text font-bold flex-col justify-center items-center"
                       >
                         <Image
+                          loading={"eager"}
                           src={category.img}
                           width={167}
                           className="relative rounded-md"

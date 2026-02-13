@@ -20,7 +20,7 @@ export default function BannerCarousel({recipes}: {recipes: Array<z.infer<typeof
             return (
               <CarouselItem key={x}>
                 <Link href={`/recipe/show/${i.recipe_id}/${i.recipe_name}`}>
-                  <Image className="h-full w-full object-cover aspect-video" fit={"cover"} src={i.recipe_images[0].recipe_image} alt={i.recipe_images[0].recipe_image_title} width={1024} height={768}/>
+                  <Image loading={"eager"} className="h-full w-full object-cover aspect-video" fit={"cover"} src={i.recipe_images[0].recipe_image} alt={i.recipe_images[0].recipe_image_title} width={1024} height={768}/>
                 </Link>
               </CarouselItem>
             )
