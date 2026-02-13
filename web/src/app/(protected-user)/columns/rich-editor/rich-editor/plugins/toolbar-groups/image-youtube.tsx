@@ -66,7 +66,7 @@ const ImageYoutube = () => {
             editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
               altText: i.blog_image_title,
               src: i.blog_image_url.startsWith("r2://") ?
-                process.env.NEXT_PUBLIC_ORIGIN + "/api/transform?src=" + i.blog_image_url.split("r2://")[1] :
+                process.env.NEXT_PUBLIC_ORIGIN + "/api/images/transform?src=" + i.blog_image_url.split("r2://")[1] :
                 i.blog_image_url,
               width: 500,
             });
