@@ -179,11 +179,11 @@ export class BlogRepository {
           lteb.fn.coalesce(lteb.selectFrom("blog_images_upload").select(({fn}) => [
             fn.count<number>("blog_images_upload.blog_image_id").as("total_blog_images")
           ]), lteb.val(0)).as("total_blog_images")
-        ]).executeTakeFirstOrThrow();
+        ]).executeTakeFirst();
 
       return {
         blog_images: images,
-        total_blog_images: totalBlogImages.total_blog_images
+        total_blog_images: totalBlogImages?.total_blog_images || 0
       }
     } catch (e) {
       log(e);
