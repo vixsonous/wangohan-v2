@@ -4,6 +4,7 @@ import UserPetsCarousel from "./components/user-pets-carousel";
 import { Metadata } from "next";
 import {getUser, isAuthenticated} from "@/server-actions/User/user";
 import AddPetsDialog from "@/app/(user)/user/[userId]/[userName]/components/add-pets-dialog";
+import PawLoading from "@/components/paw-loading";
 
 interface UserProps {
   params: Promise<{
@@ -81,6 +82,7 @@ export default async function User({
         {userData !== undefined && (
           <AddPetsDialog user_id={userData.user_id} />
         )}
+        <PawLoading />
         <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
       </section>
       <section className="w-full">

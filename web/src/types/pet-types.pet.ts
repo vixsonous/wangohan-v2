@@ -21,7 +21,9 @@ export class PetSchema {
   pet_image: z.string(),
   }).and(PetSchema.Pet);
 
-  public static PostPet = z.object({
-    pet_image: z.file("Please provide an image for your pet!")
+  public static PetFormValues = z.object({
+    pet_image: z.file("Please provide an image for your pet!"),
+    pet_existing_image: z.string().optional(),
+    pet_id: z.number().optional(),
   }).and(PetSchema.Pet);
 }
