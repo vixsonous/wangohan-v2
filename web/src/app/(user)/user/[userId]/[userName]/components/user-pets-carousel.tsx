@@ -2,28 +2,33 @@
 import Image from "@/components/Image/client";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { useEffect, useState } from "react";
+import {Dispatch, SetStateAction, useEffect, useMemo, useState} from "react";
 import z from "zod";
 import {PetSchema} from "@/types/pet-types.pet";
 import {UserSchema} from "@/types/user-types.user";
-import {format} from "date-fns";
-import {Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Button from "@/components/Button";
 import UserPetView from "@/app/(user)/user/[userId]/[userName]/components/user-pet/user-pet-view";
 
 export type PetProps = z.infer<typeof PetSchema.GetPet>;
-function Pet({pet, idx, curSlide}: {
+function Pet({pet, idx, curSlide, setCurSlide}: {
   pet: PetProps,
   idx: number,
   curSlide: number,
+  setCurSlide: Dispatch<SetStateAction<number>>
 }) {
 
   return (
     <CarouselItem className="basis-1/3 md:basis-1/3" key={idx}>
       <Dialog>
         <DialogTrigger asChild={true}>
-          <Button className={`${curSlide !== idx && 'pointer-events-none'}`}>
-            <Image src={pet.pet_image} className={`${curSlide === idx ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-50 pointer-events-none scale-50'} transition-all duration-500 w-full h-full aspect-square object-cover`} style={{clipPath: curSlide === idx ? 'circle(50% at 50% 50%)': 'circle(65% at 50% 50%)'}} alt={pet.pet_name} />
+          <Button onClick={() => setCurSlide(idx)} type={"button"} role={"button"} aria-roledescription={`pet ${pet.pet_id} button action`} className={`${curSlide !== idx && ''}`}>
+            <Image
+              src={pet.pet_image}
+              className={`${curSlide === idx ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-50 scale-70'} transition-all duration-500 w-full h-full aspect-square object-cover`}
+              style={{clipPath: curSlide === idx ? 'circle(50% at 50% 50%)': 'circle(65% at 50% 50%)'}}
+              alt={pet.pet_name}
+            />
           </Button>
         </DialogTrigger>
         <UserPetView pet={pet} user_id={pet.user_id} />
@@ -41,11 +46,17 @@ export default function UserPetsCarousel(
   }
 ) {
   const [api, setApi] = useState<CarouselApi>();
-  const [curSlide, setCurSlide] = useState(0);
+  let initialSlideIndex = useMemo(() => {
+    if(pets === undefined) return 0;
+    if(pets.length < 2) return pets.length - 1;
+    if(pets.length === 3) return 1;
+    if(pets.length > 3) return 0;
+    return 0;
+  }, [pets?.length || 0])
+  const [curSlide, setCurSlide] = useState(initialSlideIndex);
 
   useEffect(() => {
     if(!api) return;
-
     api.on("select", () => {
       setCurSlide(api.selectedScrollSnap());
     });
@@ -58,15 +69,15 @@ export default function UserPetsCarousel(
   }
 
   return (
-    <Carousel opts={{loop: true, align: 'center'}} plugins={[
+    <Carousel opts={{loop: true, watchDrag: pets.length > 3, align: 'center'}} plugins={[
           Autoplay({
-            delay: 5000
+            delay: 5000,
           })
         ]} setApi={setApi} className="max-w-md md:max-w-lg pb-8">
       <CarouselContent className={`${pets.length > 1 ? '' : 'flex justify-center'}`}>
         {pets.map((a, idx) => {
           return (
-            <Pet key={idx} pet={a} idx={idx} curSlide={curSlide} />
+            <Pet setCurSlide={setCurSlide} key={idx} pet={a} idx={idx} curSlide={curSlide} />
           )
         })}
       </CarouselContent>
