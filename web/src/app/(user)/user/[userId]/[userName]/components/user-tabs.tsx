@@ -15,8 +15,9 @@ import {Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger} fr
 import dynamic from "next/dynamic";
 import React, {useState} from "react";
 import {ScrollArea} from "@/components/ui/scroll-area";
+import Loader from "@/components/loader";
 
-const PersonalInfoForm = dynamic(() => import("@/app/(auth)/signup/personal-info/personal-info-form"), {ssr: false, loading: () => <span>Loading</span>});
+const PersonalInfoForm = dynamic(() => import("@/app/(auth)/signup/personal-info/personal-info-form"), {ssr: false, loading: () => <Loader />});
 
 interface UserTabsProps {
   liked_recipes: Array<z.infer<typeof RecipeSchema.GetBasicRecipe>> | undefined,

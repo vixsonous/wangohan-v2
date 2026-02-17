@@ -5,8 +5,9 @@ import {queryClient} from "@/lib/tanstack-query";
 import dynamic from "next/dynamic";
 import z from "zod";
 import {RecipeSchema} from "@/types/recipe-types";
+import Loader from "@/components/loader";
 
-const RecipeForm = dynamic(() => import("@/app/_root-components/root-recipe-form/root-recipe-form"), { ssr: false, loading: () => <span>Loading</span> });
+const RecipeForm = dynamic(() => import("@/app/_root-components/root-recipe-form/root-recipe-form"), { ssr: false, loading: () => <Loader /> });
 interface RecipeFormProps {
   recipe_data: z.infer<typeof RecipeSchema.UpdateRecipe>
 }

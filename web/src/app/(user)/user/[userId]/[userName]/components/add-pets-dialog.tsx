@@ -15,7 +15,8 @@ import {useRouter, useSearchParams} from "next/navigation";
 import Button from "@/components/Button";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {PetProps} from "@/app/(user)/user/[userId]/[userName]/components/user-pets-carousel";
-const AddPetForm = dynamic(() => import("./pets-form"), {ssr: false, loading: () => <span>Loading</span>})
+import Loader from "@/components/loader";
+const AddPetForm = dynamic(() => import("./pets-form"), {ssr: false, loading: () => <Loader />})
 
 export default function AddPetsDialog({user_id, pet}: {user_id: number, pet?: PetProps | undefined}) {
   const searchParams = useSearchParams();

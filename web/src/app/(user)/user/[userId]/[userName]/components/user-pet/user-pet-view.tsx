@@ -19,7 +19,9 @@ export default function UserPetView({pet, user_id}: UserPetViewProps) {
         </DialogTitle>
         <Image imgonly={true} width={300} height={122} src={"/banner/ribbon.webp"} className={"absolute bg-primary-bg rounded-lg pt-4 -top-[600%] left-1/2 -translate-x-1/2 w-[300px]"} alt="ribbon banner image"/>
       </div>
-      <EditPetDialog user_id={user_id} pet={pet}/>
+      <div className={"w-full flex justify-center items-center"}>
+        <EditPetDialog user_id={user_id} pet={pet}/>
+      </div>
       <section className={"flex flex-col md:flex-row gap-4 relative"}>
         <div className={'w-full flex justify-center items-center md:w-auto md:block'}>
           <Image height={100} width={100} src={pet.pet_image} className={`border-4 max-h-48 max-w-48 border-primary-text duration-500 w-full h-full aspect-square object-cover`} alt={pet.pet_name} />

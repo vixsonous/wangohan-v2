@@ -16,6 +16,7 @@ import z from "zod";
 import {RecipeDisplaySchema} from "@/types/recipe-types";
 import {Provider} from "react-redux";
 import {store} from "@/store/store";
+import Loader from "@/components/loader";
 
 type ShowRecipeCommentFormProps = {
   is_logged_in: boolean;
@@ -43,7 +44,7 @@ function ShowRecipeCommentForm({is_logged_in, recipe_id, recipe_name}: ShowRecip
             <Button role={"submit"} className="absolute text-white right-2 top-10" type="submit">
               {
                 commentSubmitMutation.isPending ? (
-                  <span>Loading</span>
+                  <Loader />
                 ) : (
                   <Image noprocess={true} src={"/icons/svg/primary-circle-up-arrow.svg"} className={"h-8 w-8"} alt={"circle up arrow icon for submitting comment"}/>
                 )

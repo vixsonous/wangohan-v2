@@ -14,14 +14,15 @@ import {queryClient} from "@/lib/tanstack-query";
 import Button from "@/components/Button";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {PetProps} from "@/app/(user)/user/[userId]/[userName]/components/user-pets-carousel";
-const PetForm = dynamic(() => import("../pets-form"), {ssr: false, loading: () => <span>Loading</span>})
+import Loader from "@/components/loader";
+const PetForm = dynamic(() => import("../pets-form"), {ssr: false, loading: () => <Loader />})
 
 export default function EditPetDialog({user_id, pet}: {user_id: number, pet: PetProps}) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild={true}>
-        <Button type={"button"}>
+        <Button type={"button"} className={"max-w-max"}>
           <span className="text-lg font-bold cursor-pointer hover:brightness-50 transition-all">愛犬を登録する</span>
         </Button>
       </DialogTrigger>

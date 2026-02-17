@@ -8,8 +8,9 @@ import {BlogSchema, GetBlogImagesSchema} from "@/types/blog-types";
 import {QueryClientProvider} from "@tanstack/react-query";
 import {queryClient} from "@/lib/tanstack-query";
 import {UserSchema} from "@/types/user-types.user";
+import Loader from "@/components/loader";
 
-const CreateEditor = dynamic(() => import("./editor"), {ssr: false, loading: () => <span>Loading</span>});
+const CreateEditor = dynamic(() => import("./editor"), {ssr: false, loading: () => <Loader />});
 
 type CreateEditorWrapperProps = {
   blog_images: z.infer<typeof GetBlogImagesSchema.GetBlogImages>;
