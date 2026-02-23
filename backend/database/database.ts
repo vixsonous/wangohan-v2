@@ -1,4 +1,4 @@
-import {Kysely, PostgresDialect} from 'kysely';
+import {ControlledTransaction, Kysely, PostgresDialect} from 'kysely';
 import {Pool} from 'pg';
 import dotenv from 'dotenv';
 import { Database } from './types';
@@ -12,3 +12,4 @@ const dialect = new PostgresDialect({
 });
 
 export const db = new Kysely<Database>({dialect});
+export type TransactionType = ControlledTransaction<Database, []>;
