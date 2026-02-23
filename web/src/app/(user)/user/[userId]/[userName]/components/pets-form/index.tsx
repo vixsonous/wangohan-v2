@@ -1,7 +1,7 @@
 import {Controller} from "react-hook-form";
 import Image from "@/components/Image/client";
 import InputField from "@/components/Input";
-import React from "react";
+import React, {Dispatch, SetStateAction} from "react";
 import Error from "@/components/Error";
 import {Button} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
@@ -10,7 +10,7 @@ import {ja} from "date-fns/locale";
 import {Calendar} from "@/components/ui/calendar";
 import { usePetForm} from "@/app/(user)/user/[userId]/[userName]/components/use-add-pet";
 import {formatInTimeZone} from "date-fns-tz";
-import {PetProps} from "@/app/(user)/user/[userId]/[userName]/components/user-pets-carousel";
+import {PetProps} from "@/app/(user)/user/[userId]/[userName]/components/user-pet/user-pets-carousel";
 import PetBanner from "@/app/(user)/user/[userId]/[userName]/components/pets-form/form-components/pet-banner";
 import UploadFileLoading
   from "@/app/(user)/user/[userId]/[userName]/components/pets-form/form-components/upload-file-uploading";
@@ -19,9 +19,9 @@ import PetImageInputField
   from "@/app/(user)/user/[userId]/[userName]/components/pets-form/form-components/pet-image-input-field";
 import FormField from "@/app/(user)/user/[userId]/[userName]/components/pets-form/form-components/pet-form-field";
 
-export default function PetsForm({user_id, pet}: {user_id: number, pet?: PetProps | undefined}) {
+export default function PetsForm({user_id, pet, setOpen, setPets}: {user_id: number, pet?: PetProps | undefined, setOpen: Dispatch<SetStateAction<boolean>>, setPets: Dispatch<SetStateAction<Array<PetProps>>>}) {
 
-  const {petForm, postPetOnSubmit, uploadFileMutation, postPetMutation, putPetMutation, putPetOnSubmit} = usePetForm(pet);
+  const {petForm, postPetOnSubmit, uploadFileMutation, postPetMutation, putPetMutation, putPetOnSubmit} = usePetForm({pet, setOpen, setPets});
   const errors = petForm.formState.errors;
   return (
     <form className={"pt-8"} onSubmit={petForm.handleSubmit(pet ? putPetOnSubmit : postPetOnSubmit)}>
