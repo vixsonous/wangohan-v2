@@ -13,6 +13,7 @@ import {
 import {Upload} from "@aws-sdk/lib-storage";
 import {Bucket, GetObjectCommandProcessing, s3} from "@/server/Images/image";
 import {R2_FILE_PREFIX} from "@/server/utils/constants";
+import {ImageServiceError} from "@/server/errors/error-types";
 
 export type Formats = "webp" | "png" | "jpg" | "jpeg";
 
@@ -188,8 +189,39 @@ export class ImageService {
     } else {
       await s3.send(new DeleteObjectCommand({
         Bucket,
-        Key: key
+        Key: key.startsWith(R2_FILE_PREFIX) ?  key.split(R2_FILE_PREFIX)[1] : key
       }))
     }
+  }
+
+  static async getProcessedImageBuffer({fileBuffer, width=1024, withoutEnlargement=true, fit="inside", quality=80}:{
+    fileBuffer:  Buffer<ArrayBufferLike>;
+    width?: number;
+    withoutEnlargement?: boolean;
+    fit?: keyof sharp.FitEnum;
+    quality?: number;
+  }): Promise<Buffer<ArrayBufferLike>> {
+    try {
+      const buffer: Buffer<ArrayBuffer> = Buffer.from(fileBuffer);
+
+      let image = new ImageProcess(buffer.buffer);
+
+      image = image.resize(width, undefined, {
+        withoutEnlargement,
+        fit
+      });
+
+      image = image.webp({
+        quality
+      });
+
+      return await image.result();
+    } catch (error) {
+      throw new ImageServiceError("Error processing image buffer", error);
+    }
+  }
+
+  static getFileName(file: Express.Multer.File): string {
+    return file.originalname.split(".")[0];
   }
 }
