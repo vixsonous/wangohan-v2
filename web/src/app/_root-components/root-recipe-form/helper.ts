@@ -12,6 +12,7 @@ import {RecipeDisplaySchema, RecipeSchema} from "@/types/recipe-types";
 import {FileSchema} from "@/types/file-types";
 import {ENDPOINTS} from "@/constants/endpoints";
 import {useRouter} from "next/navigation";
+import {FileUtils} from "@/lib/utils";
 
 const MAX_FILES_LENGTH = 5;
 
@@ -87,24 +88,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   }, [recipe_data]);
 
   const uploadFileMutation = useMutation({
-    mutationFn: async (file: File): Promise<File> => new Promise(async (resolve) => {
-      let retFile = file;
-      const fileExt = file.name.substring(file.name.lastIndexOf(".") + 1);
-
-      if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
-        const image = await heic2any({
-          blob: file,
-          toType: "image/webp",
-          quality: 0.8,
-
-        });
-
-        const img = !Array.isArray(image) ? [image] : image;
-        retFile = new File(img, file.name);
-      }
-
-      resolve(retFile);
-    })
+    mutationFn: async (file: File): Promise<File> => FileUtils.clientUpload(file)
   })
 
   const fileOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
