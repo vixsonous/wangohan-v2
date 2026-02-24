@@ -1,5 +1,3 @@
-import {PetProps} from "@/app/(user)/user/[userId]/[userName]/components/user-pets-carousel";
-import {usePetForm} from "@/app/(user)/user/[userId]/[userName]/components/use-add-pet";
 import InputField from "@/components/Input";
 import React from "react";
 import {FieldValues, Path, UseFormRegister} from "react-hook-form";
