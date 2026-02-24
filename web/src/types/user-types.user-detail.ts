@@ -41,3 +41,5 @@ export class UserDetailSchema {
     user_image: z.file("Please provide your profile image!").optional()
   }))
 }
+
+export type GetUserDetails = z.infer<typeof UserDetailSchema.GetUserDetails>;
