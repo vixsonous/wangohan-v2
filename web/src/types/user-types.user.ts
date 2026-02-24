@@ -18,6 +18,9 @@ export class UserSchema {
   })
 }
 
+export type User = z.infer<typeof UserSchema.User>;
+export type UserDisplay = z.infer<typeof UserSchema.UserDisplay>;
+
 export class AdminUserSchema {
   static User = z.object({
     user_id: z.number(),
@@ -26,3 +29,5 @@ export class AdminUserSchema {
     user_image: z.string()
   })
 }
+
+export type Admin = z.infer<typeof AdminUserSchema.User>;
