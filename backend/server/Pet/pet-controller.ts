@@ -37,6 +37,30 @@ export class PetController {
     ApiResponse.success(res, "Successfully posted pet!", pet);
   }
 
+  static async putPet(req: Request, res: Response) {
+    try {
+      const data = req.body;
+      const pet_id = Number(req.params.pet_id);
+      const submitData = {
+        ...data,
+        user_id: Number(data.user_id),
+        pet_birthdate: new Date(data.pet_birthdate),
+        pet_image: req.file,
+        pet_id,
+        updated_at: new Date(data.updated_at),
+        created_at: new Date(data.created_at),
+      };
+
+      const putPetResult = PetSchema.PutPet.parse(submitData);
+      const pet = await PetService.putPet(putPetResult);
+
+      ApiResponse.success(res, "Successfully updated pet!", pet);
+    } catch(error) {
+      console.error(error);
+      ApiResponse.error(res, "There was an error updating pet!");
+    }
+  }
+
   static async getBirthdayMonthPets(req: Request, res: Response) {
     const {current_month} = req.query;
     const curMonth = Number(current_month);
