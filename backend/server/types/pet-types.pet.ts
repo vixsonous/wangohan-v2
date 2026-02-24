@@ -18,4 +18,8 @@ export class PetSchema {
   public static PostPet = z.object({
     pet_image: z.custom<Express.Multer.File>()
   }).and(PetSchema.Pet);
+
+  public static PutPet = z.object({
+    pet_id: z.number()
+  }).and(PetSchema.PostPet);
 }
