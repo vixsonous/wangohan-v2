@@ -11,11 +11,12 @@ import Button from "@/components/Button";
 import UserPetView from "@/app/(user)/user/[userId]/[userName]/components/user-pet/user-pet-view";
 
 export type PetProps = z.infer<typeof PetSchema.GetPet>;
-function Pet({pet, idx, curSlide, setCurSlide}: {
+function Pet({pet, idx, curSlide, setCurSlide, setPets}: {
   pet: PetProps,
   idx: number,
   curSlide: number,
   setCurSlide: Dispatch<SetStateAction<number>>
+  setPets: Dispatch<SetStateAction<Array<PetProps>>>
 }) {
 
   return (
@@ -31,15 +32,16 @@ function Pet({pet, idx, curSlide, setCurSlide}: {
             />
           </Button>
         </DialogTrigger>
-        <UserPetView pet={pet} user_id={pet.user_id} />
+        <UserPetView pet={pet} user_id={pet.user_id} setPets={setPets}/>
       </Dialog>
     </CarouselItem>
   )
 }
 
 export default function UserPetsCarousel(
-  {pets, user_data, user_id, user_codename}: {
-    pets: Array<z.infer<typeof PetSchema.GetPet>> | undefined,
+  {pets, user_data, user_id, user_codename, setPets}: {
+    pets: Array<z.infer<typeof PetSchema.GetPet>>,
+    setPets: Dispatch<SetStateAction<Array<PetProps>>>;
     user_data: z.infer<typeof UserSchema.User> | undefined,
     user_id: number,
     user_codename: string,
@@ -72,12 +74,13 @@ export default function UserPetsCarousel(
     <Carousel opts={{loop: true, watchDrag: pets.length > 3, align: 'center'}} plugins={[
           Autoplay({
             delay: 5000,
+            stopOnInteraction: false,
           })
         ]} setApi={setApi} className="max-w-md md:max-w-lg pb-8">
       <CarouselContent className={`${pets.length > 1 ? '' : 'flex justify-center'}`}>
         {pets.map((a, idx) => {
           return (
-            <Pet setCurSlide={setCurSlide} key={idx} pet={a} idx={idx} curSlide={curSlide} />
+            <Pet setCurSlide={setCurSlide} key={idx} pet={a} idx={idx} curSlide={curSlide} setPets={setPets} />
           )
         })}
       </CarouselContent>
