@@ -1,10 +1,8 @@
 import Image from "@/components/Image/server";
 import UserTabs from "./components/user-tabs";
-import UserPetsCarousel from "./components/user-pets-carousel";
 import { Metadata } from "next";
 import {getUser, isAuthenticated} from "@/server-actions/User/user";
-import AddPetsDialog from "@/app/(user)/user/[userId]/[userName]/components/add-pets-dialog";
-import PawLoading from "@/components/paw-loading";
+import UserPets from "@/app/(user)/user/[userId]/[userName]/components/user-pet/user-pets";
 
 interface UserProps {
   params: Promise<{
@@ -79,11 +77,7 @@ export default async function User({
             うちのわん
           </h1>
         </div>
-        {userData !== undefined && (
-          <AddPetsDialog user_id={userData.user_id} />
-        )}
-        <PawLoading />
-        <UserPetsCarousel pets={user.pets} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} />
+        <UserPets userData={userData} user={user} />
       </section>
       <section className="w-full">
         <UserTabs deleted_recipes={user.deleted_recipes} total_recipes={user.total_recipes} total_deleted={user.total_deleted_recipes} total_liked={user.total_liked} user_id={Number(userId)} user_codename={user.user_codename} user_data={userData} liked_recipes={user.liked_recipes} my_recipes={user.my_recipes} />
