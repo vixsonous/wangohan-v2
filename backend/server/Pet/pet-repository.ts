@@ -1,8 +1,8 @@
-import {PetInsert} from "@/database/types";
+import {PetInsert, PetUpdate} from "@/database/types";
 import z from "zod";
 import {PetSchema} from "@/server/types/pet-types.pet";
 import {log} from "@/server/utils/log";
-import {db} from "@/database/database";
+import {db, TransactionType} from "@/database/database";
 import {ImageProcess, ImageService} from "@/server/Images/image-service";
 import {sql} from "kysely";
 
@@ -73,6 +73,25 @@ export class PetRepository {
       log(PetRepository.PET_REPOSITORY_ERROR_LOG.POST_PET_ERROR);
       return undefined;
     }
+  }
+  
+  static async updatePet(updatePet: PetUpdate, trx: TransactionType): Promise<z.infer<typeof PetSchema.GetPet>> {
+    return await trx.updateTable("pets_table")
+      .set(updatePet)
+      .where("pet_id", "=", updatePet.pet_id || -1)
+      .returning([
+        "pet_id",
+        "user_id",
+        "pet_image",
+        "pet_breed",
+        "pet_name",
+        "pet_birthdate"
+      ])
+      .executeTakeFirstOrThrow();
+  }
+
+  static async getOldPetImage(pet_id: number, trx: TransactionType) {
+    return await trx.selectFrom("pets_table").select("pet_image").where("pet_id", "=", pet_id).executeTakeFirstOrThrow();
   }
 
   static async getBirthdayMonthPets(current_month: number): Promise<Array<z.infer<typeof PetSchema.GetPet>> | undefined> {
