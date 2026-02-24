@@ -1,11 +1,11 @@
 import {ServerApiResponseService, ServerApiService} from "@/lib/server-utils";
 import z from "zod";
-import {UserSchema} from "@/types/user-types.user";
+import {User, UserSchema} from "@/types/user-types.user";
 import {log} from "@/lib/log";
-import {UserDetailSchema} from "@/types/user-types.user-detail";
+import {GetUserDetails, UserDetailSchema} from "@/types/user-types.user-detail";
 import {ENDPOINTS} from "@/constants/endpoints";
 
-export const getUser = async (user_id: number, user_codename: string): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> => {
+export const getUser = async (user_id: number, user_codename: string): Promise<GetUserDetails | undefined> => {
   try {
     const response = await ServerApiService.get(ENDPOINTS.USER + `?user_id=${user_id}&user_codename=${user_codename}`);
     return await ServerApiResponseService.getResponseData<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined>(response);
@@ -15,7 +15,7 @@ export const getUser = async (user_id: number, user_codename: string): Promise<z
   }
 }
 
-export const isAuthenticated = async (): Promise<z.infer<typeof UserSchema.User> | undefined> => {
+export const isAuthenticated = async (): Promise<User | undefined> => {
   try {
     const isAuthenticated = await ServerApiService.get(ENDPOINTS.AUTH + "/status");
     const responseJson = await ServerApiResponseService.getResponseJson<z.infer<typeof UserSchema.User> | undefined>(isAuthenticated);
