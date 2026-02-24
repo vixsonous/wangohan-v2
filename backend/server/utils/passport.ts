@@ -20,12 +20,12 @@ passport.deserializeUser(async (userParams: PassportUser, done) => {
 
   if(userParams.strategy === "google") {
     log("Logging in with google strategy");
-    user = await UserRepository.getUserByGoogleId(userParams.id);
+    user = await UserRepository.getUser({google_id: userParams.id});
   }
 
   if(userParams.strategy === "local") {
     log("Logging in with local strategy");
-    user = await UserRepository.getUserById(Number(userParams.id));
+    user = await UserRepository.getUser({user_id: Number(userParams.id)});
   }
 
   if(user === undefined) {
