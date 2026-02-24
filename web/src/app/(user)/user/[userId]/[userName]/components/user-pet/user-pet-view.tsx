@@ -1,16 +1,17 @@
 import {DialogContent, DialogDescription, DialogTitle} from "@/components/ui/dialog";
 import Image from "@/components/Image/client";
 import {format} from "date-fns";
-import {PetProps} from "@/app/(user)/user/[userId]/[userName]/components/user-pets-carousel";
-import React from "react";
+import {PetProps} from "@/app/(user)/user/[userId]/[userName]/components/user-pet/user-pets-carousel";
+import React, {Dispatch, SetStateAction} from "react";
 import EditPetDialog from "@/app/(user)/user/[userId]/[userName]/components/user-pet/edit-pet-dialog";
 
 type UserPetViewProps = {
   pet: PetProps;
   user_id: number;
+  setPets: Dispatch<SetStateAction<Array<PetProps>>>
 }
 
-export default function UserPetView({pet, user_id}: UserPetViewProps) {
+export default function UserPetView({pet, user_id, setPets}: UserPetViewProps) {
   return (
     <DialogContent>
       <div className={"relative w-full"}>
@@ -20,7 +21,7 @@ export default function UserPetView({pet, user_id}: UserPetViewProps) {
         <Image imgonly={true} width={300} height={122} src={"/banner/ribbon.webp"} className={"absolute bg-primary-bg rounded-lg pt-4 -top-[600%] left-1/2 -translate-x-1/2 w-[300px]"} alt="ribbon banner image"/>
       </div>
       <div className={"w-full flex justify-center items-center"}>
-        <EditPetDialog user_id={user_id} pet={pet}/>
+        <EditPetDialog user_id={user_id} pet={pet} setPets={setPets}/>
       </div>
       <section className={"flex flex-col md:flex-row gap-4 relative"}>
         <div className={'w-full flex justify-center items-center md:w-auto md:block'}>
