@@ -11,6 +11,7 @@ import {useRouter} from "next/navigation";
 import {AxiosError} from "axios";
 import React from "react";
 import {ENDPOINTS} from "@/constants/endpoints";
+import {FileUtils} from "@/lib/utils";
 
 export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof UserSchema.User>, setOpen?: React.Dispatch<React.SetStateAction<boolean>> | undefined) => {
 
@@ -67,24 +68,7 @@ export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof
   });
 
   const uploadFileMutation = useMutation({
-    mutationFn: async (file: File): Promise<File> => new Promise(async (resolve) => {
-      let retFile = file;
-      const fileExt = file.name.substring(file.name.lastIndexOf(".") + 1);
-
-      if(typeof window !== undefined && (fileExt.toLowerCase() === "heic" || fileExt.toLowerCase() === "heif")) {
-        const image = await heic2any({
-          blob: file,
-          toType: "image/webp",
-          quality: 0.8,
-
-        });
-
-        const img = !Array.isArray(image) ? [image] : image;
-        retFile = new File(img, file.name);
-      }
-
-      resolve(retFile);
-    })
+    mutationFn: async (file:File) => FileUtils.clientUpload(file)
   })
 
   const onSubmit = (data: FieldValues) => is_edit ? updateInfoMutation.mutate({...data}) : signupInfoMutation.mutate({...data});
