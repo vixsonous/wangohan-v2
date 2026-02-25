@@ -7,7 +7,7 @@ import {RedisStore} from 'connect-redis';
 import cors from 'cors';
 import {RecipeEvents} from "@/server/utils/recipe-events";
 
-const SESSION_MINUTES = 30;
+const SESSION_MINUTES = 60;
 
 const app = express();
 
