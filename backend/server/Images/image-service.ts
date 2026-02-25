@@ -13,7 +13,7 @@ import {
 import {Upload} from "@aws-sdk/lib-storage";
 import {Bucket, GetObjectCommandProcessing, s3} from "@/server/Images/image";
 import {R2_FILE_PREFIX} from "@/server/utils/constants";
-import {ImageServiceError} from "@/server/errors/error-types";
+import {ImageServiceError, R2Error} from "@/server/types/error-types";
 
 export type Formats = "webp" | "png" | "jpg" | "jpeg";
 
@@ -159,7 +159,7 @@ export class ImageService {
 
   }
 
-  static async uploadToR2Public(folder: string, file: Buffer, filename: string, file_extension: string, content_type: string): Promise<CompleteMultipartUploadCommandOutput> {
+  static async uploadToR2Public(folder: string, file: Buffer, filename: string, file_extension: string, content_type: string): Promise<string> {
     const upload = new Upload({
       client: s3,
       params: {
@@ -175,7 +175,11 @@ export class ImageService {
       console.log(`Upload progress ${progress.loaded} of ${progress.total}`);
     });
 
-    return await upload.done();
+    const doneUpload = await upload.done();
+    const uploadKey = doneUpload.Key;
+    if(uploadKey === undefined) throw new R2Error("Error uploading image!");
+
+    return uploadKey;
   }
 
   static async deleteR2Public(key: string | string[]) {

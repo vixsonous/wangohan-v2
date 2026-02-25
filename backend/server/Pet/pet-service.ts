@@ -3,13 +3,52 @@ import {PetSchema} from "@/server/types/pet-types.pet";
 import {PetRepository} from "@/server/Pet/pet-repository";
 import {db} from "@/database/database";
 import {ImageService} from "@/server/Images/image-service";
-import {FolderNameUtils} from "@/server/utils/string-utils";
-import {PetUpdate} from "@/database/types";
-import {ImageServiceError} from "@/server/errors/error-types";
+import {FolderNameUtils, ImageKeyUtils} from "@/server/utils/string-utils";
+import {PetInsert, PetUpdate} from "@/database/types";
+import {ImageServiceError} from "@/server/types/error-types";
 
 export class PetService {
-  static async postPet(pet: z.infer<typeof PetSchema.PostPet>) {
-    return await PetRepository.postPet(pet);
+  static async postPet(pet: z.infer<typeof PetSchema.PostPet>): Promise<z.infer<typeof PetSchema.GetPet>> {
+
+    let newPetImageKey = '';
+
+    return await db.transaction().execute(async trx => {
+      try {
+        const petInsert = {
+          pet_image: '',
+          pet_name: pet.pet_name,
+          pet_birthdate: pet.pet_birthdate,
+          pet_breed: pet.pet_breed,
+          user_id: pet.user_id,
+          updated_at: pet.updated_at || new Date(),
+          created_at: pet.created_at || new Date(),
+        } satisfies PetInsert;
+
+        const newPet = await PetRepository.postPet(petInsert, trx);
+
+        const imageBuffer = await ImageService.getProcessedImageBuffer({
+          fileBuffer: pet.pet_image.buffer,
+          quality: 80,
+          width: 1024,
+          fit: "inside"
+        });
+
+        const fileName = ImageService.getFileName(pet.pet_image);
+        const folderName = FolderNameUtils.petFolder(pet.user_id, newPet.pet_id);
+        newPetImageKey = await ImageService.uploadToR2Public(folderName, imageBuffer, fileName, "webp", "images/webp");
+
+        const petUpdate = {pet_image: ImageKeyUtils.generateR2Key(newPetImageKey), pet_id: newPet.pet_id} satisfies PetUpdate;
+
+        return await PetRepository.updatePet(petUpdate, trx);
+      } catch(error) {
+        if(newPetImageKey !== '') {
+          await ImageService.deleteR2Public(newPetImageKey);
+        }
+        throw error;
+      }
+    })
+
+
   }
 
   static async putPet(pet: z.infer<typeof PetSchema.PutPet>) {
@@ -29,41 +68,34 @@ export class PetService {
       const fileName = ImageService.getFileName(pet.pet_image);
 
       const folderName = FolderNameUtils.petFolder(pet.user_id, pet.pet_id);
-      const newPetImage = await ImageService.uploadToR2Public(folderName, imageBuffer, fileName, "webp", "images/webp");
-
-      if(newPetImage.Key === undefined) {
-        throw new ImageServiceError("Error uploading image to R2");
-      }
-
-      fileKeyToUpdate = newPetImage.Key;
+      fileKeyToUpdate = await ImageService.uploadToR2Public(folderName, imageBuffer, fileName, "webp", "images/webp");
     }
 
-    const trx = await db.startTransaction().execute();
+    return await db.transaction().execute(async trx => {
+      try {
+        const updatePetValues = {
+          ...pet,
+          pet_image: fileKeyToUpdate !== "" ? ImageKeyUtils.generateR2Key(fileKeyToUpdate) : undefined,
+          updated_at: new Date(),
+        } satisfies PetUpdate;
 
-    try {
-      const updatePetValues = {
-        ...pet,
-        pet_image: fileKeyToUpdate !== "" ? `r2://${fileKeyToUpdate}` : undefined,
-        updated_at: new Date(),
-      } satisfies PetUpdate;
+        const oldImageKey = await PetRepository.getOldPetImage(pet.pet_id, trx);
+        const updatedPet = await PetRepository.updatePet(updatePetValues, trx);
 
-      const oldImageKey = await PetRepository.getOldPetImage(pet.pet_id, trx);
-      const updatedPet = await PetRepository.updatePet(updatePetValues, trx);
-      await trx.commit().execute();
+        if(hasNewImage) {
+          await ImageService.deleteR2Public(oldImageKey.pet_image);
+        }
 
-      if(hasNewImage) {
-        console.log(oldImageKey.pet_image);
-        await ImageService.deleteR2Public(oldImageKey.pet_image);
+        return updatedPet;
+      } catch(error) {
+        if(fileKeyToUpdate !== "") {
+          await ImageService.deleteR2Public(fileKeyToUpdate);
+        }
+        throw error;
       }
+    })
 
-      return updatedPet;
-    } catch(error) {
-      if(fileKeyToUpdate !== "") {
-        await ImageService.deleteR2Public(fileKeyToUpdate);
-      }
-      await trx.rollback().execute();
-      throw error;
-    }
+
   }
 
   static async getBirthdayMonthPets(current_month: number): Promise<Array<z.infer<typeof PetSchema.GetPet>> | undefined> {

@@ -3,6 +3,11 @@ import z from "zod";
 import {log} from "@/server/utils/log";
 import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
 import {UserDetailSchema} from "@/server/types/user-types.user-detail";
+import {db} from "@/database/database";
+import {ImageService} from "@/server/Images/image-service";
+import {FolderNameUtils, ImageKeyUtils} from "@/server/utils/string-utils";
+import {UserDetailUpdate} from "@/database/types";
+import {UserDetailsRepository} from "@/server/User/user-repository";
 
 export class UserService {
   static USER_SERVICE_SUCCESS_LOGS = {
@@ -54,8 +59,44 @@ export class UserService {
   }
 
   static async updatePersonalInfo(personal_info: z.infer<typeof UserDetailSchema.UpdateUserDetails>) {
-    const updateResult = await new UpdateUserDetails(personal_info).update();
-    log(UserService.USER_SERVICE_SUCCESS_LOGS.UPDATE_USER_DETAILS_SUCCESS);
-    return updateResult;
+    return await db.transaction().execute(async trx => {
+      let new_user_image_key = '';
+      try {
+        if(personal_info.user_image) {
+          const uploadImage = await ImageService.getProcessedImageBuffer({
+            fileBuffer: personal_info.user_image.buffer,
+            quality: 80,
+            width: 1024,
+            fit: "inside"
+          });
+
+          const folder = FolderNameUtils.profileFolder(personal_info.user_id);
+          new_user_image_key = await ImageService.uploadToR2Public(folder, uploadImage, ImageService.getFileName(personal_info.user_image), "webp", "images/webp");
+        }
+
+        const updateUserDetails: UserDetailUpdate = {
+          user_codename: personal_info.user_codename,
+          user_first_name: personal_info.user_first_name,
+          user_last_name: personal_info.user_last_name,
+          user_gender: personal_info.user_gender,
+          user_occupation: personal_info.user_occupation,
+          user_agreement: personal_info.user_agreement,
+          user_birthdate: personal_info.user_birthdate,
+          updated_at: personal_info.updated_at
+        }
+
+        if(personal_info.user_image) {
+          updateUserDetails.user_image = ImageKeyUtils.generateR2Key(new_user_image_key);
+        }
+
+        return await UserDetailsRepository.updateUserDetails(updateUserDetails, trx);
+      } catch (error) {
+        if(new_user_image_key !== '') {
+          await ImageService.deleteR2Public(new_user_image_key);
+        }
+
+        throw error;
+      }
+    });
   }
 }

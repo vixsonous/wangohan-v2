@@ -1,7 +1,11 @@
 import {Request} from 'express';
 import z from "zod";
 import {UserSchema} from "@/server/types/user-types.user";
-export const getUserData = (req: Request): z.infer<typeof UserSchema.User> | undefined => {
+import {UnauthorizedError} from "@/server/types/error-types";
+export const getUserData = (req: Request): z.infer<typeof UserSchema.User> => {
+  const user = req.user;
 
-  return req.user as z.infer<typeof UserSchema.User> | undefined;
+  if(user === undefined) throw new UnauthorizedError("Unauthorized!");
+
+  return user as z.infer<typeof UserSchema.User>;
 }

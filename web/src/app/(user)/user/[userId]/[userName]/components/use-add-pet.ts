@@ -33,8 +33,12 @@ export const usePetForm = ({pet, setOpen, setPets}: {pet?: PetProps | undefined,
     mutationFn: (data: FieldValues) => ClientApiService.post(ENDPOINTS.PET, ...getRequestInfo(data)),
     onSuccess: (data) => {
       const message = ClientApiResponseService.getAxiosResponseMessage(data);
+      const postedPet: PetProps = ClientApiResponseService.getAxiosResponseData(data);
       toast.success("Successful!", {description: message});
       setOpen(false);
+      setPets(prev => {
+        return [...prev, postedPet];
+      })
     },
     onError: (error: AxiosError) => {
       const message = ClientApiResponseService.getAxiosErrorMessage(error);
@@ -66,7 +70,7 @@ export const usePetForm = ({pet, setOpen, setPets}: {pet?: PetProps | undefined,
   });
 
   const uploadFileMutation = useMutation({
-    mutationFn: async (file: File): Promise<File> => FileUtils.clientUpload(file)
+    mutationFn: async (file: File | undefined): Promise<File | null> => FileUtils.clientUpload(file)
   })
 
   const petForm = useForm({

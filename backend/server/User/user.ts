@@ -136,20 +136,4 @@ export class UpdateUserDetails extends UserDetails {
     super(user_details);
     this.user_image = user_details.user_image;
   }
-
-  async update() {
-    const userDetail: z.infer<typeof UserDetailSchema.GetUserDetails> | undefined= await UserDetailsRepository.updateUserDetails({
-      user_id: this.user_id,
-      user_codename: this.user_codename,
-      user_image: this.user_image,
-      user_first_name: this.user_first_name,
-      user_last_name: this.user_last_name,
-      user_occupation: this.user_occupation,
-      user_gender: this.user_gender,
-      user_birthdate: this.user_birthdate,
-      user_agreement: this.user_agreement,
-    });
-
-    return userDetail ? new GetUserDetails(userDetail) : userDetail;
-  }
 }

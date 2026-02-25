@@ -88,7 +88,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
   }, [recipe_data]);
 
   const uploadFileMutation = useMutation({
-    mutationFn: async (file: File): Promise<File> => FileUtils.clientUpload(file)
+    mutationFn: async (file: File | undefined): Promise<File | null> => FileUtils.clientUpload(file)
   })
 
   const fileOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +102,7 @@ export const useRecipeForm = (recipe_data?: z.infer<typeof RecipeSchema.UpdateRe
 
       const file = await uploadFileMutation.mutateAsync(targetFiles[i]);
 
+      if(file === null) return;
       temp.push({
         file: file,
         preview_url: URL.createObjectURL(file)

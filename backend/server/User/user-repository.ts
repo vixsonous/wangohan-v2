@@ -1,5 +1,5 @@
 import z from "zod";
-import { db } from "@/database/database";
+import {DatabaseTransaction, db} from "@/database/database";
 import { log } from "../utils/log";
 import { UserLevel} from "../types/user-types";
 import {UserDetailInsert, UserDetailUpdate, UserInsert} from "@/database/types";
@@ -10,7 +10,8 @@ import {ImageProcess, ImageService} from "@/server/Images/image-service";
 import {UserDetailSchema} from "@/server/types/user-types.user-detail";
 import {UserAuthenticationSchema} from "@/server/types/user-types.user-authentication";
 import {UserSchema} from "@/server/types/user-types.user";
-import {DatabaseError} from "@/server/errors/error-types";
+import {DatabaseError} from "@/server/types/error-types";
+import {FolderNameUtils, ImageKeyUtils} from "@/server/utils/string-utils";
 
 export class UserDetailsRepository {
   private static USER_DETAILS_REPOSITORY_SUCCESS_LOG = {
@@ -155,128 +156,71 @@ export class UserDetailsRepository {
     }
   }
 
-  static async postUserDetails(user_detail: z.infer<typeof UserDetailSchema.PostUserDetails>): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
-    try {
-
-      const buffer: Buffer<ArrayBuffer> = Buffer.from(user_detail.user_image.buffer);
-
-      let image = new ImageProcess(buffer.buffer);
-
-      image = image.resize(1024, undefined, {
-        withoutEnlargement: true,
-        fit: "inside"
-      });
-
-      image = image.webp({
-        quality: 80
-      });
-
-      const uploadImage = await image.result();
-      const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
-      const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, "profile_picture_" + user_detail.user_id, "webp", "images/webp");
-
-      if(uploadDone.Key === undefined) {
-        return undefined;
-      }
-
-      const newUserDetails: UserDetailInsert = {
-        ...user_detail,
-        user_image: `r2://${uploadDone.Key}`,
-        updated_at: new Date(),
-        created_at: new Date()
-      };
-
-      const userDetails: z.infer<typeof UserDetailSchema.GetUserDetails> = await db.insertInto("user_details_table")
-        .values(newUserDetails)
-        .returning([
-          "user_id",
-          "user_first_name",
-          "user_last_name",
-          "user_gender",
-          "user_occupation",
-          "user_image",
-          "user_codename",
-          "user_agreement",
-          "user_birthdate",
-        ])
-        .executeTakeFirstOrThrow();
-
-      log("Successfully posted user details data!");
-
-      return userDetails;
-
-    } catch (e) {
-      log(e);
-      return undefined;
-    }
-  }
-
-  static async updateUserDetails(user_detail: z.infer<typeof UserDetailSchema.UpdateUserDetails>): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
-    try {
-
-      let new_user_image_key = '';
-      if(user_detail.user_image) {
-        const buffer: Buffer<ArrayBuffer> = Buffer.from(user_detail.user_image.buffer);
-
-        let image = new ImageProcess(buffer.buffer);
-
-        image = image.resize(1024, undefined, {
-          withoutEnlargement: true,
+  static async postUserDetails(user_detail: z.infer<typeof UserDetailSchema.PostUserDetails>): Promise<z.infer<typeof UserDetailSchema.GetUserDetails>> {
+    return await db.transaction().execute(async trx => {
+      let imageKey = '';
+      try {
+        const uploadImage = await ImageService.getProcessedImageBuffer({
+          fileBuffer: user_detail.user_image.buffer,
+          quality: 80,
+          width: 1024,
           fit: "inside"
         });
 
-        image = image.webp({
-          quality: 80
-        });
-
-        const uploadImage = await image.result();
         const folder = `${String(user_detail.user_id).padStart(8, "0")}/profile`;
-        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, user_detail.user_image.originalname.split(".")[0], "webp", "images/webp");
+        imageKey = await ImageService.uploadToR2Public(folder, uploadImage, "profile_picture_" + user_detail.user_id, "webp", "images/webp");
 
-        if(uploadDone.Key === undefined) {
-          return undefined;
+        const newUserDetails: UserDetailInsert = {
+          ...user_detail,
+          user_image: ImageKeyUtils.generateR2Key(imageKey),
+          updated_at: new Date(),
+          created_at: new Date()
+        };
+
+        return await trx.insertInto("user_details_table")
+          .values(newUserDetails)
+          .returning([
+            "user_id",
+            "user_first_name",
+            "user_last_name",
+            "user_gender",
+            "user_occupation",
+            "user_image",
+            "user_codename",
+            "user_agreement",
+            "user_birthdate",
+          ])
+          .executeTakeFirstOrThrow();
+      } catch (error) {
+        if(imageKey !== '') {
+          await ImageService.deleteR2Public(imageKey);
         }
 
-        new_user_image_key = uploadDone.Key;
+        throw error;
       }
+    })
+  }
 
-      const updateUserDetails: UserDetailUpdate = {
-        user_codename: user_detail.user_codename,
-        user_first_name: user_detail.user_first_name,
-        user_last_name: user_detail.user_last_name,
-        user_gender: user_detail.user_gender,
-        user_occupation: user_detail.user_occupation,
-        user_agreement: user_detail.user_agreement,
-        user_birthdate: user_detail.user_birthdate,
-        updated_at: user_detail.updated_at
-      }
-
-      if(user_detail.user_image) {
-        updateUserDetails.user_image = `r2://${new_user_image_key}`
-      }
-
-      const userDetails: z.infer<typeof UserDetailSchema.GetUserDetails> = await db.updateTable("user_details_table")
-        .set(updateUserDetails)
-        .returning([
-          "user_id",
-          "user_first_name",
-          "user_last_name",
-          "user_gender",
-          "user_occupation",
-          "user_image",
-          "user_codename",
-          "user_agreement",
-          "user_birthdate",
-        ])
-        .where("user_id", "=", user_detail.user_id)
-        .executeTakeFirstOrThrow();
-
-      log("Successfully posted user details data!");
-      return userDetails;
-    } catch (e) {
-      log(e);
-      return undefined;
+  static async updateUserDetails(user_detail: UserDetailUpdate, trx: DatabaseTransaction): Promise<z.infer<typeof UserDetailSchema.GetUserDetails> | undefined> {
+    if(user_detail.user_id === undefined) {
+      throw new DatabaseError("User id not provided!");
     }
+
+    return await trx.updateTable("user_details_table")
+      .set(user_detail)
+      .returning([
+        "user_id",
+        "user_first_name",
+        "user_last_name",
+        "user_gender",
+        "user_occupation",
+        "user_image",
+        "user_codename",
+        "user_agreement",
+        "user_birthdate",
+      ])
+      .where("user_id", "=", user_detail.user_id)
+      .executeTakeFirstOrThrow();
   }
 }
 

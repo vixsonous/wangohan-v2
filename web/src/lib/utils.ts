@@ -15,8 +15,12 @@ export class DateUtils {
 }
 
 export class FileUtils {
-  static async clientUpload(file: File): Promise<File> {
+  static async clientUpload(file: File | undefined): Promise<File | null> {
     return new Promise(async (resolve) => {
+      if(file === undefined) {
+        resolve(null);
+        return;
+      }
       const heic2any = (await import("heic2any")).default;
       let retFile = file;
       const fileExt = file.name.substring(file.name.lastIndexOf(".") + 1);

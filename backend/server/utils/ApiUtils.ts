@@ -1,5 +1,6 @@
 import { Response } from "express";
 import {log} from "@/server/utils/log";
+import {ERROR_CLASS_NAMES} from "@/server/types/error-types";
 
 export interface ResponseData<T> {
   message: string;
@@ -50,6 +51,16 @@ export class ApiResponse {
     } as ResponseData<T>)
   }
   
+}
+
+export class ErrorResponseHandler {
+  static handle(error: Error, response: Response) {
+    if(error.name === ERROR_CLASS_NAMES.UNAUTHORIZED) {
+      ApiResponse.unauthorized(response, "Unauthorized!");
+    } else {
+      ApiResponse.error(response, "There was an error!");
+    }
+  }
 }
 
 export class ApiTest {

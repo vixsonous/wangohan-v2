@@ -68,7 +68,7 @@ export const usePersonalForm = (is_edit?: boolean, user_details?: z.infer<typeof
   });
 
   const uploadFileMutation = useMutation({
-    mutationFn: async (file:File) => FileUtils.clientUpload(file)
+    mutationFn: async (file:File | undefined) => FileUtils.clientUpload(file)
   })
 
   const onSubmit = (data: FieldValues) => is_edit ? updateInfoMutation.mutate({...data}) : signupInfoMutation.mutate({...data});

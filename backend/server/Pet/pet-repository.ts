@@ -2,80 +2,22 @@ import {PetInsert, PetUpdate} from "@/database/types";
 import z from "zod";
 import {PetSchema} from "@/server/types/pet-types.pet";
 import {log} from "@/server/utils/log";
-import {db, TransactionType} from "@/database/database";
-import {ImageProcess, ImageService} from "@/server/Images/image-service";
+import {DatabaseTransaction, db} from "@/database/database";
 import {sql} from "kysely";
 
 export class PetRepository {
 
-  static PET_REPOSITORY_SUCCESS_LOG = {
-    POST_PET_SUCCESS: "Successfully posted pet!"
-  }
+  static async postPet(pet: PetInsert, trx: DatabaseTransaction) {
 
-  static PET_REPOSITORY_ERROR_LOG = {
-    POST_PET_ERROR: "Failed to post pet!"
-  }
+    const getPet: z.infer<typeof PetSchema.GetPet> = await trx.insertInto("pets_table")
+      .values(pet)
+      .returningAll()
+      .executeTakeFirstOrThrow();
 
-  static async postPet(pet: z.infer<typeof PetSchema.PostPet>) {
-    try {
-      const nextPetId = await db
-        .selectFrom("pets_table")
-        .select(db.fn.max("pet_id").as("maxId"))
-        .executeTakeFirst();
-
-      if(nextPetId === undefined) {
-        return undefined;
-      }
-
-      const nextId = nextPetId.maxId + 1;
-
-      const buffer: Buffer<ArrayBuffer> = Buffer.from(pet.pet_image.buffer);
-
-      let image = new ImageProcess(buffer.buffer);
-
-      image = image.resize(1024, undefined, {
-        withoutEnlargement: true,
-        fit: "inside"
-      });
-
-      image = image.webp({
-        quality: 80
-      });
-
-      const uploadImage = await image.result();
-      const folder = `${String(pet.user_id).padStart(8, "0")}/pets/${String(nextId).padStart(8, "0")}`;
-      const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, pet.pet_image.originalname.split(".")[0], "webp", "images/webp");
-
-      if(uploadDone.Key === undefined) {
-        return undefined;
-      }
-
-      const petInsert = {
-        pet_image: `r2://${uploadDone.Key}`,
-        pet_name: pet.pet_name,
-        pet_birthdate: pet.pet_birthdate,
-        pet_breed: pet.pet_breed,
-        user_id: pet.user_id,
-        updated_at: pet.updated_at || new Date(),
-        created_at: pet.created_at || new Date(),
-      } satisfies PetInsert;
-
-      const getPet: z.infer<typeof PetSchema.GetPet> = await db.insertInto("pets_table")
-        .values(petInsert)
-        .returningAll()
-        .executeTakeFirstOrThrow();
-
-      log(PetRepository.PET_REPOSITORY_SUCCESS_LOG.POST_PET_SUCCESS);
-
-      return getPet;
-    } catch(e) {
-      log(e);
-      log(PetRepository.PET_REPOSITORY_ERROR_LOG.POST_PET_ERROR);
-      return undefined;
-    }
+    return getPet;
   }
   
-  static async updatePet(updatePet: PetUpdate, trx: TransactionType): Promise<z.infer<typeof PetSchema.GetPet>> {
+  static async updatePet(updatePet: PetUpdate, trx: DatabaseTransaction): Promise<z.infer<typeof PetSchema.GetPet>> {
     return await trx.updateTable("pets_table")
       .set(updatePet)
       .where("pet_id", "=", updatePet.pet_id || -1)
@@ -90,7 +32,7 @@ export class PetRepository {
       .executeTakeFirstOrThrow();
   }
 
-  static async getOldPetImage(pet_id: number, trx: TransactionType) {
+  static async getOldPetImage(pet_id: number, trx: DatabaseTransaction) {
     return await trx.selectFrom("pets_table").select("pet_image").where("pet_id", "=", pet_id).executeTakeFirstOrThrow();
   }
 

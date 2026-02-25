@@ -369,8 +369,8 @@ export class RecipeRepository {
         const uploadImage = await image.result();
 
         const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe_id).padStart(8, "0")}`;
-        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
-        return {key: uploadDone.Key, order: idx, filename: i.originalname};
+        const recipeImageKey = await ImageService.uploadToR2Public(folder, uploadImage, i.originalname.split(".")[0], "webp", "images/webp");
+        return {key: recipeImageKey, order: idx, filename: i.originalname};
       }));
 
       const insertImages: RecipeImageInsert[] = images.map( i => ({
@@ -464,9 +464,9 @@ export class RecipeRepository {
         const uploadImage = await imageProcess.result();
 
         const folder = `${String(recipe.user_id).padStart(8, "0")}/recipes/${String(recipe.recipe_id).padStart(8, "0")}`;
-        const uploadDone = await ImageService.uploadToR2Public(folder, uploadImage, image.originalname.split(".")[0], "webp", "images/webp");
+        const recipeImageKey = await ImageService.uploadToR2Public(folder, uploadImage, image.originalname.split(".")[0], "webp", "images/webp");
 
-        return {key: uploadDone.Key, order: 0, filename: image.originalname};
+        return {key: recipeImageKey, order: 0, filename: image.originalname};
       }));
 
       const newImages: Array<RecipeImageInsert> =[];
