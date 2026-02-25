@@ -20,7 +20,7 @@ export default async function RootFooter() {
           </div>
           <div className="col-span-6 flex flex-wrap md:grid grid-cols-3 md:col-span-4 md:col-start-8 gap-2 gap-y-2 md:gap-4 justify-between items-center self-center w-[100%]">
             <Link href="/terms" className="text-[8px] md:text-xs self-center flex">利用規約</Link>
-            <Link href="/inquiry/disclaimer" className="text-[8px] md:text-xs self-center flex">免責事項</Link>
+            <Link href="/disclaimer" className="text-[8px] md:text-xs self-center flex">免責事項</Link>
             <Link href="/inquiry/privacy-policy" className="text-[8px] md:text-xs self-center flex">プライバシーポリシー</Link>
             <Link href={user.user_id !== 0 ? `/user/${user.user_id}` : '/login'} className="text-[8px] md:text-xs self-center flex">Myページ</Link>
             <Link href="/" className="text-[8px] md:text-xs self-center flex">HOME</Link>
