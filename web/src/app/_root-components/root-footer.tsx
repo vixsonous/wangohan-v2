@@ -24,7 +24,7 @@ export default async function RootFooter() {
             <Link href="/privacy" className="text-[8px] md:text-xs self-center flex">プライバシーポリシー</Link>
             <Link href={user.user_id !== 0 ? `/user/${user.user_id}` : '/login'} className="text-[8px] md:text-xs self-center flex">Myページ</Link>
             <Link href="/" className="text-[8px] md:text-xs self-center flex">HOME</Link>
-            <Link href="/inquiry/send-inquiry" className="text-[8px] md:text-xs self-center flex">ご意見・お問い合わせ</Link>
+            <Link href="/send-inquiry" className="text-[8px] md:text-xs self-center flex">ご意見・お問い合わせ</Link>
           </div>
         </div>
         <h1 className="w-[100%] flex justify-center absolute  md:bottom-16 text-[10px] md:text-sm">@Web5Dimensional</h1>
