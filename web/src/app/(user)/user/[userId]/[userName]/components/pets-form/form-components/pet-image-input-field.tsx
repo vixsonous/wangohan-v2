@@ -3,7 +3,7 @@ import {UseMutationResult} from "@tanstack/react-query";
 import InputField from "@/components/Input";
 
 type PetImageInputFieldProps = {
-  uploadFileMutation:  UseMutationResult<File, Error, File, unknown>;
+  uploadFileMutation:  UseMutationResult<File | null, Error, File | undefined, unknown>;
   onChange: (...event: any[]) => void;
 }
 export default function PetImageInputField ({uploadFileMutation, onChange} : PetImageInputFieldProps) {
